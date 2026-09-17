@@ -1,6 +1,6 @@
-﻿import React, { useState } from 'react';
-import { Shield, Cpu, Send, CheckCircle2, AlertCircle, Lock, ArrowRight, ExternalLink } from 'lucide-react';
-import { DEFAULT_PREPROD_CONTRACT, type CircuitCallState } from '../hooks/useMidnight';
+import React, { useState } from 'react';
+import { Shield, Cpu, Send, CheckCircle2, AlertCircle, Lock, ArrowRight, ExternalLink, Copy, Check, Sparkles } from 'lucide-react';
+import { DEFAULT_PREPROD_CONTRACT, DEFAULT_PREVIEW_CONTRACT, type CircuitCallState } from '../hooks/useMidnight';
 
 interface CircuitCallProps {
   isConnected: boolean;
@@ -14,6 +14,8 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
   onCallCircuit,
 }) => {
   const [contractAddress, setContractAddress] = useState(DEFAULT_PREPROD_CONTRACT);
+  const [copiedContract, setCopiedContract] = useState(false);
+  const [copiedTx, setCopiedTx] = useState(false);
 
   const {
     isProving,
@@ -26,6 +28,22 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
   } = circuitState;
 
   const isLoading = isProving || isSubmitting;
+
+  const handleCopyContract = () => {
+    if (contractAddress) {
+      navigator.clipboard.writeText(contractAddress);
+      setCopiedContract(true);
+      setTimeout(() => setCopiedContract(false), 2000);
+    }
+  };
+
+  const handleCopyTx = () => {
+    if (txHash) {
+      navigator.clipboard.writeText(txHash);
+      setCopiedTx(true);
+      setTimeout(() => setCopiedTx(false), 2000);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,26 +66,63 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
         </div>
 
         <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 rounded-full">
-          <Lock className="w-3 h-3 text-emerald-400" /> Proved without revealing your input
+          <Lock className="w-3 h-3 text-emerald-400" /> Proved Confidential
         </span>
       </div>
 
-      {/* Target Preprod Contract */}
+      {/* Target Contract Selection & Presets */}
       <div className="space-y-2">
-        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
-          Preprod Contract Address
-        </label>
-        <div className="relative">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
+            Target Contract Address
+          </label>
+          <div className="flex items-center gap-1.5 text-[11px]">
+            <button
+              type="button"
+              onClick={() => setContractAddress(DEFAULT_PREPROD_CONTRACT)}
+              className={`px-2 py-0.5 rounded-md transition-colors ${
+                contractAddress === DEFAULT_PREPROD_CONTRACT
+                  ? 'bg-indigo-600 text-white font-medium'
+                  : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+              }`}
+            >
+              Preprod
+            </button>
+            <button
+              type="button"
+              onClick={() => setContractAddress(DEFAULT_PREVIEW_CONTRACT)}
+              className={`px-2 py-0.5 rounded-md transition-colors ${
+                contractAddress === DEFAULT_PREVIEW_CONTRACT
+                  ? 'bg-indigo-600 text-white font-medium'
+                  : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+              }`}
+            >
+              Preview
+            </button>
+          </div>
+        </div>
+
+        <div className="relative flex items-center">
           <input
             type="text"
             value={contractAddress}
             onChange={(e) => setContractAddress(e.target.value)}
             disabled={isLoading}
-            className="w-full bg-slate-950 px-3 py-2.5 rounded-xl border border-slate-800 font-mono text-xs text-slate-300 focus:outline-none focus:border-indigo-500/60 transition-colors"
+            className="w-full bg-slate-950 pl-3 pr-10 py-2.5 rounded-xl border border-slate-800 font-mono text-xs text-slate-300 focus:outline-none focus:border-indigo-500/60 transition-colors"
+            placeholder="Contract address..."
           />
+          <button
+            type="button"
+            onClick={handleCopyContract}
+            title="Copy Contract Address"
+            className="absolute right-2 p-1.5 text-slate-400 hover:text-slate-200 bg-slate-900/80 hover:bg-slate-800 rounded-lg transition-colors border border-slate-800"
+          >
+            {copiedContract ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+          </button>
         </div>
-        <p className="text-[11px] text-slate-500">
-          Target Midnight Preprod contract configured for Level 2 verification.
+        <p className="text-[11px] text-slate-500 flex items-center justify-between">
+          <span>Midnight contract target for Level 2 verification.</span>
+          {copiedContract && <span className="text-emerald-400 font-medium">Copied to clipboard!</span>}
         </p>
       </div>
 
@@ -78,7 +133,7 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
           <span>Strict Zero-Knowledge Guarantee</span>
         </div>
         <p className="text-xs text-indigo-200/80 leading-relaxed">
-          The secret increment amount is treated as an off-chain private witness (<code className="text-indigo-300">witness secretIncrement(): Uint&lt;64&gt;</code>). It is processed only inside the local zero-knowledge proof circuit. Neither this website nor the public blockchain ledger ever sees or records the private input.
+          The secret increment amount is treated as an off-chain private witness (<code className="text-indigo-300 font-mono">witness secretIncrement(): Uint&lt;64&gt;</code>). It is processed only inside the local zero-knowledge proof circuit in your browser. Neither this dApp nor the public blockchain ledger ever sees or records the private input.
         </p>
       </div>
 
@@ -101,6 +156,7 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
             </>
           ) : (
             <>
+              <Sparkles className="w-4 h-4 text-emerald-300" />
               <span>Prove &amp; Submit Increment</span>
               <ArrowRight className="w-4 h-4" />
             </>
@@ -114,7 +170,7 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
           <div className="flex items-center justify-between text-xs font-medium">
             <span className="flex items-center gap-2 text-slate-300">
               <div className="w-3.5 h-3.5 border-2 border-indigo-400/30 border-t-indigo-400 rounded-full animate-spin" />
-              {isProving ? 'Executing Compact ZK Circuit in browser...' : 'Broadcasting proof to Midnight Preprod...'}
+              {isProving ? 'Executing Compact ZK Circuit in browser...' : 'Broadcasting proof to Midnight Network...'}
             </span>
             <span className="text-indigo-400 font-mono text-[11px]">{isProving ? 'PROVING' : 'SUBMITTING'}</span>
           </div>
@@ -142,15 +198,32 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
       {/* Success & Transaction Output */}
       {success && txHash && (
         <div className="p-5 bg-emerald-950/30 border border-emerald-500/30 rounded-xl space-y-4">
-          <div className="flex items-center gap-2 text-emerald-300 font-semibold text-sm">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-            <span>Circuit Executed &amp; Verified Successfully!</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-emerald-300 font-semibold text-sm">
+              <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+              <span>Circuit Executed &amp; Verified Successfully!</span>
+            </div>
+            <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
+              CONFIRMED
+            </span>
           </div>
 
           <div className="space-y-2 bg-slate-950/70 p-3.5 rounded-lg border border-emerald-900/40">
-            <span className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block">
-              Preprod Transaction Hash
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block">
+                Transaction Hash
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleCopyTx}
+                  className="inline-flex items-center gap-1 text-[11px] text-slate-400 hover:text-slate-200 font-medium transition-colors"
+                >
+                  {copiedTx ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                  <span>{copiedTx ? 'Copied' : 'Copy'}</span>
+                </button>
+              </div>
+            </div>
             <div className="flex items-center justify-between gap-2">
               <span className="font-mono text-xs text-emerald-300 break-all select-all">
                 {txHash}
@@ -169,8 +242,8 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
             </div>
           </div>
 
-          <div className="text-center pt-1">
-            <span className="inline-flex items-center gap-1 text-xs text-emerald-400 font-medium">
+          <div className="text-center pt-1 flex items-center justify-center gap-3 text-xs">
+            <span className="inline-flex items-center gap-1 text-emerald-400 font-medium">
               <Lock className="w-3.5 h-3.5" /> Proved without revealing your input
             </span>
           </div>

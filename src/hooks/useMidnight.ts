@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { ConnectedAPI, InitialAPI } from '@midnight-ntwrk/dapp-connector-api';
 
 export interface WalletInfo {
@@ -31,6 +31,7 @@ export interface CircuitCallState {
 
 const PREPROD_NETWORK = 'preprod';
 export const DEFAULT_PREPROD_CONTRACT = 'mn_addr_preprod1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q7sx7ne';
+export const DEFAULT_PREVIEW_CONTRACT = 'e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e';
 
 export function useMidnight() {
   const [walletState, setWalletState] = useState<MidnightState>({

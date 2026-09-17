@@ -1,5 +1,5 @@
-﻿import React, { useState } from 'react';
-import { Wallet, LogOut, CheckCircle2, AlertCircle, Copy, Check, ExternalLink } from 'lucide-react';
+import React, { useState } from 'react';
+import { Wallet, LogOut, CheckCircle2, AlertCircle, Copy, Check, ExternalLink, ShieldCheck } from 'lucide-react';
 import type { WalletInfo } from '../hooks/useMidnight';
 
 interface WalletConnectProps {
@@ -27,12 +27,19 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
   onConnect,
   onDisconnect,
 }) => {
-  const [copied, setCopied] = useState(false);
+  const [copiedUnshielded, setCopiedUnshielded] = useState(false);
+  const [copiedShielded, setCopiedShielded] = useState(false);
 
-  const copyToClipboard = (text: string) => {
+  const copyUnshielded = (text: string) => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopiedUnshielded(true);
+    setTimeout(() => setCopiedUnshielded(false), 2000);
+  };
+
+  const copyShielded = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedShielded(true);
+    setTimeout(() => setCopiedShielded(false), 2000);
   };
 
   const truncateAddress = (addr: string) => {
@@ -132,20 +139,23 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
         <div className="space-y-4">
           <div className="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-3">
             <div>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">
-                Unshielded Address (Public)
-              </span>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
+                  Unshielded Address (Public)
+                </span>
+                {copiedUnshielded && <span className="text-[11px] text-emerald-400 font-medium">Copied!</span>}
+              </div>
               <div className="flex items-center justify-between gap-2 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800">
                 <span className="font-mono text-xs text-indigo-300 truncate select-all">
                   {unshieldedAddress || 'Address unavailable'}
                 </span>
                 {unshieldedAddress && (
                   <button
-                    onClick={() => copyToClipboard(unshieldedAddress)}
+                    onClick={() => copyUnshielded(unshieldedAddress)}
                     className="p-1 text-slate-400 hover:text-slate-200 transition-colors"
                     title="Copy Address"
                   >
-                    {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                    {copiedUnshielded ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                   </button>
                 )}
               </div>
@@ -153,19 +163,23 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
 
             {shieldedAddress && (
               <div>
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">
-                  Shielded Address (ZK-Protected)
-                </span>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                    Shielded Address (ZK-Protected)
+                  </span>
+                  {copiedShielded && <span className="text-[11px] text-emerald-400 font-medium">Copied!</span>}
+                </div>
                 <div className="flex items-center justify-between gap-2 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800">
                   <span className="font-mono text-xs text-emerald-300 truncate select-all">
                     {truncateAddress(shieldedAddress)}
                   </span>
                   <button
-                    onClick={() => copyToClipboard(shieldedAddress)}
+                    onClick={() => copyShielded(shieldedAddress)}
                     className="p-1 text-slate-400 hover:text-slate-200 transition-colors"
                     title="Copy Shielded Address"
                   >
-                    <Copy className="w-4 h-4" />
+                    {copiedShielded ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
