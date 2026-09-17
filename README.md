@@ -1,25 +1,41 @@
-﻿# PrivateAid Counter â€” Privacy-Preserving DApp
+# PrivateAid Counter — Privacy-Preserving DApp
 
 > A zero-knowledge decentralized counter dApp on Midnight Network with confidential state transitions and browser proof generation.
 
-## Live Demo
+## 🔗 Live Demo & Links
 
-https://privateaid-counterdapp.vercel.app/
+- 🌐 **Live DApp on Vercel**: [https://privateaid-counterdapp.vercel.app/](https://privateaid-counterdapp.vercel.app/)
+- 🎬 **Demo Video (YouTube)**: [https://www.youtube.com/watch?v=lAUVTL0EaUM](https://www.youtube.com/watch?v=lAUVTL0EaUM)
+- 📁 **Direct Video Walkthrough**: [./demo/level-2.mp4](./demo/level-2.mp4)
 
-*(Deploy via Vercel using the CLI commands detailed in the Deploying Frontend section below)*
+---
 
-## Contract Address
+## 📜 Contract Address
 
-| Network  | Address                                                              |
-|----------|----------------------------------------------------------------------|
-| Preprod  | `mn_addr_preprod1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q7sx7ne` |
-| Preview  | `e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e` |
+| Network  | Contract Address |
+|:---|:---|
+| **Preprod** | `mn_addr_preprod1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q7sx7ne` |
+| **Preview** | `e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e` |
 
-## What This Does
+---
+
+## 🎬 Demo Video
+
+[![Watch Demo Video](https://img.youtube.com/vi/lAUVTL0EaUM/hqdefault.jpg)](https://www.youtube.com/watch?v=lAUVTL0EaUM)
+
+▶️ **[Watch the Complete Level 2 Walkthrough on YouTube](https://www.youtube.com/watch?v=lAUVTL0EaUM)**
+
+*The video demonstrates connecting Midnight Lace & 1am Wallet, synthesizing client-side ZK-SNARK proofs in the browser, and verifying confidential state transitions on Midnight Preprod testnet.*
+
+---
+
+## 💡 What This Does
 
 PrivateAid Counter allows users to interact with a smart contract on the Midnight Network to increment a shared counter and advance state rounds without disclosing their secret increment values. When a user submits an increment, a zero-knowledge proof is generated locally in the browser. The smart contract verifies the proof and updates the on-chain public tally, ensuring that state transitions are valid and tamper-proof while maintaining complete input confidentiality.
 
-## Privacy Model
+---
+
+## 🔒 Privacy Model
 
 - **What is PUBLIC (on-chain, visible to everyone):**
   - `round`: The sequential index of increment transactions completed on the contract.
@@ -36,7 +52,9 @@ PrivateAid Counter allows users to interact with a smart contract on the Midnigh
   - The user proves that the state update calculation `newTotal = totalValue + secret` was computed correctly.
   - Using Compact's `disclose()`, the caller commits only the resulting state transition without leaking the secret value itself.
 
-## Privacy Claim
+---
+
+## 🛡️ Privacy Claim
 
 An on-chain observer or validator sees:
 - The transaction timestamp, public transaction hash, and gas/dust fees paid.
@@ -47,21 +65,27 @@ An on-chain observer **CANNOT** see:
 - The private witness input (`secretIncrement`) used for the calculation.
 - Any identifying metadata or secret parameters belonging to the caller.
 
-## Tech Stack
+---
+
+## 🛠️ Tech Stack
 
 - **Blockchain**: Midnight Network (Preprod & Preview Testnets)
 - **Smart Contract Language**: Compact (v0.23+ language version / compiler 0.31.1)
 - **SDK & Framework**: Midnight.js SDK (`@midnight-ntwrk/midnight-js-contracts`, `@midnight-ntwrk/dapp-connector-api`)
-- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS, Lucide Icons
+- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS, Lucide Icons, Custom Animated Canvas Background
 - **Supported Wallets**: Midnight Lace Wallet, 1am Wallet (`1am.xyz`)
 
-## Prerequisites
+---
+
+## 📋 Prerequisites
 
 - **Midnight Wallet**: Midnight Lace Wallet or [1am Wallet](https://1am.xyz) installed in your browser.
 - **Node.js**: v22.0.0 or higher (`node -v`).
 - **Network Setting**: Ensure your wallet network is set to **Midnight Preprod**.
 
-## Run Locally
+---
+
+## 🚀 Run Locally
 
 1. **Clone the repository:**
    ```bash
@@ -95,7 +119,9 @@ An on-chain observer **CANNOT** see:
    npm run build
    ```
 
-## Deploying to Vercel
+---
+
+## 🌐 Deploying to Vercel
 
 ### Option A: Deploy via Vercel CLI
 ```bash
@@ -115,9 +141,3 @@ vercel --prod
    - **Output Directory**: `dist`
    - **Install Command**: `npm install`
 4. Click **Deploy**. Vercel will automatically build and publish your SPA with single-page routing and security headers configured via `vercel.json`.
-
-## Demo Video
-
-ðŸŽ¬ **[Watch Level 2 Demo Walkthrough Video](./demo/level-2.mp4)**
-
-*A complete walkthrough demonstrating Midnight Wallet connection, zero-knowledge client-side proof generation, confidential state transitions, and on-chain Preprod verification.*
