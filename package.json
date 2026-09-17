@@ -5,12 +5,15 @@
   "description": "Midnight Builder Challenge Level 1 - Privacy-Preserving Counter",
   "scripts": {
     "compile": "compact compile contracts/counter.compact managed",
+    "typecheck": "tsc --noEmit",
     "test": "npx tsx --test tests/counter.test.ts",
+    "test:unit": "npx tsx --test tests/counter.test.ts",
     "deploy": "npx tsx src/deploy.ts",
     "network": "npx tsx src/network.ts",
     "dev": "vite",
     "build": "vite build",
-    "preview-ui": "vite preview"
+    "preview-ui": "vite preview",
+    "validate": "npm run typecheck && npm test && npm run build"
   },
   "dependencies": {
     "@midnight-ntwrk/compact-runtime": "0.16.0",

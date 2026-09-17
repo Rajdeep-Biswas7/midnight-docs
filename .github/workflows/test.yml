@@ -1,4 +1,4 @@
-name: Midnight CI
+name: Midnight CI & Verification
 
 on:
   push:
@@ -7,15 +7,27 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  test:
+  validate:
+    name: Typecheck, Test & Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node.js
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'npm'
+
       - name: Install Dependencies
         run: npm ci
-      - name: Run Tests
+
+      - name: TypeScript Typecheck
+        run: npm run typecheck
+
+      - name: Run Unit Tests
         run: npm test
+
+      - name: Verify Production Build
+        run: npm run build
