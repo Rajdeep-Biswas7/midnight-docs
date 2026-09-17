@@ -118,4 +118,6 @@ vercel --prod
 
 ## Demo Video
 
-[PLACEHOLDER — I will add the link after recording]
+🎬 **[Watch Level 2 Demo Walkthrough Video](./demo/level-2.mp4)**
+
+*A complete walkthrough demonstrating Midnight Wallet connection, zero-knowledge client-side proof generation, confidential state transitions, and on-chain Preprod verification.*
