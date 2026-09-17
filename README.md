@@ -1,4 +1,4 @@
-﻿# PrivateAid Counter — Privacy-Preserving DApp
+# PrivateAid Counter — Privacy-Preserving DApp
 
 > A zero-knowledge decentralized counter dApp on Midnight Network with confidential state transitions and browser proof generation.
 
@@ -6,7 +6,7 @@
 
 [PASTE LIVE URL AFTER DEPLOYING FRONTEND]
 
-*(Deploy via Vercel or Netlify using the CLI commands detailed in the Run Locally section below)*
+*(Deploy via Vercel using the CLI commands detailed in the Deploying Frontend section below)*
 
 ## Contract Address
 
@@ -95,25 +95,26 @@ An on-chain observer **CANNOT** see:
    npm run build
    ```
 
-## Deploying Frontend
+## Deploying to Vercel
 
-### Option A: Deploy to Vercel
+### Option A: Deploy via Vercel CLI
 ```bash
-# Install Vercel CLI (if not already installed)
+# Install Vercel CLI globally (if not already installed)
 npm install -g vercel
 
-# Deploy to production
+# Link and deploy to production
 vercel --prod
 ```
 
-### Option B: Deploy to Netlify
-```bash
-# Install Netlify CLI (if not already installed)
-npm install -g netlify-cli
-
-# Deploy to production
-netlify deploy --prod --dir=dist
-```
+### Option B: Deploy via Vercel Dashboard (Git Integration)
+1. Push your changes to GitHub repository (`Rajdeep-Biswas7/midnight-docs`).
+2. Go to [Vercel Dashboard](https://vercel.com/new) and import the repository.
+3. Configure the project:
+   - **Framework Preset**: Vite
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+   - **Install Command**: `npm install`
+4. Click **Deploy**. Vercel will automatically build and publish your SPA with single-page routing and security headers configured via `vercel.json`.
 
 ## Demo Video
 
