@@ -1,0 +1,48 @@
+// ============================================================
+// counter.compact — Midnight Builder Challenge Level 1
+// ============================================================
+//
+// PRIVACY MODEL:
+//
+// 1. PUBLIC LEDGER STATE (on-chain, visible to anyone):
+//    - round: Public counter tracking total increment rounds (Uint<64>)
+//    - totalValue: Public accumulator of total disclosed values (Uint<64>)
+//
+// 2. PRIVATE WITNESS (off-chain, private to caller, never on-chain):
+//    - secretIncrement: Private witness function retrieving secret value from caller
+//
+// 3. PROOF & DISCLOSURE:
+//    - The user proves they possess a positive secret increment (assert(secret > 0))
+//    - The circuit uses disclose() to deliberately commit the new total to the public ledger
+//    - Observers see the public round increment and the updated total, but the private witness
+//      evaluation remains confidential within the zero-knowledge proof.
+// ============================================================
+
+pragma language_version >= 0.23;
+
+import CompactStandardLibrary;
+
+// Declare private witness: returns secret increment value known only to caller
+witness secretIncrement(): Uint<64>;
+
+// Public ledger state: visible to everyone on the Midnight blockchain
+export ledger round: Uint<64>;
+export ledger totalValue: Uint<64>;
+
+// Circuit: increment counter using private witness and deliberate disclose()
+export circuit incrementWithSecret(): [] {
+    // Retrieve secret increment from off-chain private witness
+    const secret = secretIncrement();
+
+    // Verify secret is positive (enforced in ZK circuit)
+    assert(secret > (0 as Uint<64>), "secret must be positive");
+
+    // Compute new total with safe cast
+    const newTotal = (totalValue + secret) as Uint<64>;
+
+    // Disclose the resulting public total to commit it to the ledger
+    totalValue = disclose(newTotal);
+
+    // Increment public round counter
+    round = (round + (1 as Uint<64>)) as Uint<64>;
+}
