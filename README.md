@@ -1,10 +1,10 @@
-# PrivateAid Counter — Privacy-Preserving DApp
+﻿# PrivateAid Counter â€” Privacy-Preserving DApp
 
 > A zero-knowledge decentralized counter dApp on Midnight Network with confidential state transitions and browser proof generation.
 
 ## Live Demo
 
-[PASTE LIVE URL AFTER DEPLOYING FRONTEND]
+https://privateaid-counterdapp.vercel.app/
 
 *(Deploy via Vercel using the CLI commands detailed in the Deploying Frontend section below)*
 
@@ -118,6 +118,6 @@ vercel --prod
 
 ## Demo Video
 
-🎬 **[Watch Level 2 Demo Walkthrough Video](./demo/level-2.mp4)**
+ðŸŽ¬ **[Watch Level 2 Demo Walkthrough Video](./demo/level-2.mp4)**
 
 *A complete walkthrough demonstrating Midnight Wallet connection, zero-knowledge client-side proof generation, confidential state transitions, and on-chain Preprod verification.*
