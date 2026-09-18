@@ -1,4 +1,4 @@
-﻿# PrivateAid — Privacy-Preserving Humanitarian Aid DApp
+# PrivateAid — Privacy-Preserving Humanitarian Aid DApp
 
 [![CI](https://github.com/Rajdeep-Biswas7/midnight-docs/actions/workflows/ci.yml/badge.svg)](https://github.com/Rajdeep-Biswas7/midnight-docs/actions/workflows/ci.yml)
 [![Network: Midnight Preprod](https://img.shields.io/badge/Network-Midnight_Preprod-6366f1?style=flat&logo=blockchain&logoColor=white)](https://explorer.1am.xyz/contract/mn_addr_preprod1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q7sx7ne?network=preprod)
@@ -8,7 +8,13 @@
 
 > Decentralized, privacy-preserving humanitarian aid verification and confidential state management built natively on the Midnight blockchain using Compact smart contracts and client-side zero-knowledge proofs.
 
-[🚀 Live DApp](#live-demo) • [🎬 Video Walkthrough](#demo-video) • [📜 Smart Contracts](#contract-address) • [💡 Architecture](#what-this-does) • [🔒 Privacy Model](#privacy-model) • [🛡️ Privacy Claim](#privacy-claim) • [✨ Key Innovations](#key-features--innovations) • [🛠️ Tech Stack](#tech-stack) • [💻 Local Setup](#setup--run-locally) • [🧪 Test Suite](#run-tests) • [⚙️ CI/CD Pipeline](#cicd) • [📋 Product Proposal](#product-proposal) • [✅ Submission Checklist](#submission-checklist)
+<p align="center">
+  <a href="https://privateaid-counterdapp.vercel.app/" target="_blank">
+    <img src="docs/images/hero-dark.png" alt="PrivateAid DApp Preview - Confidential State Transitions" width="100%" />
+  </a>
+</p>
+
+[🚀 Live DApp](#live-demo) • [📸 Screenshots](#application-previews) • [🎬 Video Walkthrough](#demo-video) • [📜 Smart Contracts](#contract-address) • [💡 Architecture](#what-this-does) • [🔒 Privacy Model](#privacy-model) • [🛡️ Privacy Claim](#privacy-claim) • [✨ Key Innovations](#key-features--innovations) • [🛠️ Tech Stack](#tech-stack) • [💻 Local Setup](#setup--run-locally) • [🧪 Test Suite](#run-tests) • [⚙️ CI/CD Pipeline](#cicd) • [📋 Product Proposal](#product-proposal) • [✅ Submission Checklist](#submission-checklist)
 
 ---
 
@@ -16,6 +22,55 @@
 
 - 🌐 **Production Web DApp:** [https://privateaid-counterdapp.vercel.app/](https://privateaid-counterdapp.vercel.app/)
 - 🎬 **Video Walkthrough:** [https://www.youtube.com/watch?v=lAUVTL0EaUM](https://www.youtube.com/watch?v=lAUVTL0EaUM)
+- 📸 **Visual Showcase:** [Application Screenshots & Walkthrough](#application-previews)
+
+---
+
+## Demo Video
+
+🎬 **Watch the MVP Demo Walkthrough on YouTube:**
+
+[![Watch Demo Video](https://img.youtube.com/vi/lAUVTL0EaUM/hqdefault.jpg)](https://www.youtube.com/watch?v=lAUVTL0EaUM)
+
+*The video demonstrates connecting Midnight Lace & 1am Wallet, synthesizing client-side ZK-SNARK proofs in the browser, verifying confidential state transitions, and checking the green CI/CD pipeline on GitHub.*
+
+---
+
+## Application Previews
+
+### 🌌 1. Confidential State Transitions & Live On-Chain State Viewer
+Real-time polling and synchronization with the Midnight Preprod indexer displaying current ledger round, disclosed aid pool tally, and zero witness leaks. Includes full dual-theme support with dynamic canvas neural particle physics.
+
+| Dark Cyber Theme (Default) | Light Pastel Aurora Theme |
+|:---:|:---:|
+| <img src="docs/images/hero-dark.png" alt="Dark Cyber Theme" width="100%" /> | <img src="docs/images/hero-light.png" alt="Light Aurora Theme" width="100%" /> |
+
+---
+
+### 🛡️ 2. Humanitarian Verification Engine & Eligibility Simulator
+Interactive zero-knowledge threshold simulator modeling UNHCR/NGO aid qualification (`assert(income < $50,000)`). Beneficiaries prove eligibility client-side without exposing their personal financial records or identity.
+
+<p align="center">
+  <img src="docs/images/humanitarian-engine.png" alt="PrivateAid Humanitarian Verification Engine" width="100%" />
+</p>
+
+---
+
+### ⚡ 3. Interactive ZK Circuit Execution Pipeline
+Step-by-step 4-stage visualizer illustrating how off-chain private witnesses are shielded in browser memory, evaluated against Compact constraints, proved client-side with WebAssembly ZK-SNARK provers, and committed via selective disclosure to the public ledger.
+
+<p align="center">
+  <img src="docs/images/zk-pipeline.png" alt="ZK Circuit Execution Pipeline" width="100%" />
+</p>
+
+---
+
+### 💼 4. Midnight Wallet Integration & Circuit Proving
+Seamless connection to Midnight browser wallets (1AM Wallet & Midnight Lace Wallet) with dual operation modes for **Beneficiary Aid Claim** and **Confidential Donation**.
+
+<p align="center">
+  <img src="docs/images/wallet-circuit-execution.png" alt="Midnight Wallet & ZK Circuit Execution" width="100%" />
+</p>
 
 ---
 
@@ -44,16 +99,6 @@ Rules             : assert(secret > 0); disclose(totalValue + secret); round += 
 Status            : 100% On-Chain Verifiable Dual-State Machine (Zero Mocking)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
-
----
-
-## Demo Video
-
-🎬 **Watch the MVP Demo Walkthrough on YouTube:**
-
-[![Watch Demo Video](https://img.youtube.com/vi/lAUVTL0EaUM/hqdefault.jpg)](https://www.youtube.com/watch?v=lAUVTL0EaUM)
-
-*The video demonstrates connecting Midnight Lace & 1am Wallet, synthesizing client-side ZK-SNARK proofs in the browser, verifying confidential state transitions, and checking the green CI/CD pipeline on GitHub.*
 
 ---
 
