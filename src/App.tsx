@@ -1,9 +1,11 @@
-import React from 'react';
+﻿import React, { useState } from 'react';
 import { useMidnight } from './hooks/useMidnight';
 import { WalletConnect } from './components/WalletConnect';
 import { CircuitCall } from './components/CircuitCall';
 import { ProofVisualizer } from './components/ProofVisualizer';
 import { AidVerificationFeed } from './components/AidVerificationFeed';
+import { ContractStateViewer } from './components/ContractStateViewer';
+import { ContributionHistoryFeed } from './components/ContributionHistoryFeed';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import {
   ZkShieldBrandIcon,
@@ -12,15 +14,18 @@ import {
   LedgerBlockIcon,
   EnergySparkIcon,
 } from './components/CustomIcons';
-import { ExternalLink, ShieldCheck, Activity, Terminal, Lock } from 'lucide-react';
+import { ExternalLink, ShieldCheck, Activity, Terminal, Lock, Sun, Moon } from 'lucide-react';
 
 export const App: React.FC = () => {
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
   const {
     isConnected,
     isConnecting,
     walletName,
     unshieldedAddress,
     shieldedAddress,
+    balances,
     error,
     networkId,
     availableWallets,
@@ -28,17 +33,20 @@ export const App: React.FC = () => {
     disconnectWallet,
     callCircuit,
     circuitState,
+    contractState,
+    contributionHistory,
+    refreshContractState,
   } = useMidnight();
 
   return (
-    <div className="relative min-h-screen text-slate-100 flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white">
+    <div className={`relative min-h-screen ${isDarkMode ? 'text-slate-100' : 'text-slate-900 bg-slate-100'} flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white transition-colors duration-300`}>
       {/* Animated Interactive Particle & Nebula Canvas Background */}
-      <AnimatedBackground />
+      {isDarkMode && <AnimatedBackground />}
 
       {/* Foreground Container */}
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Top Header / Cyber HUD Navigation */}
-        <header className="border-b border-indigo-500/15 bg-slate-950/75 backdrop-blur-xl sticky top-0 z-50">
+        <header className={`border-b ${isDarkMode ? 'border-indigo-500/15 bg-slate-950/75' : 'border-slate-300 bg-white/80'} backdrop-blur-xl sticky top-0 z-50`}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
             {/* Brand Title & Custom Logo */}
             <div className="flex items-center gap-3">
@@ -47,36 +55,46 @@ export const App: React.FC = () => {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-display text-base sm:text-lg font-extrabold tracking-tight text-white glow-text-indigo">
+                  <span className={`font-display text-base sm:text-lg font-extrabold tracking-tight ${isDarkMode ? 'text-white glow-text-indigo' : 'text-slate-900'}`}>
                     PrivateAid
                   </span>
-                  <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 font-semibold">
-                    ZK-Counter
+                  <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 font-semibold">
+                    ZK-Humanitarian
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 hidden sm:flex items-center gap-1.5 font-sans">
+                <p className={`text-[11px] ${isDarkMode ? 'text-slate-400' : 'text-slate-500'} hidden sm:flex items-center gap-1.5 font-sans`}>
                   Zero-Knowledge Privacy DApp on Midnight Network
                 </p>
               </div>
             </div>
 
-            {/* Network & Live Status Indicators */}
+            {/* Network, Theme Toggle & Status Indicators */}
             <div className="flex items-center gap-2 sm:gap-3 text-xs">
-              <div className="px-3 py-1 rounded-full bg-slate-900/90 border border-indigo-500/30 text-slate-300 font-mono flex items-center gap-2 shadow-inner">
+              <div className={`px-3 py-1 rounded-full ${isDarkMode ? 'bg-slate-900/90 border-indigo-500/30 text-slate-300' : 'bg-slate-200 border-slate-300 text-slate-700'} border font-mono flex items-center gap-2 shadow-inner`}>
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span className="text-emerald-400 font-bold uppercase tracking-wider text-[11px]">
+                <span className="text-emerald-500 font-bold uppercase tracking-wider text-[11px]">
                   {networkId}
                 </span>
               </div>
+
+              {/* Theme Toggle (Dark / Light) */}
+              <button
+                type="button"
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className={`p-2 rounded-xl ${isDarkMode ? 'bg-slate-900/80 hover:bg-slate-800 text-slate-400 border-slate-800' : 'bg-slate-200 hover:bg-slate-300 text-slate-700 border-slate-300'} transition-all border shadow-sm`}
+                title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              >
+                {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-600" />}
+              </button>
 
               <a
                 href="https://github.com/Rajdeep-Biswas7/midnight-docs"
                 target="_blank"
                 rel="noreferrer"
-                className="p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-white transition-all border border-slate-800 hover:border-indigo-500/40 shadow-sm"
+                className={`p-2 rounded-xl ${isDarkMode ? 'bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-white border-slate-800' : 'bg-slate-200 hover:bg-slate-300 text-slate-700 hover:text-slate-900 border-slate-300'} transition-all border shadow-sm`}
                 title="GitHub Repository"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -88,27 +106,27 @@ export const App: React.FC = () => {
         </header>
 
         {/* Live Cyber Telemetry Ribbon */}
-        <div className="border-b border-indigo-500/10 bg-slate-950/40 backdrop-blur-md overflow-x-auto py-2">
-          <div className="max-w-6xl mx-auto px-4 flex items-center justify-between gap-6 text-[11px] font-mono text-slate-400 whitespace-nowrap">
+        <div className={`border-b ${isDarkMode ? 'border-indigo-500/10 bg-slate-950/40 text-slate-400' : 'border-slate-200 bg-slate-100 text-slate-600'} backdrop-blur-md overflow-x-auto py-2`}>
+          <div className="max-w-6xl mx-auto px-4 flex items-center justify-between gap-6 text-[11px] font-mono whitespace-nowrap">
             <div className="flex items-center gap-2">
               <Activity className="w-3.5 h-3.5 text-indigo-400 animate-pulse" />
               <span>ZKP ENGINE:</span>
-              <span className="text-indigo-300 font-bold">COMPACT 0.31.1</span>
+              <span className="text-indigo-400 font-bold">COMPACT 0.31.1</span>
             </div>
             <div className="flex items-center gap-2">
               <Lock className="w-3.5 h-3.5 text-emerald-400" />
               <span>OFF-CHAIN WITNESS:</span>
-              <span className="text-emerald-300 font-bold">STRICTLY CONFIDENTIAL</span>
+              <span className="text-emerald-500 font-bold">STRICTLY CONFIDENTIAL</span>
             </div>
             <div className="flex items-center gap-2">
               <Terminal className="w-3.5 h-3.5 text-cyan-400" />
               <span>PROVER:</span>
-              <span className="text-cyan-300 font-bold">BROWSER WASM</span>
+              <span className="text-cyan-500 font-bold">BROWSER WASM</span>
             </div>
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-3.5 h-3.5 text-purple-400" />
               <span>PROTOCOL:</span>
-              <span className="text-purple-300 font-bold">LEVEL 2 SPEC</span>
+              <span className="text-purple-400 font-bold">MIDNIGHT PROTOCOL</span>
             </div>
           </div>
         </div>
@@ -117,19 +135,25 @@ export const App: React.FC = () => {
         <main className="max-w-4xl mx-auto px-4 py-8 sm:py-12 w-full space-y-8 flex-1">
           {/* Hero Banner with Futuristic Glow */}
           <div className="text-center space-y-4 max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-emerald-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-mono font-medium shadow-md shadow-indigo-500/10">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-emerald-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-mono font-medium shadow-md shadow-indigo-500/10">
               <EnergySparkIcon className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Midnight Builder Challenge • Level 2 Verified</span>
+              <span>Midnight Builder Challenge • Verified Production DApp</span>
             </div>
 
-            <h1 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+            <h1 className={`font-display text-3xl sm:text-5xl font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'} leading-tight`}>
               Confidential State Transitions
             </h1>
 
-            <p className="text-sm sm:text-base text-slate-300/90 leading-relaxed font-sans max-w-xl mx-auto">
-              Synthesize zero-knowledge proofs client-side directly in your browser. Increment the contract tally without disclosing your secret witness input.
+            <p className={`text-sm sm:text-base ${isDarkMode ? 'text-slate-300/90' : 'text-slate-600'} leading-relaxed font-sans max-w-xl mx-auto`}>
+              Synthesize zero-knowledge proofs client-side directly in your browser. Verify humanitarian relief claims and increment community pools without disclosing private witness data.
             </p>
           </div>
+
+          {/* Live On-Chain Contract State Viewer */}
+          <ContractStateViewer
+            contractState={contractState}
+            onRefresh={refreshContractState}
+          />
 
           {/* Interactive Flow Stepper & Simulator */}
           <ProofVisualizer />
@@ -142,6 +166,7 @@ export const App: React.FC = () => {
               walletName={walletName}
               unshieldedAddress={unshieldedAddress}
               shieldedAddress={shieldedAddress}
+              balances={balances}
               error={error}
               networkId={networkId}
               availableWallets={availableWallets}
@@ -155,14 +180,20 @@ export const App: React.FC = () => {
               onCallCircuit={callCircuit}
             />
 
-            {/* Real-World Humanitarian Aid Verification & Preprod Claims Feed */}
+            {/* Real-World Humanitarian Aid Verification Engine */}
             <AidVerificationFeed />
+
+            {/* On-Chain Contribution & Transition Feed */}
+            <ContributionHistoryFeed
+              history={contributionHistory}
+              contractAddress={contractState.contractAddress}
+            />
           </div>
 
           {/* Privacy Architecture Explainer Card with Bespoke Icons */}
           <div className="radiant-card-wrap">
             <div className="radiant-card-content p-6 sm:p-7 space-y-4">
-              <h3 className="font-display text-base font-bold text-white flex items-center gap-2">
+              <h3 className={`font-display text-base font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'} flex items-center gap-2`}>
                 <ZkShieldBrandIcon className="w-5 h-5 text-indigo-400" />
                 <span>Zero-Knowledge Security Architecture</span>
               </h3>
@@ -203,9 +234,9 @@ export const App: React.FC = () => {
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-indigo-500/15 py-6 text-xs text-slate-500 bg-slate-950/80 backdrop-blur-md">
+        <footer className={`border-t ${isDarkMode ? 'border-indigo-500/15 bg-slate-950/80 text-slate-500' : 'border-slate-200 bg-white text-slate-600'} py-6 text-xs backdrop-blur-md`}>
           <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="font-mono text-slate-400">
+            <p className="font-mono">
               © 2026 PrivateAid • Powered by Midnight Network &amp; Compact
             </p>
             <div className="flex items-center gap-5">
@@ -213,7 +244,7 @@ export const App: React.FC = () => {
                 href="https://docs.midnight.network"
                 target="_blank"
                 rel="noreferrer"
-                className="hover:text-indigo-300 transition-colors flex items-center gap-1 font-medium"
+                className="hover:text-indigo-400 transition-colors flex items-center gap-1 font-medium"
               >
                 Docs <ExternalLink className="w-3 h-3" />
               </a>
@@ -221,7 +252,7 @@ export const App: React.FC = () => {
                 href="https://1am.xyz"
                 target="_blank"
                 rel="noreferrer"
-                className="hover:text-indigo-300 transition-colors flex items-center gap-1 font-medium"
+                className="hover:text-indigo-400 transition-colors flex items-center gap-1 font-medium"
               >
                 1am Wallet <ExternalLink className="w-3 h-3" />
               </a>

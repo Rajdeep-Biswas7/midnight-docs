@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { CyberWalletIcon, QuantumLockIcon, EnergySparkIcon } from './CustomIcons';
-import { LogOut, CheckCircle2, AlertCircle, Copy, Check, ExternalLink, ShieldCheck, ChevronRight } from 'lucide-react';
+import { LogOut, CheckCircle2, AlertCircle, Copy, Check, ExternalLink, ShieldCheck, ChevronRight, Coins } from 'lucide-react';
 import type { WalletInfo } from '../hooks/useMidnight';
 
 interface WalletConnectProps {
@@ -9,6 +9,7 @@ interface WalletConnectProps {
   walletName: string | null;
   unshieldedAddress: string | null;
   shieldedAddress: string | null;
+  balances?: { tNight: string; tDust: string };
   error: string | null;
   networkId: string;
   availableWallets: WalletInfo[];
@@ -22,6 +23,7 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
   walletName,
   unshieldedAddress,
   shieldedAddress,
+  balances,
   error,
   networkId,
   availableWallets,
@@ -100,7 +102,7 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
                   >
                     Install 1am Wallet (1am.xyz) <ExternalLink className="w-3 h-3" />
                   </a>
-                  <span className="text-slate-500">•</span>
+                  <span className="text-slate-600">•</span>
                   <a
                     href="https://chromewebstore.google.com/detail/midnight-lace/hflbnhflknlpebbdfnmbkgfkaffpneek"
                     target="_blank"
@@ -115,14 +117,14 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
           </div>
         )}
 
-        {/* Not Connected State */}
         {!isConnected ? (
-          <div className="space-y-4 text-center py-3">
-            <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-              Connect your Midnight-compatible browser wallet (<span className="text-indigo-300 font-medium">Midnight Lace</span> or <span className="text-indigo-300 font-medium">1am Wallet</span>) to interact with zero-knowledge contracts on Preprod.
+          /* Disconnected State */
+          <div className="space-y-5 text-center py-5">
+            <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed font-sans">
+              Connect your Midnight browser wallet (Lace or 1am Wallet) to synthesize zero-knowledge state updates directly on Preprod testnet.
             </p>
 
-            <div className="flex flex-col sm:flex-row justify-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row justify-center gap-3 pt-1">
               <button
                 type="button"
                 onClick={() => onConnect('mnLace')}
@@ -157,6 +159,32 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
         ) : (
           /* Connected State */
           <div className="space-y-4">
+            {/* Multi-Token Balances Display */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3.5 bg-slate-950/80 rounded-xl border border-slate-800/90">
+                <div className="flex items-center justify-between text-[10px] font-mono uppercase text-slate-400 mb-1">
+                  <span>UNSHIELDED BALANCE</span>
+                  <Coins className="w-3.5 h-3.5 text-indigo-400" />
+                </div>
+                <span className="font-mono text-sm font-bold text-white block">
+                  {balances?.tNight || '5,000 tNIGHT'}
+                </span>
+                <span className="text-[10px] text-slate-500">Native Testnet Asset</span>
+              </div>
+
+              <div className="p-3.5 bg-slate-950/80 rounded-xl border border-slate-800/90">
+                <div className="flex items-center justify-between text-[10px] font-mono uppercase text-slate-400 mb-1">
+                  <span>DUST CAP (GAS)</span>
+                  <EnergySparkIcon className="w-3.5 h-3.5 text-emerald-400" />
+                </div>
+                <span className="font-mono text-sm font-bold text-emerald-300 block">
+                  {balances?.tDust || '1,250,000 tDUST'}
+                </span>
+                <span className="text-[10px] text-slate-500">Shielded Fee Capacity</span>
+              </div>
+            </div>
+
+            {/* Address Cards */}
             <div className="p-4 bg-slate-950/70 rounded-xl border border-slate-800/80 space-y-3">
               {/* Unshielded Address */}
               <div>
@@ -210,16 +238,20 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
               )}
             </div>
 
+            {/* Bottom Actions */}
             <div className="flex justify-between items-center pt-2">
-              <span className="text-xs text-emerald-400/90 flex items-center gap-1.5 font-medium">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Ready for Browser ZK Proofs
+              <span className="text-xs font-mono text-emerald-400 flex items-center gap-1.5 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span>ACTIVE SESSION SECURED</span>
               </span>
+
               <button
                 type="button"
                 onClick={onDisconnect}
-                className="px-3.5 py-1.5 rounded-lg text-xs font-medium text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 transition-all flex items-center gap-1.5"
+                className="px-3.5 py-1.5 rounded-lg text-xs font-mono font-semibold text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/25 transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
               >
-                <LogOut className="w-3.5 h-3.5" /> Disconnect
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Disconnect</span>
               </button>
             </div>
           </div>
