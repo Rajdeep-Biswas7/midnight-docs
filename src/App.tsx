@@ -6,13 +6,12 @@ import { ProofVisualizer } from './components/ProofVisualizer';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import {
   ZkShieldBrandIcon,
-  QuantumLockIcon,
   CircuitCoreIcon,
   WitnessEyeIcon,
   LedgerBlockIcon,
   EnergySparkIcon,
 } from './components/CustomIcons';
-import { Sparkles, ExternalLink, ShieldCheck, Activity, Terminal, Lock } from 'lucide-react';
+import { ExternalLink, ShieldCheck, Activity, Terminal, Lock } from 'lucide-react';
 
 export const App: React.FC = () => {
   const {

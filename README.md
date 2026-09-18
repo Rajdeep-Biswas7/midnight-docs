@@ -1,4 +1,4 @@
-﻿# PrivateAid Counter
+# PrivateAid Counter
 [![CI](https://github.com/Rajdeep-Biswas7/midnight-docs/actions/workflows/ci.yml/badge.svg)](https://github.com/Rajdeep-Biswas7/midnight-docs/actions/workflows/ci.yml)
 
 > Decentralized, privacy-preserving state management and confidential counter built natively on the Midnight blockchain using Compact smart contracts and zero-knowledge proofs.
@@ -90,7 +90,7 @@ An on-chain observer **CANNOT SEE**:
 - **Wallets & Connectors**: 1AM Wallet (`1am.xyz`), Midnight Lace Wallet, `@midnight-ntwrk/dapp-connector-api`
 - **SDK & Protocol**: `@midnight-ntwrk/midnight-js-contracts`, `@midnight-ntwrk/wallet-sdk`
 - **Frontend dApp**: React 19, TypeScript, Vite, Tailwind CSS, Lucide Icons
-- **Deployment**: Vercel (`vercel.json`), Netlify (`netlify.toml`)
+- **Deployment**: Vercel (`vercel.json`)
 - **CI/CD**: GitHub Actions (`.github/workflows/ci.yml`)
 
 ---

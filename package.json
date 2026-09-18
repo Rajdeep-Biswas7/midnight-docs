@@ -7,7 +7,6 @@
     "compile": "compact compile contracts/counter.compact managed",
     "typecheck": "tsc --noEmit",
     "test": "npx tsx --test tests/counter.test.ts",
-    "test:unit": "npx tsx --test tests/counter.test.ts",
     "deploy": "npx tsx src/deploy.ts",
     "network": "npx tsx src/network.ts",
     "dev": "vite",

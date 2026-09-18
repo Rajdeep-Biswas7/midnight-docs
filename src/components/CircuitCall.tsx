@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ZkShieldBrandIcon, QuantumLockIcon, CircuitCoreIcon, WitnessEyeIcon, LedgerBlockIcon, EnergySparkIcon } from './CustomIcons';
-import { Cpu, Send, CheckCircle2, AlertCircle, ArrowRight, Copy, Check, Sparkles, Shield, Hash, RefreshCw } from 'lucide-react';
+import { QuantumLockIcon, CircuitCoreIcon, WitnessEyeIcon } from './CustomIcons';
+import { Cpu, Send, CheckCircle2, AlertCircle, Copy, Check, Sparkles, Hash } from 'lucide-react';
 import { DEFAULT_PREPROD_CONTRACT, DEFAULT_PREVIEW_CONTRACT, type CircuitCallState } from '../hooks/useMidnight';
 
 interface CircuitCallProps {
@@ -249,7 +249,7 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
 
             <div className="text-center pt-1 flex items-center justify-center gap-2 text-xs text-emerald-400 font-medium">
               <QuantumLockIcon className="w-4 h-4 text-emerald-400" />
-              <span>Zero knowledge was leaked to the network.</span>
+              <span>Zero knowledge was NOT leaked to the network.</span>
             </div>
           </div>
         )}

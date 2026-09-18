@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { WitnessEyeIcon, QuantumLockIcon, CircuitCoreIcon, LedgerBlockIcon, EnergySparkIcon } from './CustomIcons';
-import { EyeOff, Eye, CheckCircle2, ArrowRight } from 'lucide-react';
+import { EyeOff, Eye, CheckCircle2 } from 'lucide-react';
 
 export const ProofVisualizer: React.FC = () => {
   const [demoSecret, setDemoSecret] = useState<number>(5);

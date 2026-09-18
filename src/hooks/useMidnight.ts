@@ -154,7 +154,6 @@ export function useMidnight() {
         error: null,
       }));
     } catch (err: any) {
-      console.error('Wallet connection error:', err);
       let errorMsg = err?.message || 'Failed to connect wallet.';
       if (errorMsg.includes('User rejected') || errorMsg.includes('declined')) {
         errorMsg = 'Connection request was rejected by the user.';
@@ -218,7 +217,7 @@ export function useMidnight() {
       try {
         // Step 1: Generate confidential witness off-chain (NEVER RENDERED TO UI)
         // A cryptographically verified positive increment value
-        const offChainSecretWitness = BigInt(Math.floor(Math.random() * 5) + 1);
+        const _offChainSecretWitness = BigInt(Math.floor(Math.random() * 5) + 1);
 
         // Simulated local ZK proving step (browser proof generation)
         // In full Midnight.js client, this calls prover with compact keys
@@ -235,8 +234,7 @@ export function useMidnight() {
 
         try {
           // If wallet supports balanceUnsealedTransaction or signData
-          if (typeof connectedApi.submitTransaction === 'function') {
-            // Wallet submission pathway
+          if (typeof (connectedApi as any).submitTransaction === 'function') {
             generatedTxHash = '0x' + Array.from(crypto.getRandomValues(new Uint8Array(32)))
               .map((b) => b.toString(16).padStart(2, '0'))
               .join('');
@@ -267,7 +265,6 @@ export function useMidnight() {
           disclosedTotal: Math.floor(Math.random() * 50) + 20,
         });
       } catch (err: any) {
-        console.error('Circuit execution error:', err);
         setCircuitState({
           isProving: false,
           isSubmitting: false,
