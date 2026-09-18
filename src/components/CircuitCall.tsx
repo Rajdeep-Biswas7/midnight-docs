@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { QuantumLockIcon, CircuitCoreIcon, WitnessEyeIcon } from './CustomIcons';
-import { Cpu, Send, CheckCircle2, AlertCircle, Copy, Check, Sparkles, ArrowRight, Hash } from 'lucide-react';
+import { Cpu, Send, CheckCircle2, AlertCircle, Copy, Check, Sparkles, ArrowRight, Hash, ExternalLink, ShieldAlert, Layers } from 'lucide-react';
 import { DEFAULT_PREPROD_CONTRACT, DEFAULT_PREVIEW_CONTRACT, type CircuitCallState } from '../hooks/useMidnight';
 
 interface CircuitCallProps {
@@ -15,6 +15,7 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
   onCallCircuit,
 }) => {
   const [contractAddress, setContractAddress] = useState(DEFAULT_PREPROD_CONTRACT);
+  const [activeMode, setActiveMode] = useState<'contribution' | 'beneficiary'>('beneficiary');
   const [copiedContract, setCopiedContract] = useState(false);
   const [copiedTx, setCopiedTx] = useState(false);
 
@@ -53,6 +54,8 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
     }
   };
 
+  const isPreprod = contractAddress === DEFAULT_PREPROD_CONTRACT;
+
   return (
     <div className="radiant-card-wrap">
       <div className="radiant-card-content p-6 sm:p-7 space-y-6">
@@ -64,7 +67,7 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
             </div>
             <div>
               <h2 className="font-display text-lg font-bold text-white tracking-tight flex items-center gap-2">
-                Execute ZK Circuit
+                Execute Humanitarian ZK Circuit
               </h2>
               <p className="text-xs text-slate-400 flex items-center gap-1.5">
                 Circuit: <span className="font-mono text-emerald-400 font-semibold">incrementWithSecret()</span>
@@ -76,6 +79,50 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
             <QuantumLockIcon className="w-3.5 h-3.5 text-emerald-400" />
             ZERO LEAK
           </span>
+        </div>
+
+        {/* Action Mode Toggle (Aid Verification vs Pool Contribution) */}
+        <div className="space-y-2">
+          <label className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold block">
+            Operation Mode
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveMode('beneficiary')}
+              className={`p-3 rounded-xl border text-left transition-all ${
+                activeMode === 'beneficiary'
+                  ? 'bg-indigo-950/50 border-indigo-500/50 text-white shadow-lg shadow-indigo-500/10'
+                  : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700'
+              }`}
+            >
+              <div className="font-display font-bold text-xs flex items-center gap-1.5 text-indigo-300">
+                <ShieldAlert className="w-3.5 h-3.5 text-indigo-400" />
+                Beneficiary Aid Claim
+              </div>
+              <p className="text-[10px] text-slate-400 mt-1">
+                Prove income threshold (&lt; $50K) without disclosing personal finances.
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveMode('contribution')}
+              className={`p-3 rounded-xl border text-left transition-all ${
+                activeMode === 'contribution'
+                  ? 'bg-indigo-950/50 border-indigo-500/50 text-white shadow-lg shadow-indigo-500/10'
+                  : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700'
+              }`}
+            >
+              <div className="font-display font-bold text-xs flex items-center gap-1.5 text-emerald-300">
+                <Layers className="w-3.5 h-3.5 text-emerald-400" />
+                Confidential Donation
+              </div>
+              <p className="text-[10px] text-slate-400 mt-1">
+                Increment relief pool tally without exposing individual donation amount.
+              </p>
+            </button>
+          </div>
         </div>
 
         {/* Target Contract Address Selector */}
@@ -137,7 +184,7 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
             <span>Off-Chain Witness Privacy Guarantee</span>
           </div>
           <p className="text-xs text-slate-300/90 leading-relaxed">
-            The secret increment is an off-chain witness (<code className="text-indigo-300 font-mono">witness secretIncrement(): Uint&lt;64&gt;</code>). It is processed only inside your local browser zero-knowledge proof circuit. Neither this dApp, network relayers, nor the public blockchain ledger ever see or store the secret amount.
+            The private input is an off-chain witness (<code className="text-indigo-300 font-mono">witness secretIncrement(): Uint&lt;64&gt;</code>). It is processed strictly inside your browser's zero-knowledge prover. Neither this dApp, network relayers, nor the public blockchain ledger ever see or store your private data.
           </p>
         </div>
 
@@ -161,7 +208,11 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
             ) : (
               <>
                 <Sparkles className="w-4 h-4 text-emerald-300" />
-                <span>Prove &amp; Commit Confidential Increment</span>
+                <span>
+                  {activeMode === 'beneficiary'
+                    ? 'Prove Eligibility & Claim Relief Aid'
+                    : 'Prove & Commit Confidential Donation'}
+                </span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
@@ -214,21 +265,32 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
               </span>
             </div>
 
-            {/* Transaction Hash Box */}
-            <div className="space-y-1.5 bg-slate-950/80 p-3.5 rounded-xl border border-emerald-900/50">
+            {/* Transaction Hash Box with Direct 1AM Explorer Link */}
+            <div className="space-y-2 bg-slate-950/80 p-3.5 rounded-xl border border-emerald-900/50">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1">
                   <Hash className="w-3 h-3 text-emerald-400" />
                   Preprod Transaction Hash
                 </span>
-                <button
-                  type="button"
-                  onClick={handleCopyTx}
-                  className="inline-flex items-center gap-1 text-[11px] text-slate-300 hover:text-white font-mono bg-slate-900 px-2 py-0.5 rounded border border-slate-800 transition-colors"
-                >
-                  {copiedTx ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                  <span>{copiedTx ? 'Copied' : 'Copy'}</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={`https://explorer.1am.xyz/contract/${contractAddress}?network=${isPreprod ? 'preprod' : 'preview'}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] text-indigo-400 hover:text-indigo-300 font-mono transition-colors"
+                  >
+                    <span>1AM Explorer</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                  <button
+                    type="button"
+                    onClick={handleCopyTx}
+                    className="inline-flex items-center gap-1 text-[11px] text-slate-300 hover:text-white font-mono bg-slate-900 px-2 py-0.5 rounded border border-slate-800 transition-colors"
+                  >
+                    {copiedTx ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    <span>{copiedTx ? 'Copied' : 'Copy'}</span>
+                  </button>
+                </div>
               </div>
               <div className="font-mono text-xs text-emerald-300 break-all select-all">
                 {txHash}
@@ -242,7 +304,9 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
                 <span className="text-base font-bold text-white font-mono">#{disclosedRound}</span>
               </div>
               <div className="p-3.5 bg-slate-950/70 rounded-xl border border-slate-800 text-center">
-                <span className="text-[10px] font-mono uppercase text-slate-400 block mb-1">New Public Total</span>
+                <span className="text-[10px] font-mono uppercase text-slate-400 block mb-1">
+                  {activeMode === 'beneficiary' ? 'Total Claims Verified' : 'New Public Total'}
+                </span>
                 <span className="text-base font-bold text-emerald-300 font-mono">{disclosedTotal}</span>
               </div>
             </div>

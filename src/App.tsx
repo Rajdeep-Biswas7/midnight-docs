@@ -3,6 +3,7 @@ import { useMidnight } from './hooks/useMidnight';
 import { WalletConnect } from './components/WalletConnect';
 import { CircuitCall } from './components/CircuitCall';
 import { ProofVisualizer } from './components/ProofVisualizer';
+import { AidVerificationFeed } from './components/AidVerificationFeed';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import {
   ZkShieldBrandIcon,
@@ -153,6 +154,9 @@ export const App: React.FC = () => {
               circuitState={circuitState}
               onCallCircuit={callCircuit}
             />
+
+            {/* Real-World Humanitarian Aid Verification & Preprod Claims Feed */}
+            <AidVerificationFeed />
           </div>
 
           {/* Privacy Architecture Explainer Card with Bespoke Icons */}
