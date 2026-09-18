@@ -223,13 +223,17 @@ Run the test suite covering circuit logic, sequential state transitions, and zer
 npm test
 ```
 
+<p align="center">
+  <img src="docs/images/test-pass.png" alt="Midnight Counter Compact Contract Tests - 100% Pass" width="100%" />
+</p>
+
 **Passing Test Output:**
 ```text
 ▶ Midnight Counter Compact Contract Tests
-  ✔ 1. Circuit Logic: executes successfully and validates assert preconditions (22.92ms)
-  ✔ 2. State Transitions: initializes correctly and transitions ledger state sequentially (13.38ms)
-  ✔ 3. Privacy Model: private witness inputs are never exposed on the public ledger (6.87ms)
-✔ Midnight Counter Compact Contract Tests (43.92ms)
+  ✔ 1. Circuit Logic: executes successfully and validates assert preconditions (22.45ms)
+  ✔ 2. State Transitions: initializes correctly and transitions ledger state sequentially (12.92ms)
+  ✔ 3. Privacy Model: private witness inputs are never exposed on the public ledger (6.56ms)
+✔ Midnight Counter Compact Contract Tests (42.59ms)
 ℹ tests 3
 ℹ suites 1
 ℹ pass 3
