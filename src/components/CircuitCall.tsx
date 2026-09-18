@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { QuantumLockIcon, CircuitCoreIcon, WitnessEyeIcon } from './CustomIcons';
-import { Cpu, Send, CheckCircle2, AlertCircle, Copy, Check, Sparkles, Hash } from 'lucide-react';
+import { Cpu, Send, CheckCircle2, AlertCircle, Copy, Check, Sparkles, ArrowRight, Hash } from 'lucide-react';
 import { DEFAULT_PREPROD_CONTRACT, DEFAULT_PREVIEW_CONTRACT, type CircuitCallState } from '../hooks/useMidnight';
 
 interface CircuitCallProps {
