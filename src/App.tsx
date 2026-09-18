@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useMidnight } from './hooks/useMidnight';
 import { WalletConnect } from './components/WalletConnect';
 import { CircuitCall } from './components/CircuitCall';
@@ -39,9 +39,9 @@ export const App: React.FC = () => {
   } = useMidnight();
 
   return (
-    <div className={`relative min-h-screen ${isDarkMode ? 'text-slate-100' : 'text-slate-900 bg-slate-100'} flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white transition-colors duration-300`}>
-      {/* Animated Interactive Particle & Nebula Canvas Background */}
-      {isDarkMode && <AnimatedBackground />}
+    <div className={`relative min-h-screen ${isDarkMode ? 'text-slate-100' : 'light-theme text-slate-900 bg-slate-50'} flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white transition-colors duration-300`}>
+      {/* Animated Interactive Particle & Nebula Canvas Background (Adaptive Dark & Light Themes) */}
+      <AnimatedBackground isDarkMode={isDarkMode} />
 
       {/* Foreground Container */}
       <div className="relative z-10 flex flex-col min-h-screen">

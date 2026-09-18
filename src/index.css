@@ -111,3 +111,62 @@ body {
   stroke-dasharray: 10 5;
   animation: traceFlow 6s linear infinite;
 }
+
+/* ============================================================
+   Light Theme Enhancements
+   ============================================================ */
+.light-theme {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.light-theme .radiant-card-wrap {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.4) 0%, rgba(139, 92, 246, 0.25) 50%, rgba(16, 185, 129, 0.4) 100%);
+  box-shadow: 0 16px 40px -10px rgba(99, 102, 241, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.light-theme .radiant-card-content {
+  background: rgba(255, 255, 255, 0.92);
+  color: #0f172a;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.light-theme .text-white {
+  color: #0f172a !important;
+}
+
+.light-theme .text-slate-200 {
+  color: #1e293b !important;
+}
+
+.light-theme .text-slate-300 {
+  color: #334155 !important;
+}
+
+.light-theme .text-slate-400 {
+  color: #64748b !important;
+}
+
+.light-theme .bg-slate-950,
+.light-theme .bg-slate-950\/90,
+.light-theme .bg-slate-950\/80,
+.light-theme .bg-slate-950\/70,
+.light-theme .bg-slate-950\/60,
+.light-theme .bg-slate-950\/50,
+.light-theme .bg-slate-950\/40 {
+  background-color: rgba(248, 250, 252, 0.85) !important;
+}
+
+.light-theme .bg-slate-900,
+.light-theme .bg-slate-900\/90,
+.light-theme .bg-slate-900\/80,
+.light-theme .bg-slate-900\/70,
+.light-theme .bg-slate-900\/60 {
+  background-color: #ffffff !important;
+}
+
+.light-theme .border-slate-800,
+.light-theme .border-slate-800\/80,
+.light-theme .border-slate-800\/90 {
+  border-color: rgba(203, 213, 225, 0.7) !important;
+}
