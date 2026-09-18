@@ -1,0 +1,38 @@
+﻿name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Node.js v22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: npm install
+        run: npm install
+
+      - name: compact compile
+        run: |
+          if command -v compact &> /dev/null; then
+            npm run compile
+          else
+            echo "Using pre-compiled Compact contract artifacts in managed/"
+            test -f managed/contract/index.js
+          fi
+
+      - name: Run test suite
+        run: npm test
+
+      - name: Build frontend
+        run: npm run build

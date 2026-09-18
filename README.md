@@ -1,8 +1,7 @@
-﻿# PrivateAid
+﻿# PrivateAid Counter
+[![CI](https://github.com/Rajdeep-Biswas7/midnight-docs/actions/workflows/ci.yml/badge.svg)](https://github.com/Rajdeep-Biswas7/midnight-docs/actions/workflows/ci.yml)
 
-Decentralized, privacy-preserving, and mathematically provably confidential state management built natively on the Midnight blockchain using Compact smart contracts and zero-knowledge proofs.
-
-[Live Demo](#live-demo) • [Demo Video](#demo-video) • [Contract Address](#contract-address) • [What This Product Does](#what-this-product-does) • [Privacy Model](#privacy-model) • [Privacy Claim](#privacy-claim) • [Tech Stack](#tech-stack) • [Prerequisites](#prerequisites) • [Setup & Run Locally](#setup--run-locally) • [Run Tests](#run-tests) • [CI/CD](#cicd) • [Usage Guide](#usage-guide) • [Submission Checklist](#submission-checklist)
+> Decentralized, privacy-preserving state management and confidential counter built natively on the Midnight blockchain using Compact smart contracts and zero-knowledge proofs.
 
 ---
 
@@ -12,22 +11,12 @@ Decentralized, privacy-preserving, and mathematically provably confidential stat
 
 ---
 
-## Demo Video
-
-🎬 **Watch the MVP Demo Walkthrough:** [https://www.youtube.com/watch?v=lAUVTL0EaUM](https://www.youtube.com/watch?v=lAUVTL0EaUM)
-
-[![Watch Demo Video](https://img.youtube.com/vi/lAUVTL0EaUM/hqdefault.jpg)](https://www.youtube.com/watch?v=lAUVTL0EaUM)
-
----
-
 ## Contract Address
 
-### 🌟 Latest Deployed Contracts (September 2026)
-
-| Network | Contract Address | Deployment TX / Block | Explorer | Status |
-| :--- | :--- | :--- | :--- | :--- |
-| **Preprod** | `mn_addr_preprod1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q7sx7ne` | Extrinsic 0xa427c7... (Block #2427315) | [View on 1AM Preprod Explorer ↗](https://explorer.1am.xyz/contract/mn_addr_preprod1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q7sx7ne?network=preprod) | 🟢 LIVE & ACTIVE |
-| **Preview** | `e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e` | Extrinsic 0xbc23aa... (Block #742760) | [View on 1AM Preview Explorer ↗](https://explorer.1am.xyz/contract/e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e?network=preview) | 🟢 LIVE & ACTIVE |
+| Network  | Address | Explorer | Status |
+|:---|:---|:---|:---|
+| **Preprod** | `mn_addr_preprod1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q7sx7ne` | [View on 1AM Preprod Explorer ↗](https://explorer.1am.xyz/contract/mn_addr_preprod1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q7sx7ne?network=preprod) | 🟢 LIVE & ACTIVE |
+| **Preview** | `e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e` | [View on 1AM Preview Explorer ↗](https://explorer.1am.xyz/contract/e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e?network=preview) | 🟢 LIVE & ACTIVE |
 
 ```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -38,7 +27,6 @@ Managed Bindings  : ./managed/contract/index.js
 [Latest Deployments - September 2026]
 Preprod Contract  : mn_addr_preprod1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q7sx7ne
 Preview Contract  : e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e
-Deployed At       : 2026-09-17 (Preprod: Block #2427315 | Preview: Block #742760)
 Active Circuits   : incrementWithSecret
 State Variables   : round (Uint<64>), totalValue (Uint<64>)
 Witness Input     : secretIncrement (Uint<64>, private to caller)
@@ -49,35 +37,35 @@ Status            : 100% On-Chain Verifiable Dual-State Machine (Zero Mocking)
 
 ---
 
-## What This Product Does
+## What This Does
 
-Traditional on-chain counters, donation pools, and tally mechanisms force participants to expose their individual contributions, increments, and voting weights publicly on transparent ledgers. This transparency enables front-running, copycat behaviors, and participant surveillance. In aid distribution, public exposure can compromise the privacy and safety of donors and beneficiaries alike.
+Traditional on-chain counters, tallies, and contribution pools force users to expose individual values publicly on transparent ledgers, enabling surveillance, front-running, and data exploitation.
 
-**PrivateAid** solves these issues by leveraging **Midnight Network's dual-state architecture** and **Compact zero-knowledge smart contracts**:
-- Participants contribute increments or state transitions in complete privacy.
-- Off-chain private witnesses (`secretIncrement`) and local browser ZK-SNARK proving ensure that neither operators, miners, nor blockchain observers can observe the caller's private values before, during, or after execution.
-- The smart contract mathematically verifies through arithmetic circuits that the secret input satisfies all domain rules (e.g. strictly positive, non-overflowing) and computes the updated total value without disclosing the witness itself.
-- Selective disclosure via Compact's `disclose()` commits only the verified state update to the shared public ledger.
+**PrivateAid Counter** leverages **Midnight Network's dual-state architecture** and **Compact zero-knowledge smart contracts**:
+- Users interact with the smart contract to increment a shared counter and advance state rounds without revealing their private input amount.
+- An off-chain private witness (`secretIncrement`) is supplied locally by the caller.
+- Client-side ZK arithmetic circuits generate a zero-knowledge proof in the browser verifying that the input satisfies contract preconditions (such as being strictly positive).
+- Selective disclosure via Compact's `disclose()` commits only the verified state update to the shared public ledger without disclosing the secret witness itself.
 
 ---
 
 ## Privacy Model
 
-### What is PUBLIC (on-chain, anyone can see):
-- Current public execution round (`round: Uint<64>`).
-- Cumulative public disclosed tally (`totalValue: Uint<64>`).
-- Public contract address, verification keys, and zero-knowledge circuit schemas.
-- Transaction timestamp, public transaction hash, and fees paid in tDUST.
+- **PUBLIC (on-chain, anyone can see):**
+  - `round`: The sequential index of increment transactions completed on the contract (`round: Uint<64>`).
+  - `totalValue`: The current cumulative disclosed total committed to the public ledger (`totalValue: Uint<64>`).
+  - Contract bytecode, verification keys, and zero-knowledge circuit schemas.
+  - Transaction hash, block height, timestamp, and gas/dust fees paid.
 
-### What is PRIVATE (private witness, never on-chain):
-- The caller's actual increment value (`secretIncrement(): Uint<64>`).
-- The caller's off-chain private witness state and execution trace.
-- Intermediate arithmetic circuit wire evaluations during proof generation.
+- **PRIVATE (private witness, never on-chain):**
+  - `secretIncrement`: The off-chain witness value provided by the caller (`witness secretIncrement(): Uint<64>`).
+  - The caller's local private state and client execution inputs.
+  - Intermediate arithmetic circuit wire evaluations during zero-knowledge proof synthesis.
 
-### What the user PROVES without revealing:
-- **Valid Input**: The caller proves that their confidential increment is strictly positive (`assert(secret > 0)`).
-- **Correct State Transition**: The caller proves that `newTotal == totalValue + secret` without exposing `secret`.
-- **Selective Disclosure**: The caller commits the resulting total to the ledger using `disclose()`, keeping the contribution amount completely confidential.
+- **PROVED without revealing:**
+  - **Valid Input**: The caller proves their secret increment is strictly positive (`assert(secret > 0)`).
+  - **Correct State Transition**: The caller proves that `newTotal == totalValue + secret` without disclosing the `secret` value.
+  - **Selective Disclosure**: The caller commits the resulting total to the ledger using `disclose()`, keeping the contribution amount completely confidential.
 
 ---
 
@@ -103,7 +91,7 @@ An on-chain observer **CANNOT SEE**:
 - **SDK & Protocol**: `@midnight-ntwrk/midnight-js-contracts`, `@midnight-ntwrk/wallet-sdk`
 - **Frontend dApp**: React 19, TypeScript, Vite, Tailwind CSS, Lucide Icons
 - **Deployment**: Vercel (`vercel.json`), Netlify (`netlify.toml`)
-- **CI/CD**: GitHub Actions (`.github/workflows/test.yml`)
+- **CI/CD**: GitHub Actions (`.github/workflows/ci.yml`)
 
 ---
 
@@ -112,7 +100,7 @@ An on-chain observer **CANNOT SEE**:
 - **Node.js**: `v20.x` or `v22.x` LTS (`node -v` >= 22.0.0)
 - **Docker Desktop**: Required to run the local Midnight ZK Proof Server container
 - **Compact Compiler**: Compact CLI (`compact 0.5.2` / compiler `0.31.1`)
-- **Midnight Wallet**: 1AM Wallet (Chrome/Brave Extension from `1am.xyz`) or Midnight Lace Wallet with Preprod / Preview testnet tokens
+- **Midnight Wallet**: 1AM Wallet (Chrome/Brave Extension from `1am.xyz`) or Midnight Lace Wallet with Preprod testnet tokens
 
 ---
 
@@ -156,7 +144,7 @@ npm run build
 
 ## Run Tests
 
-Run the comprehensive unit test suite covering circuit logic, state transitions, and zero-knowledge privacy guarantees:
+Run the unit test suite covering circuit logic, state transitions, and zero-knowledge privacy guarantees:
 
 ```bash
 npm test
@@ -165,10 +153,10 @@ npm test
 **Test Execution Output:**
 ```text
 ▶ Midnight Counter Compact Contract Tests
-  ✔ 1. Circuit Logic: executes successfully and validates assert preconditions (24.56ms)
-  ✔ 2. State Transitions: initializes correctly and transitions ledger state sequentially (13.05ms)
-  ✔ 3. Privacy Model: private witness inputs are never exposed on the public ledger (6.68ms)
-✔ Midnight Counter Compact Contract Tests
+  ✔ 1. Circuit Logic: executes successfully and validates assert preconditions (25.60ms)
+  ✔ 2. State Transitions: initializes correctly and transitions ledger state sequentially (13.96ms)
+  ✔ 3. Privacy Model: private witness inputs are never exposed on the public ledger (7.12ms)
+✔ Midnight Counter Compact Contract Tests (47.55ms)
 ℹ tests 3
 ℹ suites 1
 ℹ pass 3
@@ -179,29 +167,38 @@ npm test
 
 ## CI/CD
 
-Continuous Integration is configured via GitHub Actions in [`.github/workflows/test.yml`](.github/workflows/test.yml). On every push and pull request to `main`, the workflow automatically:
-- Checks out code and provisions Node.js v22 environment.
-- Installs dependencies using clean `npm ci`.
-- Executes contract compilation and the full unit test suite.
-- Builds production web assets to verify bundling.
+Continuous Integration is configured via GitHub Actions in [`.github/workflows/ci.yml`](.github/workflows/ci.yml). On every push and pull request to `main`, the workflow automatically:
+1. Checks out repository code.
+2. Sets up Node.js v22.
+3. Installs dependencies via clean `npm install`.
+4. Executes Compact contract compilation (or validates `managed/` bindings).
+5. Runs the full test suite (`npm test`).
+6. Builds the production frontend bundle (`npm run build`) to ensure zero packaging or type errors.
 
 ---
 
-## Usage Guide
+## Product Proposal
 
-1. **Open DApp:** Navigate to [https://privateaid-counterdapp.vercel.app/](https://privateaid-counterdapp.vercel.app/).
-2. **Connect Wallet:** Click **"Connect Lace / 1am Wallet"** and approve the connection popup.
-3. **Verify Network:** Ensure your wallet is connected to **Midnight Preprod** (or Preview).
-4. **Call Circuit:** Click **"Prove & Submit Increment"**.
-5. **Local ZK Proving:** Watch the client-side ZK prover generate a zero-knowledge proof in real time.
-6. **Confirmation:** The transaction is sealed, fees are balanced, and the updated `round` and `totalValue` appear on-chain. Notice the confirmation badge: **"Proved without revealing your input"**.
+See [PROPOSAL.md](PROPOSAL.md) for the complete product proposal scoping the production dApp for Midnight Mainnet.
+
+---
+
+## Demo Video
+
+🎬 **Watch the MVP Demo Walkthrough:** [https://www.youtube.com/watch?v=lAUVTL0EaUM](https://www.youtube.com/watch?v=lAUVTL0EaUM)
+
+[![Watch Demo Video](https://img.youtube.com/vi/lAUVTL0EaUM/hqdefault.jpg)](https://www.youtube.com/watch?v=lAUVTL0EaUM)
 
 ---
 
 ## Submission Checklist
 
-- [✓] **Public GitHub Repository:** Complete open-source repository with full documentation, architecture diagrams, and comprehensive setup instructions ([https://github.com/Rajdeep-Biswas7/midnight-docs](https://github.com/Rajdeep-Biswas7/midnight-docs)).
-- [✓] **Live Demo Link + Contract Address:** Deployed DApp on Vercel ([https://privateaid-counterdapp.vercel.app/](https://privateaid-counterdapp.vercel.app/)) with live verified contracts on Midnight Preprod (`mn_addr_preprod1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q7sx7ne`) and Midnight Preview (`e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e`).
-- [✓] **CI/CD Pipeline:** GitHub Actions workflow ([`.github/workflows/test.yml`](.github/workflows/test.yml)) with automated test and build verification.
-- [✓] **Demo Video of the MVP:** [Watch PrivateAid MVP Demo Video on YouTube](https://www.youtube.com/watch?v=lAUVTL0EaUM).
-- [✓] **Meaningful Commits:** 15+ meaningful commits across contract development, test suites, cryptographic circuits, and frontend UI.
+- [✓] **3+ tests passing**: Comprehensive test suite covering circuit logic, state transitions, and privacy model (`npm test`).
+- [✓] **CI/CD pipeline running on push**: GitHub Actions workflow at `.github/workflows/ci.yml` verifying test and build.
+- [✓] **CI badge in README.md**: Embedded workflow badge pointing to GitHub Actions.
+- [✓] **Contract address in README.md (MANDATORY)**: Preprod contract `mn_addr_preprod1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q7sx7ne`.
+- [✓] **Privacy Model section in README.md**: Clear breakdown of PUBLIC, PRIVATE, and PROVED elements.
+- [✓] **PROPOSAL.md created with correct structure**: Structured proposal file ready for user inputs.
+- [✓] **dApp builds with zero errors**: Verified via `npm run build`.
+- [✓] **File structure matches spec**: Strict compliance with Level 3 file tree.
+- [✓] **15+ Meaningful Commits**: Semantic commit history across development lifecycle.
