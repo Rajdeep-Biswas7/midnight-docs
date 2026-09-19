@@ -22,7 +22,10 @@ jobs:
       - name: npm install
         run: npm install
 
-      - name: compact compile
+      - name: TypeScript Typecheck
+        run: npm run typecheck
+
+      - name: compact compile check
         run: |
           if command -v compact &> /dev/null; then
             npm run compile
