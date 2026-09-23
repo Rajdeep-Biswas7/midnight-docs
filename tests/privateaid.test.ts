@@ -135,4 +135,18 @@ describe('PrivateAid Compact Smart Contract Tests (Level 4)', () => {
     assert.strictEqual(publicLedger.round, 1n);
     assert.strictEqual(publicLedger.totalValue, 888888n);
   });
+
+  it('4. Address & Network Validation: verifies 32-byte hex and network display names', async () => {
+    const { validateContractAddress, isValidBech32Address, getNetworkDisplayName } = await import('../src/utils/contract.js');
+
+    const validHex = '02c01991a0f8bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e89a3f21';
+    assert.strictEqual(validateContractAddress(validHex), true, 'Valid 32-byte hex address should pass validation');
+    assert.strictEqual(validateContractAddress('invalid-hex-len'), false, 'Short hex address should fail');
+
+    const validBech32 = 'mn_addr_preprod1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q7sx7ne';
+    assert.strictEqual(isValidBech32Address(validBech32, 'preprod'), true, 'Preprod Bech32 address should pass validation');
+
+    assert.strictEqual(getNetworkDisplayName('preprod'), 'Midnight Preprod Testnet');
+  });
 });
+
