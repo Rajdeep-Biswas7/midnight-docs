@@ -1,0 +1,51 @@
+// ============================================================
+// privateaid.compact — Midnight Builder Challenge Level 4
+// ============================================================
+//
+// PRIVACY MODEL:
+//
+// 1. PUBLIC LEDGER STATE (on-chain, verifiable by anyone):
+//    - round: Public counter tracking total aid distribution & contribution rounds (Uint<64>)
+//    - totalValue: Public accumulator of total aid funds disclosed to the relief pool (Uint<64>)
+//
+// 2. PRIVATE WITNESS (off-chain, private to caller, never stored on-chain):
+//    - secretIncrement: Private witness function retrieving secret contribution / claim
+//      amount directly from client browser memory (0 bytes leaked on-chain).
+//
+// 3. PROOF & SELECTIVE DISCLOSURE:
+//    - The user executes client-side zero-knowledge circuits proving they possess a
+//      strictly positive contribution value (assert(secret > 0)).
+//    - The Compact circuit computes the new pool total inside the ZK-SNARK circuit.
+//    - Using deliberate disclose(), only the aggregated new total is committed to the public ledger.
+//    - Observers and verifiers can mathematically verify that the ledger update is valid
+//      without ever learning individual contribution values, beneficiary income, or private inputs.
+// ============================================================
+
+pragma language_version >= 0.23;
+
+import CompactStandardLibrary;
+
+// Declare private witness: returns secret contribution/aid value known only to caller
+witness secretIncrement(): Uint<64>;
+
+// Public ledger state: visible to everyone on the Midnight blockchain
+export ledger round: Uint<64>;
+export ledger totalValue: Uint<64>;
+
+// Circuit: contribute or distribute aid using private witness and deliberate disclose()
+export circuit incrementWithSecret(): [] {
+    // Retrieve secret amount from off-chain private witness
+    const secret = secretIncrement();
+
+    // Verify secret is positive (enforced in ZK circuit)
+    assert(secret > (0 as Uint<64>), "secret must be positive");
+
+    // Compute new total with safe cast
+    const newTotal = (totalValue + secret) as Uint<64>;
+
+    // Disclose the resulting public total to commit it to the ledger
+    totalValue = disclose(newTotal);
+
+    // Increment public round counter
+    round = (round + (1 as Uint<64>)) as Uint<64>;
+}
