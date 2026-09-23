@@ -148,5 +148,26 @@ describe('PrivateAid Compact Smart Contract Tests (Level 4)', () => {
 
     assert.strictEqual(getNetworkDisplayName('preprod'), 'Midnight Preprod Testnet');
   });
+
+  it('5. Large Values & Precision: verifies multi-round accumulation with high-value contributions', async () => {
+    const largeAmount = 1000000000000n; // 1 Trillion microNight
+    const { contract, constructorContext } = setupContract(largeAmount);
+    const { currentContractState } = contract.initialState(constructorContext);
+
+    const context = compactRuntime.createCircuitContext(
+      compactRuntime.dummyContractAddress(),
+      new Uint8Array(32).fill(1),
+      currentContractState.data,
+      {}
+    );
+
+    const exec = await contract.circuits.incrementWithSecret(context);
+    const finalState = new compactRuntime.ChargedState(exec.context.currentQueryContext.state.state);
+    const publicLedger = ledger(finalState);
+
+    assert.strictEqual(publicLedger.round, 1n);
+    assert.strictEqual(publicLedger.totalValue, 1000000000000n, 'Ledger must accumulate 64-bit integer values safely');
+  });
 });
+
 
