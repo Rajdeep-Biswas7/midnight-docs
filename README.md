@@ -252,6 +252,18 @@ Continuous Integration is configured via GitHub Actions in [`.github/workflows/c
 
 ---
 
+## Usage Guide
+
+See [docs/USAGE.md](docs/USAGE.md) for a comprehensive, non-technical walkthrough covering prerequisites, wallet connection, zero-knowledge qualification proofs, confidential donor contributions, and troubleshooting.
+
+---
+
+## Product X Profile
+
+[https://x.com/PrivateAidZK](https://x.com/PrivateAidZK) *(Official product profile for PrivateAid on X/Twitter)*
+
+---
+
 ## Submission Checklist
 
 - [✓] **Public GitHub Repository:** Complete open-source repository with full documentation, architecture diagrams, and comprehensive setup instructions ([https://github.com/Rajdeep-Biswas7/midnight-docs](https://github.com/Rajdeep-Biswas7/midnight-docs)).
