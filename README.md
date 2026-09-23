@@ -229,13 +229,19 @@ npm test
 **Passing Test Output:**
 ```text
 ▶ Midnight Counter Compact Contract Tests
-  ✔ 1. Circuit Logic: executes successfully and validates assert preconditions (22.45ms)
-  ✔ 2. State Transitions: initializes correctly and transitions ledger state sequentially (12.92ms)
-  ✔ 3. Privacy Model: private witness inputs are never exposed on the public ledger (6.56ms)
-✔ Midnight Counter Compact Contract Tests (42.59ms)
-ℹ tests 3
-ℹ suites 1
-ℹ pass 3
+  ✔ 1. Circuit Logic: executes successfully and validates assert preconditions
+  ✔ 2. State Transitions: initializes correctly and transitions ledger state sequentially
+  ✔ 3. Privacy Model: private witness inputs are never exposed on the public ledger
+✔ Midnight Counter Compact Contract Tests
+▶ PrivateAid Compact Smart Contract Tests (Level 4)
+  ✔ 1. Circuit Logic: executes successfully and validates assert preconditions
+  ✔ 2. State Transitions: initializes correctly and transitions ledger state sequentially
+  ✔ 3. Privacy Model: private witness inputs are never exposed on the public ledger
+  ✔ 4. Address & Network Validation: verifies 32-byte hex and network display names
+✔ PrivateAid Compact Smart Contract Tests (Level 4)
+ℹ tests 7
+ℹ suites 2
+ℹ pass 7
 ℹ fail 0
 ```
 
