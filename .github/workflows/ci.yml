@@ -1,4 +1,4 @@
-﻿name: CI
+name: CI
 
 on:
   push:
@@ -24,6 +24,11 @@ jobs:
 
       - name: TypeScript Typecheck
         run: npm run typecheck
+
+      - name: Verify contract sources
+        run: |
+          test -f contracts/counter.compact
+          test -f contracts/privateaid.compact
 
       - name: compact compile check
         run: |
