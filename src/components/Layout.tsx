@@ -53,6 +53,7 @@ export const Layout: React.FC<LayoutProps> = ({
               }`}>
                 <button
                   onClick={() => switchNetwork('preprod')}
+                  aria-label="Switch to Preprod Network"
                   className={`px-2.5 py-1 rounded-md font-mono transition-all ${
                     activeNetwork === 'preprod' ? 'bg-[#FFD400] text-black font-bold' : 'text-zinc-400'
                   }`}
@@ -61,6 +62,7 @@ export const Layout: React.FC<LayoutProps> = ({
                 </button>
                 <button
                   onClick={() => switchNetwork('preview')}
+                  aria-label="Switch to Preview Network"
                   className={`px-2.5 py-1 rounded-md font-mono transition-all ${
                     activeNetwork === 'preview' ? 'bg-[#FFD400] text-black font-bold' : 'text-zinc-400'
                   }`}
@@ -73,6 +75,7 @@ export const Layout: React.FC<LayoutProps> = ({
             {setIsDarkMode && (
               <button
                 onClick={() => setIsDarkMode(!isDarkMode)}
+                aria-label="Toggle Dark and Light Mode"
                 className={`p-2 rounded-lg border transition-colors ${
                   isDarkMode ? 'bg-zinc-900 border-zinc-800 text-amber-400' : 'bg-zinc-100 border-zinc-200 text-zinc-700'
                 }`}
