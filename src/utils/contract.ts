@@ -58,3 +58,15 @@ export const isValidBech32Address = (address: string, network: SupportedNetwork 
   const prefix = network === 'preview' ? 'mn_addr_preview1' : 'mn_addr_preprod1';
   return address.startsWith(prefix);
 };
+
+export const getNetworkDisplayName = (network: SupportedNetwork): string => {
+  switch (network) {
+    case 'preprod':
+      return 'Midnight Preprod Testnet';
+    case 'preview':
+      return 'Midnight Preview Testnet';
+    default:
+      return 'Local Undeployed Environment';
+  }
+};
+
