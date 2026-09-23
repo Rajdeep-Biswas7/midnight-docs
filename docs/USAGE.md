@@ -83,3 +83,7 @@ Follow these simple steps to use PrivateAid:
 
 ### 4. "Circuit assertion failed"
 - **Solution:** The contract enforces that aid amounts must be positive numbers (`assert(secret > 0)`). Make sure your contribution amount is greater than 0.
+
+### 5. "Transaction stays pending"
+- **Solution:** Block finalization on Midnight Preprod takes approximately 10-15 seconds. You can click on the extrinsic hash to monitor progress on the 1AM Preprod Explorer.
+
