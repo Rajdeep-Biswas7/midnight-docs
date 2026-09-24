@@ -8,7 +8,7 @@
 [![DApp Connector: CAIP--372](https://img.shields.io/badge/DApp_Connector-CAIP--372_v4-yellow?style=flat)](https://1am.xyz)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-> Decentralized, privacy-preserving humanitarian aid verification and confidential state management built natively on the Midnight blockchain using Compact smart contracts, client-side zero-knowledge proofs, and official 1AM Wallet CAIP-372 DApp Connector.
+> Decentralized, privacy-preserving humanitarian aid verification and confidential state management built natively on the Midnight blockchain using Compact smart contracts, client-side zero-knowledge proofs, and official 1AM Wallet CAIP-372 DApp Connector. Prepod adress of Users 
 
 <p align="center">
   <a href="https://privateaid-counterdapp.vercel.app/" target="_blank">
