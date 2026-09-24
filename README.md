@@ -24,7 +24,7 @@
 
 - 🌐 **Production Web DApp:** [https://privateaid-counterdapp.vercel.app/](https://privateaid-counterdapp.vercel.app/)
 - 🎬 **Video Walkthrough:** [https://www.youtube.com/watch?v=lAUVTL0EaUM](https://www.youtube.com/watch?v=lAUVTL0EaUM)
-- 📸 **Visual Showcase:** [Application Screenshots & Walkthrough](#application-previews)
+- **Visual Showcase:** [Application Screenshots & Walkthrough](#application-previews)
 
 ---
 
