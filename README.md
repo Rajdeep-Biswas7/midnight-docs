@@ -1,17 +1,17 @@
-# PrivateAid — Privacy-Preserving Humanitarian Aid DApp
+﻿# PrivateAid — Privacy-Preserving Humanitarian Aid DApp
 
 [![CI](https://github.com/Rajdeep-Biswas7/midnight-docs/actions/workflows/ci.yml/badge.svg)](https://github.com/Rajdeep-Biswas7/midnight-docs/actions/workflows/ci.yml)
 [![Network: Midnight Preprod](https://img.shields.io/badge/Network-Midnight_Preprod-6366f1?style=flat&logo=blockchain&logoColor=white)](https://explorer.1am.xyz/contract/02c01991a0f8bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e89a3f21?network=preprod)
 [![Network: Midnight Preview](https://img.shields.io/badge/Network-Midnight_Preview-8b5cf6?style=flat&logo=blockchain&logoColor=white)](https://explorer.1am.xyz/contract/e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e?network=preview)
 [![Live DApp: Vercel](https://img.shields.io/badge/Deployment-Vercel_Live-10b981?style=flat&logo=vercel&logoColor=white)](https://privateaid-counterdapp.vercel.app/)
 [![Smart Contract: Compact](https://img.shields.io/badge/Language-Compact_0.31.1-purple?style=flat)](https://docs.midnight.network)
-[![DApp Connector: CAIP--372](https://img.shields.io/badge/DApp_Connector-CAIP--372_v4-yellow?style=flat)](https://1am.xyz)
+[![DApp Connector: CAIP-372](https://img.shields.io/badge/DApp_Connector-CAIP--372_v4-yellow?style=flat)](https://1am.xyz)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-> Decentralized, privacy-preserving humanitarian aid verification and confidential state management built natively on the Midnight blockchain using Compact smart contracts, client-side zero-knowledge proofs, and official 1AM Wallet CAIP-372 DApp Connector. Prepod adress of Users 
+> PrivateAid is a decentralized, privacy-preserving humanitarian aid application built on the Midnight blockchain. It combines Compact smart contracts, client-side zero-knowledge proofs, and the official 1AM Wallet CAIP-372 connector to verify aid eligibility and confidential contributions without exposing sensitive user data.
 
 <p align="center">
-  <a href="https://privateaid-counterdapp.vercel.app/" target="_blank">
+  <a href="https://privateaid-counterdapp.vercel.app/" target="_blank" rel="noreferrer">
     <img src="docs/images/hero-dark.png" alt="PrivateAid DApp Preview - Confidential State Transitions" width="100%" />
   </a>
 </p>
@@ -24,15 +24,16 @@
 
 - 🌐 **Production Web DApp:** [https://privateaid-counterdapp.vercel.app/](https://privateaid-counterdapp.vercel.app/)
 - 🎬 **Video Walkthrough:** [https://www.youtube.com/watch?v=lAUVTL0EaUM](https://www.youtube.com/watch?v=lAUVTL0EaUM)
-- **Visual Showcase:** [Application Screenshots & Walkthrough](#application-previews)
+- 📸 **Visual Showcase:** [Application screenshots and walkthrough](#application-previews)
 
 ---
 
 ## Smart Contract Addresses & Deployments
 
 > [!IMPORTANT]
-> **Contract Address vs Operator Wallet Address:**
-> Midnight smart contracts are identified on-chain by **32-byte hexadecimal strings** (64 hex characters), whereas user and operator accounts use **Bech32 addresses** (`mn_addr_preprod1...` / `mn_addr_preview1...`). Both are documented below for complete transparency.
+> **Contract addresses vs. operator wallet addresses**
+>
+> Midnight smart contracts are identified by on-chain 32-byte hexadecimal identifiers (64 hex characters), while user and operator accounts use Bech32 addresses such as `mn_addr_preprod1...` and `mn_addr_preview1...`.
 
 ### 🌟 Verified Deployed Compact Smart Contracts
 
@@ -52,7 +53,7 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 PrivateAid — Compact Smart Contracts on Midnight Testnet
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Contract Source   : ./contracts/counter.compact
+Contract Source   : ./contracts/privateaid.compact
 Managed Bindings  : ./managed/contract/index.js
 Preprod Contract  : 02c01991a0f8bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e89a3f21
 Preview Contract  : e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e
@@ -68,38 +69,38 @@ Telemetry Sync    : Direct Midnight GraphQL Indexer v4 (Zero Simulation Mocks)
 
 ## 1AM Wallet & DApp Connector Integration
 
-PrivateAid features genuine, production-grade integration with the **Midnight DApp Connector API** (`@midnight-ntwrk/dapp-connector-api`) implementing the **CAIP-372** specification:
+PrivateAid uses the official **Midnight DApp Connector API** (`@midnight-ntwrk/dapp-connector-api`) with the **CAIP-372** standard for secure wallet connections and network-aware contract interactions.
 
-1. **Multi-Wallet Discovery (`window.midnight`)**:
-   - Dynamically inspects `window.midnight` for registered providers (`1am`, `mnLace`).
-   - Supports 1AM Wallet extension (`1am.xyz`) and Midnight Lace Wallet.
-2. **Official CAIP-372 Authorization Flow**:
-   - Invokes `wallet.enable()` to establish a cryptographically secured connection.
+1. **Multi-Wallet Discovery (`window.midnight`)**
+   - Detects registered providers such as `1am` and `mnLace`.
+   - Supports the 1AM Wallet extension and Midnight Lace Wallet.
+2. **Official CAIP-372 Authorization Flow**
+   - Calls `wallet.enable()` to establish a secure connection.
    - Queries `api.getUnshieldedAddress()` and `api.getShieldedAddresses()`.
-   - Retrieves real-time token balances via `api.getDustBalance()` and `api.getUnshieldedBalances()`.
-3. **Dynamic Network Id Switching**:
-   - Calls `setNetworkId('preprod')` / `setNetworkId('preview')` via `@midnight-ntwrk/midnight-js-network-id`.
-   - Synchronizes network identifiers across all contract calls and indexer requests.
-4. **Live Midnight Indexer Telemetry**:
-   - Polls `https://indexer.preprod.midnight.network/api/v4/graphql` and `https://indexer.preview.midnight.network/api/v4/graphql` directly for consensus block height (`block { height hash timestamp }`).
-   - Eliminates all fake `Math.random()` simulation hashes in favor of genuine Midnight blockchain state.
+   - Reads live balances via `api.getDustBalance()` and `api.getUnshieldedBalances()`.
+3. **Dynamic Network ID Switching**
+   - Uses `setNetworkId('preprod')` and `setNetworkId('preview')` from `@midnight-ntwrk/midnight-js-network-id`.
+   - Keeps network configuration synchronized across contract calls and indexer requests.
+4. **Live Midnight Indexer Telemetry**
+   - Polls the Preprod and Preview GraphQL endpoints for consensus block height values (`block { height hash timestamp }`).
+   - Avoids fake `Math.random()`-based simulation hashes and relies on real Midnight blockchain state.
 
 ---
 
 ## Demo Video
 
-🎬 **Watch the MVP Demo Walkthrough on YouTube:**
+🎬 **Watch the MVP walkthrough on YouTube:**
 
 [![Watch Demo Video](https://img.youtube.com/vi/lAUVTL0EaUM/hqdefault.jpg)](https://www.youtube.com/watch?v=lAUVTL0EaUM)
 
-*The video demonstrates connecting Midnight 1AM Wallet, synthesizing client-side ZK-SNARK proofs in the browser, verifying confidential state transitions, and checking the green CI/CD pipeline on GitHub.*
+*The video demonstrates wallet connection, browser-side ZK proof generation, confidential state transitions, and the successful GitHub CI/CD pipeline.*
 
 ---
 
 ## Application Previews
 
 ### 🌌 1. Confidential State Machine & Dual-Theme UI
-Built with a sleek Cyphra-inspired minimalist aesthetic. Features obsidian dark mode and crystal-clear high-contrast light mode, dynamic interactive neural particle physics, live consensus block height, and network toggle.
+A sleek, cyber-inspired interface with dark and light themes, animated background particles, live consensus block height, and network toggles for a polished user experience.
 
 | Dark Cyber Theme (Default) | High-Contrast Light Theme |
 |:---:|:---:|
@@ -108,7 +109,7 @@ Built with a sleek Cyphra-inspired minimalist aesthetic. Features obsidian dark 
 ---
 
 ### 🛡️ 2. Humanitarian Verification Engine & Eligibility Simulator
-Interactive zero-knowledge threshold simulator modeling UNHCR/NGO aid qualification (`assert(income < $50,000)`). Beneficiaries prove eligibility client-side without exposing their personal financial records or identity.
+Interactive zero-knowledge threshold logic models aid qualification rules such as `assert(income < $50,000)`, allowing beneficiaries to prove eligibility without revealing sensitive financial data.
 
 <p align="center">
   <img src="docs/images/humanitarian-engine.png" alt="PrivateAid Humanitarian Verification Engine" width="100%" />
@@ -117,7 +118,7 @@ Interactive zero-knowledge threshold simulator modeling UNHCR/NGO aid qualificat
 ---
 
 ### ⚡ 3. Interactive ZK Circuit Execution Pipeline
-Step-by-step visualizer illustrating how off-chain private witnesses are shielded in browser memory, evaluated against Compact constraints, proved client-side with WebAssembly ZK-SNARK provers, and committed via selective disclosure to the public ledger.
+A visual walkthrough of how private witnesses are kept in browser memory, evaluated against Compact constraints, proven client-side with WebAssembly ZK-SNARK tooling, and selectively disclosed to the public ledger.
 
 <p align="center">
   <img src="docs/images/zk-pipeline.png" alt="ZK Circuit Execution Pipeline" width="100%" />
@@ -126,7 +127,7 @@ Step-by-step visualizer illustrating how off-chain private witnesses are shielde
 ---
 
 ### 💼 4. 1AM Wallet Integration & Multi-Token Balances
-Seamless connection to Midnight 1AM Wallet and Lace Wallet, displaying unshielded addresses, shielded zero-knowledge addresses, native **tNIGHT** balances, and **DUST Cap** capacity.
+A seamless wallet connection experience showing unshielded addresses, shielded zero-knowledge addresses, native `tNIGHT` balances, and DUST capacity in a practical humanitarian financing flow.
 
 <p align="center">
   <img src="docs/images/wallet-circuit-execution.png" alt="Midnight Wallet & ZK Circuit Execution" width="100%" />
@@ -136,13 +137,18 @@ Seamless connection to Midnight 1AM Wallet and Lace Wallet, displaying unshielde
 
 ## What This Does
 
-Traditional on-chain counters, donation pools, and social welfare distribution programs force users to expose their individual contributions, income thresholds, or ballot choices on public ledgers. In humanitarian relief programs (e.g. UNHCR, WFP, Red Cross), public transparency exposes vulnerable beneficiaries to surveillance, profiling, and discrimination.
+Traditional on-chain counters, donation pools, and social welfare distribution systems often expose personal contributions, income thresholds, or voting choices on public ledgers. In humanitarian contexts, this can reveal sensitive information about vulnerable beneficiaries and create privacy risks.
 
-**PrivateAid** solves this challenge by leveraging **Midnight Network's dual-state architecture** and **Compact zero-knowledge smart contracts**:
-1. **Confidential Beneficiary Qualification**: Beneficiaries prove they meet aid qualification criteria (such as income below a defined threshold) without exposing personal financial details.
-2. **Anonymous Aid Contributions**: Donors contribute to humanitarian relief reserves without disclosing their individual gift amounts.
-3. **Client-Side ZK Proving**: Proofs are synthesized directly in the browser WebAssembly environment before any data touches the network.
-4. **Selective On-Chain Disclosure**: Using Compact's `disclose()`, only the verified state update (incremented claim round and cumulative pool tally) is committed to the public ledger.
+PrivateAid addresses this by combining **Midnight's dual-state architecture** with **Compact zero-knowledge smart contracts**:
+
+1. **Confidential Beneficiary Qualification**
+   - Beneficiaries prove they satisfy eligibility requirements without revealing personal financial details.
+2. **Anonymous Aid Contributions**
+   - Donors contribute to humanitarian funds without exposing individual gift amounts.
+3. **Client-Side ZK Proving**
+   - Proofs are generated in the browser's WebAssembly environment before any data is sent to the network.
+4. **Selective On-Chain Disclosure**
+   - Using `disclose()`, only validated public state updates are committed to the ledger while private inputs remain hidden.
 
 ---
 
@@ -150,35 +156,37 @@ Traditional on-chain counters, donation pools, and social welfare distribution p
 
 | Element | Type | Where It Lives | Who Can See It |
 |:---|:---|:---|:---|
-| **`round`** | Public Ledger | On-Chain State | Everyone (Public) |
-| **`totalValue`** | Public Ledger | On-Chain State | Everyone (Public) |
-| **`secretIncrement`** | Private Witness | Browser Local Memory | **Only the Caller** (0 bytes on-chain) |
-| **Beneficiary Income / Salt** | Private Witness | Browser Local Memory | **Only the Caller** (0 bytes on-chain) |
-| **ZK-SNARK Proof** | Cryptographic Proof | Extrinsic Payload | Verifiers / Nodes (Validates truth, leaks 0 data) |
+| **`round`** | Public Ledger | On-Chain State | Everyone |
+| **`totalValue`** | Public Ledger | On-Chain State | Everyone |
+| **`secretIncrement`** | Private Witness | Browser Local Memory | Only the Caller |
+| **Beneficiary Income / Salt** | Private Witness | Browser Local Memory | Only the Caller |
+| **ZK-SNARK Proof** | Cryptographic Proof | Extrinsic Payload | Verifiers / Nodes |
 
-### What the User Proves Without Revealing
-- **Valid Input Constraint:** Proves that the private input is strictly positive (`assert(secret > 0)`) or under threshold.
-- **Arithmetic Integrity:** Proves `newTotal == totalValue + secret` mathematically inside zero-knowledge arithmetic circuits.
-- **Selective Disclosure:** Commits only the resulting sum to the ledger using `disclose()`, keeping the contribution confidential.
+### What the user proves without revealing
+
+- **Valid Input Constraint:** The private input is proven to be strictly positive (`assert(secret > 0)`) or below a threshold.
+- **Arithmetic Integrity:** The circuit proves that `newTotal == totalValue + secret` without exposing the secret value.
+- **Selective Disclosure:** Only the verified result is committed on-chain, preserving confidentiality for the contributor and beneficiary.
 
 ---
 
 ## Tech Stack
 
 - **Smart Contracts:** Compact (`.compact`), Compact Pure Circuits, Compact Runtime (`@midnight-ntwrk/compact-runtime`)
-- **Zero-Knowledge Infrastructure:** Midnight Proof Server (`midnightnetwork/proof-server:latest`), Proving & Verification Keys (`.zkir`, `.bzkir`, `.prover`, `.verifier`)
-- **Blockchain & Network:** Midnight Preprod Testnet & Preview Testnet, Substrate Extrinsics, Midnight Indexer (GraphQL v4)
+- **Zero-Knowledge Infrastructure:** Midnight Proof Server (`midnightnetwork/proof-server:latest`), proving and verification keys (`.zkir`, `.bzkir`, `.prover`, `.verifier`)
+- **Blockchain & Network:** Midnight Preprod and Preview testnets, Substrate extrinsics, Midnight Indexer (GraphQL v4)
 - **Supported Wallets:** 1AM Wallet (`1am.xyz`), Midnight Lace Wallet, `@midnight-ntwrk/dapp-connector-api`
 - **SDK & Protocol:** `@midnight-ntwrk/midnight-js-network-id`, `@midnight-ntwrk/midnight-js-contracts`
-- **Frontend dApp:** React 19, TypeScript, Vite, Tailwind CSS, Lucide Icons, HTML5 Canvas Particle Engine
-- **Deployment:** Vercel SPA Hosting (`vercel.json`)
+- **Frontend DApp:** React 19, TypeScript, Vite, Tailwind CSS, Lucide icons, HTML5 Canvas particle engine
+- **Deployment:** Vercel SPA hosting (`vercel.json`)
 - **CI/CD Pipeline:** GitHub Actions (`.github/workflows/ci.yml`)
 
 ---
 
 ## Setup & Run Locally
 
-### 1. Clone & Install Dependencies
+### 1. Clone & install dependencies
+
 ```bash
 git clone https://github.com/Rajdeep-Biswas7/midnight-docs.git
 cd midnight-docs
@@ -186,28 +194,35 @@ npm install
 ```
 
 ### 2. Start the Midnight Proof Server (Docker)
+
 ```bash
 docker run -d -p 6300:6300 --name proof-server midnightnetwork/proof-server:latest
 ```
 
-### 3. Compile the Compact Contract
+### 3. Compile the Compact contract
+
 ```bash
 npm run compile
 ```
-*Outputs circuits, proving keys, and TypeScript bindings to `managed/`.*
 
-### 4. Run Unit Tests
+This generates the circuit artifacts and TypeScript bindings in `managed/`.
+
+### 4. Run the unit tests
+
 ```bash
 npm test
 ```
 
-### 5. Start Development Server
+### 5. Start the development server
+
 ```bash
 npm run dev
 ```
+
 Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-### 6. Build for Production
+### 6. Build for production
+
 ```bash
 npm run build
 ```
@@ -216,7 +231,7 @@ npm run build
 
 ## Run Tests
 
-Run the test suite covering circuit logic, sequential state transitions, and zero-knowledge privacy guarantees:
+Run the test suite covering circuit logic, sequential state transitions, and privacy guarantees:
 
 ```bash
 npm test
@@ -226,7 +241,8 @@ npm test
   <img src="docs/images/test-pass.png" alt="Midnight Counter Compact Contract Tests - 100% Pass" width="100%" />
 </p>
 
-**Passing Test Output:**
+**Passing test output:**
+
 ```text
 ▶ Midnight Counter Compact Contract Tests
   ✔ 1. Circuit Logic: executes successfully and validates assert preconditions
@@ -238,10 +254,11 @@ npm test
   ✔ 2. State Transitions: initializes correctly and transitions ledger state sequentially
   ✔ 3. Privacy Model: private witness inputs are never exposed on the public ledger
   ✔ 4. Address & Network Validation: verifies 32-byte hex and network display names
+  ✔ 5. Large Values & Precision: verifies multi-round accumulation with high-value contributions
 ✔ PrivateAid Compact Smart Contract Tests (Level 4)
-ℹ tests 7
+ℹ tests 8
 ℹ suites 2
-ℹ pass 7
+ℹ pass 8
 ℹ fail 0
 ```
 
@@ -249,10 +266,11 @@ npm test
 
 ## CI/CD Pipeline
 
-Continuous Integration is configured via GitHub Actions in [`.github/workflows/ci.yml`](.github/workflows/ci.yml). On every push and pull request to `main`, the workflow automatically:
+Continuous integration is configured via GitHub Actions in [`.github/workflows/ci.yml`](.github/workflows/ci.yml). On every push and pull request to `main`, the workflow automatically:
+
 1. Provisions a clean Ubuntu environment with Node.js v22.
 2. Installs dependencies using `npm install`.
-3. Verifies Compact contract compilation artifacts in `managed/`.
+3. Verifies the generated Compact contract bindings in `managed/`.
 4. Executes the automated test suite (`npm test`).
 5. Validates production frontend bundling (`npm run build`).
 
@@ -260,22 +278,22 @@ Continuous Integration is configured via GitHub Actions in [`.github/workflows/c
 
 ## Usage Guide
 
-See [docs/USAGE.md](docs/USAGE.md) for a comprehensive, non-technical walkthrough covering prerequisites, wallet connection, zero-knowledge qualification proofs, confidential donor contributions, and troubleshooting.
+See [docs/USAGE.md](docs/USAGE.md) for a comprehensive walkthrough covering prerequisites, wallet connection, zero-knowledge qualification proofs, confidential donor contributions, and troubleshooting.
 
 ---
 
 ## Product X Profile
 
-[https://x.com/PrivateAidZK](https://x.com/PrivateAidZK) *(Official product profile for PrivateAid on X/Twitter)*
+[https://x.com/PrivateAidZK](https://x.com/PrivateAidZK) — official product profile for PrivateAid on X/Twitter.
 
 ---
 
 ## Submission Checklist
 
-- [✓] **Public GitHub Repository:** Complete open-source repository with full documentation, architecture diagrams, and comprehensive setup instructions ([https://github.com/Rajdeep-Biswas7/midnight-docs](https://github.com/Rajdeep-Biswas7/midnight-docs)).
+- [✓] **Public GitHub Repository:** Open-source repository with documentation, architecture notes, and setup instructions ([https://github.com/Rajdeep-Biswas7/midnight-docs](https://github.com/Rajdeep-Biswas7/midnight-docs)).
 - [✓] **Verified Contract Hex Addresses:** Deployed and verified contracts on Midnight Preprod (`02c01991a0f8bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e89a3f21`) and Preview (`e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e`).
-- [✓] **Genuine DApp Connector API:** Official CAIP-372 integration with 1AM Wallet, `setNetworkId('preprod')`, and live indexer GraphQL polling.
-- [✓] **Live Demo Link:** Deployed production DApp on Vercel ([https://privateaid-counterdapp.vercel.app/](https://privateaid-counterdapp.vercel.app/)).
-- [✓] **Demo Video of the MVP:** [Watch PrivateAid MVP Demo Video on YouTube](https://www.youtube.com/watch?v=lAUVTL0EaUM).
-- [✓] **CI/CD Pipeline:** Automated GitHub Actions workflow ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) with green passing status.
-- [✓] **Meaningful Commits:** Clean semantic commits across contract development, test suites, cryptographic circuits, and frontend UI.
+- [✓] **Genuine DApp Connector API:** Official CAIP-372 integration with 1AM Wallet, `setNetworkId('preprod')`, and live GraphQL indexer polling.
+- [✓] **Live Demo Link:** Production DApp deployed on Vercel ([https://privateaid-counterdapp.vercel.app/](https://privateaid-counterdapp.vercel.app/)).
+- [✓] **Demo Video of the MVP:** [Watch the PrivateAid MVP demo on YouTube](https://www.youtube.com/watch?v=lAUVTL0EaUM).
+- [✓] **CI/CD Pipeline:** Automated GitHub Actions workflow ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) with passing checks.
+- [✓] **Meaningful Commits:** Structured semantic commits covering contracts, tests, cryptographic circuits, and frontend development.
