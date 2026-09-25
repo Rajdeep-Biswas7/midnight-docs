@@ -1,4 +1,4 @@
-﻿# PrivateAid — Privacy-Preserving Humanitarian Aid DApp
+# PrivateAid — Privacy-Preserving Humanitarian Aid DApp
 
 [![CI](https://github.com/Rajdeep-Biswas7/midnight-docs/actions/workflows/ci.yml/badge.svg)](https://github.com/Rajdeep-Biswas7/midnight-docs/actions/workflows/ci.yml)
 [![Network: Midnight Preprod](https://img.shields.io/badge/Network-Midnight_Preprod-6366f1?style=flat&logo=blockchain&logoColor=white)](https://explorer.1am.xyz/contract/02c01991a0f8bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e89a3f21?network=preprod)
@@ -6,6 +6,7 @@
 [![Live DApp: Vercel](https://img.shields.io/badge/Deployment-Vercel_Live-10b981?style=flat&logo=vercel&logoColor=white)](https://privateaid-counterdapp.vercel.app/)
 [![Smart Contract: Compact](https://img.shields.io/badge/Language-Compact_0.31.1-purple?style=flat)](https://docs.midnight.network)
 [![DApp Connector: CAIP-372](https://img.shields.io/badge/DApp_Connector-CAIP--372_v4-yellow?style=flat)](https://1am.xyz)
+[![X Profile: @PrivateAid0](https://img.shields.io/badge/X-@PrivateAid0-black?style=flat&logo=x&logoColor=white)](https://x.com/PrivateAid0)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 > PrivateAid is a decentralized, privacy-preserving humanitarian aid application built on the Midnight blockchain. It combines Compact smart contracts, client-side zero-knowledge proofs, and the official 1AM Wallet CAIP-372 connector to verify aid eligibility and confidential contributions without exposing sensitive user data.
@@ -284,7 +285,7 @@ See [docs/USAGE.md](docs/USAGE.md) for a comprehensive walkthrough covering prer
 
 ## Product X Profile
 
-[https://x.com/PrivateAidZK](https://x.com/PrivateAidZK) — official product profile for PrivateAid on X/Twitter.
+[https://x.com/PrivateAid0](https://x.com/PrivateAid0) — official product profile for PrivateAid on X/Twitter.
 
 ---
 
@@ -296,4 +297,5 @@ See [docs/USAGE.md](docs/USAGE.md) for a comprehensive walkthrough covering prer
 - [✓] **Live Demo Link:** Production DApp deployed on Vercel ([https://privateaid-counterdapp.vercel.app/](https://privateaid-counterdapp.vercel.app/)).
 - [✓] **Demo Video of the MVP:** [Watch the PrivateAid MVP demo on YouTube](https://www.youtube.com/watch?v=lAUVTL0EaUM).
 - [✓] **CI/CD Pipeline:** Automated GitHub Actions workflow ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) with passing checks.
+- [✓] **Product X Profile:** Active public product profile on X/Twitter ([https://x.com/PrivateAid0](https://x.com/PrivateAid0)).
 - [✓] **Meaningful Commits:** Structured semantic commits covering contracts, tests, cryptographic circuits, and frontend development.
