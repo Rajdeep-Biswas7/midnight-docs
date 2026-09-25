@@ -11,6 +11,8 @@ interface RecentClaim {
   eligibilityProof: string;
 }
 
+import { useMidnight } from '../hooks/useMidnight';
+
 interface AidVerificationFeedProps {
   contractAddress?: string;
   networkId?: string;
@@ -20,33 +22,10 @@ export const AidVerificationFeed: React.FC<AidVerificationFeedProps> = ({
   contractAddress = DEFAULT_PREPROD_CONTRACT,
   networkId = 'preprod',
 }) => {
+  const { contributionHistory } = useMidnight();
   const [testIncome, setTestIncome] = useState<number>(32000);
   const threshold = 50000;
   const isEligible = testIncome < threshold && testIncome > 0;
-
-  const mockClaims: RecentClaim[] = [
-    {
-      id: 18,
-      timestamp: 'Just now',
-      status: 'Verified',
-      txHash: '0x8f2a1b9c7d6e4f3a2b1c0d9e8f7a6b5c4d3e2f1a',
-      eligibilityProof: 'ZK-SNARK • Compact Proof',
-    },
-    {
-      id: 17,
-      timestamp: '4 mins ago',
-      status: 'Verified',
-      txHash: '0x3c5d7e9f1a2b4c6d8e0f2a4b6c8d0e2f4a6b8c0d',
-      eligibilityProof: 'ZK-SNARK • Compact Proof',
-    },
-    {
-      id: 16,
-      timestamp: '12 mins ago',
-      status: 'Verified',
-      txHash: '0x7e2f1a3b5c9d8e0f4a6b8c0d2e4f6a8b0c2d4e6f',
-      eligibilityProof: 'ZK-SNARK • Compact Proof',
-    },
-  ];
 
   return (
     <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/90 shadow-sm overflow-hidden">
@@ -122,7 +101,7 @@ export const AidVerificationFeed: React.FC<AidVerificationFeedProps> = ({
 
           <div className="space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="text-zinc-600 dark:text-zinc-400">Simulate Beneficiary Annual Income (Private Witness):</span>
+              <span className="text-zinc-600 dark:text-zinc-400">Beneficiary Annual Income (Private Witness):</span>
               <span className="font-mono font-bold text-black dark:text-white">${testIncome.toLocaleString()}</span>
             </div>
             <input
@@ -180,26 +159,26 @@ export const AidVerificationFeed: React.FC<AidVerificationFeedProps> = ({
           </div>
 
           <div className="space-y-2">
-            {mockClaims.map((claim) => (
+            {contributionHistory.map((claim) => (
               <div
                 key={claim.id}
                 className="p-3 bg-zinc-50 dark:bg-zinc-950/70 rounded-xl border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono"
               >
                 <div className="flex items-center gap-2.5">
                   <span className="px-2 py-0.5 rounded bg-black text-[#FFD400] font-bold">
-                    Claim #{claim.id}
+                    Claim #{claim.round}
                   </span>
                   <span className="text-emerald-700 dark:text-emerald-400 flex items-center gap-1 font-semibold">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                     {claim.status}
                   </span>
                   <span className="text-zinc-400 hidden sm:inline">•</span>
-                  <span className="text-zinc-500 hidden sm:inline">{claim.eligibilityProof}</span>
+                  <span className="text-zinc-500 hidden sm:inline">{claim.type}</span>
                 </div>
 
                 <div className="flex items-center gap-3 text-[11px] text-zinc-500">
-                  <span className="truncate max-w-[140px] text-zinc-400">{claim.txHash.slice(0, 10)}...</span>
-                  <span className="text-zinc-400">{claim.timestamp}</span>
+                  <span className="truncate max-w-[140px] text-zinc-400">{claim.txHash?.slice(0, 10)}...</span>
+                  <span className="text-zinc-400">{claim.time}</span>
                 </div>
               </div>
             ))}

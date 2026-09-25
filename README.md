@@ -29,42 +29,19 @@
 
 ---
 
-## Smart Contract Addresses & Deployments
+## Contract Address
 
-> [!IMPORTANT]
-> **Contract addresses vs. operator wallet addresses**
->
-> Midnight smart contracts are identified by on-chain 32-byte hexadecimal identifiers (64 hex characters), while user and operator accounts use Bech32 addresses such as `mn_addr_preprod1...` and `mn_addr_preview1...`.
+| Network | Address |
+|:---|:---|
+| **Preprod** | `02c01991a0f8bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e89a3f21` |
+| **Preview** | `e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e` |
 
-### 🌟 Verified Deployed Compact Smart Contracts
+## Level 5 — User Validation
 
-| Network | Contract Identifier (32-byte Hex) | Live Indexer Consensus | Block Explorer | Status |
-|:---|:---|:---|:---|:---:|
-| **Preprod** | `02c01991a0f8bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e89a3f21` | Block #2,677,185+ (GraphQL v4) | [View on 1AM Preprod Explorer ↗](https://explorer.1am.xyz/contract/02c01991a0f8bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e89a3f21?network=preprod) | 🟢 LIVE & VERIFIED |
-| **Preview** | `e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e` | Block #993,750+ (GraphQL v4) | [View on 1AM Preview Explorer ↗](https://explorer.1am.xyz/contract/e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e?network=preview) | 🟢 LIVE & VERIFIED |
-
-### 🔑 Authorized Deployer / Operator Accounts
-
-| Network | Deployer Wallet (Bech32 Account) | Role |
-|:---|:---|:---|
-| **Preprod** | `mn_addr_preprod1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q7sx7ne` | Contract Deployer & Initial Liquidity Provider |
-| **Preview** | `mn_addr_preview1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q73cwqy` | Preview Staging Operator Account |
-
-```text
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-PrivateAid — Compact Smart Contracts on Midnight Testnet
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Contract Source   : ./contracts/privateaid.compact
-Managed Bindings  : ./managed/contract/index.js
-Preprod Contract  : 02c01991a0f8bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e89a3f21
-Preview Contract  : e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e
-Active Circuits   : incrementWithSecret
-State Variables   : round (Uint<64>), totalValue (Uint<64>)
-Witness Input     : secretIncrement (Uint<64>, private to caller)
-Rules             : assert(secret > 0); disclose(totalValue + secret); round += 1
-Telemetry Sync    : Direct Midnight GraphQL Indexer v4 (Zero Simulation Mocks)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
+- **Target:** 50 Preprod users
+- **Current:** 50 / 50 verified
+- **See `USERS.md`** for wallet addresses and on-chain explorer evidence
+- **See `docs/FEEDBACK.md`** for feedback log and changes
 
 ---
 

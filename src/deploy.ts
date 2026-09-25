@@ -23,7 +23,7 @@ globalThis.WebSocket = WebSocket;
 const PRIVATE_STATE_ID = 'counterPrivateState';
 const DUST_WAIT_TIMEOUT_MS = 5 * 60 * 1000;
 
-const { network, config: networkConfig } = resolveNetwork('preview');
+const { network, config: networkConfig } = resolveNetwork({ argv: [...process.argv.slice(0, 2), '--network', 'preprod'] });
 const WALLET = getOrCreateWallet(network);
 const SEED = WALLET.seed;
 {

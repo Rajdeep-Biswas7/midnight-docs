@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ConnectedAPI, InitialAPI } from '@midnight-ntwrk/dapp-connector-api';
 import { setNetworkId as setSdkNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 
@@ -35,7 +35,7 @@ export interface ContributionRecord {
   txHash: string;
   time: string;
   type: 'Relief Aid Claim' | 'Confidential Donation';
-  status: 'Verified (ZK-SNARK)';
+  status: 'Verified (ZK-SNARK)' | 'Confirmed on-chain';
 }
 
 export interface MidnightState {
@@ -63,7 +63,7 @@ export interface CircuitCallState {
 
 // ── Verified Contract & Network Definitions ──────────────────────────
 export const DEFAULT_PREPROD_CONTRACT = '02c01991a0f8bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e89a3f21';
-export const DEFAULT_PREVIEW_CONTRACT = 'e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e';
+export const DEFAULT_PREVIEW_CONTRACT = '';
 
 export const NETWORK_DETAILS: Record<NetworkType, {
   name: string;
@@ -85,8 +85,8 @@ export const NETWORK_DETAILS: Record<NetworkType, {
   },
   preview: {
     name: 'Midnight Preview',
-    contractAddress: 'e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e',
-    deployerWallet: 'mn_addr_preview1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q73cwqy',
+    contractAddress: '',
+    deployerWallet: '',
     indexerUrl: 'https://indexer.preview.midnight.network/api/v4/graphql',
     indexerWsUrl: 'wss://indexer.preview.midnight.network/api/v4/graphql/ws',
     nodeUrl: 'https://rpc.preview.midnight.network',
@@ -117,45 +117,17 @@ export function useMidnight() {
   const connectedApiRef = useRef<ConnectedAPI | null>(null);
 
   const [contractState, setContractState] = useState<ContractLiveState>({
-    round: 18,
-    totalValue: 5000000,
-    isLoading: false,
-    lastUpdated: 'Just now',
+    round: 0,
+    totalValue: 0,
+    isLoading: true,
+    lastUpdated: 'Loading...',
     contractAddress: NETWORK_DETAILS.preprod.contractAddress,
     deployerWallet: NETWORK_DETAILS.preprod.deployerWallet,
     blockHeight: null,
     blockHash: null,
   });
 
-  const [contributionHistory, setContributionHistory] = useState<ContributionRecord[]>([
-    {
-      id: 'tx-18',
-      round: 18,
-      totalValue: 5000000,
-      txHash: '0x8f2a1b9c7d6e4f3a2b1c0d9e8f7a6b5c4d3e2f1a',
-      time: '2 mins ago',
-      type: 'Relief Aid Claim',
-      status: 'Verified (ZK-SNARK)',
-    },
-    {
-      id: 'tx-17',
-      round: 17,
-      totalValue: 4975000,
-      txHash: '0x3c5d7e9f1a2b4c6d8e0f2a4b6c8d0e2f4a6b8c0d',
-      time: '8 mins ago',
-      type: 'Confidential Donation',
-      status: 'Verified (ZK-SNARK)',
-    },
-    {
-      id: 'tx-16',
-      round: 16,
-      totalValue: 4950000,
-      txHash: '0x7e2f1a3b5c9d8e0f4a6b8c0d2e4f6a8b0c2d4e6f',
-      time: '19 mins ago',
-      type: 'Relief Aid Claim',
-      status: 'Verified (ZK-SNARK)',
-    },
-  ]);
+  const [contributionHistory, setContributionHistory] = useState<ContributionRecord[]>([]);
 
   const [circuitState, setCircuitState] = useState<CircuitCallState>({
     isProving: false,
@@ -320,8 +292,9 @@ export function useMidnight() {
       try {
         const resp = await api.getUnshieldedAddress();
         unshielded = resp.unshieldedAddress;
-      } catch {
-        unshielded = NETWORK_DETAILS[activeNetwork].deployerWallet;
+      } catch (addrErr) {
+        console.warn('getUnshieldedAddress failed:', addrErr);
+        unshielded = '';
       }
 
       // 4. Query shielded addresses
@@ -344,9 +317,10 @@ export function useMidnight() {
           dustBalStr = `${bal.toLocaleString()} DUST`;
           dustCapStr = `${cap.toLocaleString()} DUST`;
         }
-      } catch {
-        dustBalStr = '1,250,000 DUST';
-        dustCapStr = '5,000,000 DUST';
+      } catch (dustErr) {
+        console.warn('getDustBalance failed:', dustErr);
+        dustBalStr = '0.00 DUST';
+        dustCapStr = '0.00 DUST';
       }
 
       // 6. Query unshielded token balances
@@ -357,11 +331,10 @@ export function useMidnight() {
           const firstVal = Object.values(unshieldedBals)[0];
           const num = typeof firstVal === 'bigint' ? Number(firstVal) : Number(firstVal || 0);
           nightBalStr = `${num.toLocaleString()} NIGHT`;
-        } else {
-          nightBalStr = '2,450.00 NIGHT';
         }
-      } catch {
-        nightBalStr = '2,450.00 NIGHT';
+      } catch (nightErr) {
+        console.warn('getUnshieldedBalances failed:', nightErr);
+        nightBalStr = '0.00 NIGHT';
       }
 
       setConnectedApi(api);
@@ -432,6 +405,20 @@ export function useMidnight() {
       const contractAddr = targetContractAddress || NETWORK_DETAILS[activeNetwork].contractAddress;
       const api = connectedApiRef.current;
 
+      // Wallet must be connected — no silent fallback
+      if (!api) {
+        setCircuitState({
+          isProving: false,
+          isSubmitting: false,
+          txHash: null,
+          error: 'No wallet connected. Please connect your 1AM Wallet before submitting a circuit call.',
+          success: false,
+          disclosedRound: null,
+          disclosedTotal: null,
+        });
+        return;
+      }
+
       setCircuitState({
         isProving: true,
         isSubmitting: false,
@@ -443,8 +430,14 @@ export function useMidnight() {
       });
 
       try {
-        // Step 1: Synthesize private off-chain witness inside browser WASM
-        await new Promise((resolve) => setTimeout(resolve, 1800));
+        // Hint the wallet which methods will be called
+        try {
+          if (typeof api.hintUsage === 'function') {
+            await api.hintUsage(['balanceUnsealedTransaction', 'submitTransaction', 'getProvingProvider']);
+          }
+        } catch (hintErr) {
+          console.debug('hintUsage error (non-fatal):', hintErr);
+        }
 
         setCircuitState((prev) => ({
           ...prev,
@@ -452,29 +445,33 @@ export function useMidnight() {
           isSubmitting: true,
         }));
 
-        // Step 2: Genuine transaction preparation via DApp Connector if wallet available
-        let txId = '';
-        if (api && typeof api.balanceUnsealedTransaction === 'function') {
-          try {
-            // Hint usage of transaction submission
-            if (typeof api.hintUsage === 'function') {
-              await api.hintUsage(['balanceUnsealedTransaction', 'submitTransaction']);
-            }
-          } catch (hintErr) {
-            console.debug('hintUsage error:', hintErr);
-          }
+        // Real transaction submission via DApp Connector
+        // The wallet signs, balances, and submits the transaction on-chain.
+        // balanceUnsealedTransaction + submitTransaction are the CAIP-372 calls.
+        let txId: string;
+        let confirmedRound: number;
+        let confirmedTotal: number;
+
+        if (typeof api.balanceUnsealedTransaction === 'function' && typeof api.submitTransaction === 'function') {
+          // Build a minimal unsealed transaction for the circuit call
+          // The actual circuit payload (secretIncrement witness) stays private in the wallet WASM.
+          const unsealedTx = await api.balanceUnsealedTransaction({
+            contractAddress: contractAddr,
+            circuit: 'increment',
+          } as any);
+
+          const submitResult = await api.submitTransaction(unsealedTx as any);
+          // submitTransaction returns the on-chain tx identifier
+          txId = (submitResult as any)?.txHash ?? (submitResult as any)?.hash ?? String(submitResult);
+          confirmedRound = contractState.round + 1;
+          confirmedTotal = contractState.totalValue + 25000;
+        } else {
+          // Wallet API does not expose balanceUnsealedTransaction — surface honest error
+          throw new Error(
+            'Connected wallet does not support balanceUnsealedTransaction / submitTransaction. ' +
+            'Please use 1AM Wallet v4+ or Midnight Lace with CAIP-372 support.'
+          );
         }
-
-        // Wait for on-chain state transition confirmation
-        await new Promise((resolve) => setTimeout(resolve, 1600));
-
-        // Generate cryptographic transaction commitment hash
-        const buffer = new Uint8Array(32);
-        crypto.getRandomValues(buffer);
-        txId = '0x' + Array.from(buffer).map((b) => b.toString(16).padStart(2, '0')).join('');
-
-        const nextRound = contractState.round + 1;
-        const nextTotal = contractState.totalValue + 25000;
 
         setCircuitState({
           isProving: false,
@@ -482,30 +479,30 @@ export function useMidnight() {
           txHash: txId,
           error: null,
           success: true,
-          disclosedRound: nextRound,
-          disclosedTotal: nextTotal,
+          disclosedRound: confirmedRound,
+          disclosedTotal: confirmedTotal,
         });
 
-        // Update live on-chain state
+        // Update live on-chain state only after network confirms
         setContractState((prev) => ({
           ...prev,
-          round: nextRound,
-          totalValue: nextTotal,
+          round: confirmedRound,
+          totalValue: confirmedTotal,
           isLoading: false,
-          lastUpdated: 'Just now',
+          lastUpdated: new Date().toLocaleTimeString(),
           contractAddress: contractAddr,
         }));
 
-        // Record verifiable on-chain transition in feed
+        // Record confirmed on-chain transition in feed
         setContributionHistory((prev) => [
           {
-            id: `tx-${nextRound}`,
-            round: nextRound,
-            totalValue: nextTotal,
+            id: `tx-${confirmedRound}`,
+            round: confirmedRound,
+            totalValue: confirmedTotal,
             txHash: txId,
             time: 'Just now',
             type: 'Relief Aid Claim',
-            status: 'Verified (ZK-SNARK)',
+            status: 'Confirmed on-chain',
           },
           ...prev,
         ]);

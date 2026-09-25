@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { WitnessEyeIcon, QuantumLockIcon, CircuitCoreIcon, LedgerBlockIcon, EnergySparkIcon } from './CustomIcons';
 import { EyeOff, Eye, CheckCircle2 } from 'lucide-react';
+import { useMidnight } from '../hooks/useMidnight';
 
 export const ProofVisualizer: React.FC = () => {
+  const { contractState } = useMidnight();
   const [demoSecret, setDemoSecret] = useState<number>(5);
   const [showSecretInSimulator, setShowSecretInSimulator] = useState<boolean>(false);
   const [activeStep, setActiveStep] = useState<number>(2);
 
-  const initialTotal = 42;
-  const initialRound = 12;
-  const simulatedNewTotal = initialTotal + demoSecret;
-  const simulatedNewRound = initialRound + 1;
+  const initialTotal = contractState.totalValue || 42;
+  const initialRound = contractState.round || 12;
+  const nextTotal = initialTotal + demoSecret;
+  const nextRound = initialRound + 1;
 
   return (
     <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/90 shadow-sm overflow-hidden">
@@ -155,7 +157,7 @@ export const ProofVisualizer: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Simulate Secret Witness Value:
+              Interactive Secret Witness Value:
             </span>
             <div className="flex items-center gap-3">
               <input
@@ -186,12 +188,12 @@ export const ProofVisualizer: React.FC = () => {
               </span>
             </div>
             <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-              <span className="text-[10px] text-zinc-500 block uppercase font-mono">Simulated Round</span>
-              <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100">#{simulatedNewRound}</span>
+              <span className="text-[10px] text-zinc-500 block uppercase font-mono">Projected Round</span>
+              <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100">#{nextRound}</span>
             </div>
             <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-              <span className="text-[10px] text-zinc-500 block uppercase font-mono">Public New Total</span>
-              <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">{simulatedNewTotal}</span>
+              <span className="text-[10px] text-zinc-500 block uppercase font-mono">Projected New Total</span>
+              <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">{nextTotal}</span>
             </div>
           </div>
         </div>
