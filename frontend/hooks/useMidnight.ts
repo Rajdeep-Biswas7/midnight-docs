@@ -606,14 +606,14 @@ export function useMidnight() {
           contractStateObj,
           {},
         );
-        const proofData = contract.circuits.incrementWithSecret(circuitContext as any);
-
+        const circuitResults = contract.circuits.incrementWithSecret(circuitContext as any);
+        const proofData = circuitResults.proofData;
         // 5. Serialize proof data using compact-runtime (same WASM module â€” no type mismatch)
         const serializedPreimage = proofDataIntoSerializedPreimage(
-          (proofData as any).input,
-          (proofData as any).output,
-          (proofData as any).publicTranscript,
-          (proofData as any).privateTranscriptOutputs,
+          proofData.input,
+          proofData.output,
+          proofData.publicTranscript,
+          proofData.privateTranscriptOutputs,
           'incrementWithSecret',
         );
 
