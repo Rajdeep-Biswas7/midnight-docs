@@ -23,7 +23,8 @@ globalThis.WebSocket = WebSocket;
 const PRIVATE_STATE_ID = 'counterPrivateState';
 const DUST_WAIT_TIMEOUT_MS = 5 * 60 * 1000;
 
-const { network, config: networkConfig } = resolveNetwork({ argv: [...process.argv.slice(0, 2), '--network', 'preprod'] });
+const requestedNetwork = process.env.NETWORK_ID ?? 'preprod';
+const { network, config: networkConfig } = resolveNetwork({ argv: [...process.argv.slice(0, 2), '--network', requestedNetwork] });
 const WALLET = getOrCreateWallet(network);
 const SEED = WALLET.seed;
 {
@@ -177,10 +178,7 @@ async function main() {
   console.log('  Setting up providers...');
   const providers = await createProviders(walletCtx);
 
-  console.log('  Generating DUST...');
-  await new Promise((r) => setTimeout(r, 6000));
-
-  console.log('  Deploying counter contract to Preview...\n');
+  console.log(`  Deploying counter contract to ${network}...\n`);
 
   const deployed = await deployContract(providers, {
     compiledContract: compiledContract as any,
