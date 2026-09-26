@@ -453,10 +453,11 @@ export function useMidnight() {
   const callCircuit = useCallback(
     async (targetContractAddress?: string) => {
       const contractAddr = targetContractAddress || NETWORK_DETAILS[activeNetwork].contractAddress;
+      // Always read the ref — never the stale closure over walletState
       const api = connectedApiRef.current;
 
       // Wallet must be connected — no silent fallback
-      if (!api || !walletState.isConnected) {
+      if (!api) {
         setCircuitState({
           isProving: false,
           isSubmitting: false,
