@@ -249,10 +249,6 @@ Run the test suite covering circuit logic, sequential state transitions, and pri
 npm test
 ```
 
-<p align="center">
-  <img src="docs/images/test-pass.jpg" alt="Midnight Counter Compact Contract Tests - 100% Pass" width="100%" />
-</p>
-
 **Passing test output:**
 
 ```text
