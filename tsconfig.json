@@ -18,6 +18,13 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["src/main.tsx", "src/App.tsx", "src/components/**/*", "src/hooks/**/*", "vite.config.ts"],
+  "include": [
+    "frontend/main.tsx",
+    "frontend/App.tsx",
+    "frontend/components/**/*",
+    "frontend/hooks/**/*",
+    "frontend/utils/**/*",
+    "vite.config.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

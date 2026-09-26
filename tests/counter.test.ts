@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { Contract, ledger } from '../managed/contract/index.js';
+import { Contract, ledger } from '../blockchain/managed/contract/index.js';
 import * as compactRuntime from '@midnight-ntwrk/compact-runtime';
 
 describe('Midnight Counter Compact Contract Tests', () => {

@@ -1,8 +1,9 @@
-﻿import { defineConfig } from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig({
+  root: 'frontend',
   plugins: [
     react(),
     nodePolyfills({
@@ -16,6 +17,8 @@ export default defineConfig({
   ],
   build: {
     target: 'esnext',
+    outDir: '../dist',
+    emptyOutDir: true,
   },
   optimizeDeps: {
     esbuildOptions: {

@@ -36,7 +36,7 @@ const SEED = WALLET.seed;
 }
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const zkConfigPath = path.resolve(__dirname, '..', 'contracts', 'managed', 'hello-world');
+const zkConfigPath = path.resolve(__dirname, '..', 'blockchain', 'managed');
 
 // Load compiled contract
 const contractPath = path.join(zkConfigPath, 'contract', 'index.js');

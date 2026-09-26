@@ -195,6 +195,31 @@ flowchart TD
 
 ---
 
+## Repository Structure
+
+```text
+├── blockchain/
+│   ├── contracts/          # Compact smart contracts (counter.compact, privateaid.compact)
+│   └── managed/            # Compiled ZK keys, contract bindings, and .zkir circuits
+├── frontend/               # React 19 + TypeScript + Vite SPA
+│   ├── components/         # UI components (WalletConnect, TransactionReceipt, etc.)
+│   ├── hooks/              # useMidnight hook (wallet-derived endpoints, CAIP-372)
+│   ├── public/managed/     # Publicly served proving & verifier assets
+│   ├── utils/              # Contract helpers & address formatting
+│   ├── App.tsx             # Root DApp interface
+│   └── main.tsx            # Application entrypoint
+├── scripts/                # Node.js CLI & deployment automation
+│   ├── deploy.ts           # Multi-network deployment script (Preprod & Preview)
+│   ├── network.ts          # Network configurations & RPC definitions
+│   └── wallet.ts           # CLI wallet & seed phrase resolution
+├── tests/                  # Contract & circuit test suites (Node tsx test runner)
+│   ├── counter.test.ts     # Compact counter circuit & state tests
+│   └── privateaid.test.ts  # Level 4 multi-round private aid circuit tests
+└── docs/                   # Visual proof of test execution & screenshots
+```
+
+---
+
 ## Setup & Run Locally
 
 ### 1. Clone & install dependencies
@@ -217,7 +242,7 @@ docker run -d -p 6300:6300 --name proof-server midnightnetwork/proof-server:late
 npm run compile
 ```
 
-This generates the circuit artifacts and TypeScript bindings in `managed/`.
+This generates the circuit artifacts and TypeScript bindings in `blockchain/managed/`.
 
 ### 4. Run the unit tests
 
@@ -278,7 +303,7 @@ Continuous integration is configured via GitHub Actions in [`.github/workflows/c
 
 1. Provisions a clean Ubuntu environment with Node.js v22.
 2. Installs dependencies using `npm install`.
-3. Verifies the generated Compact contract bindings in `managed/`.
+3. Verifies the generated Compact contract bindings in `blockchain/managed/`.
 4. Executes the automated test suite (`npm test`).
 5. Validates production frontend bundling (`npm run build`).
 

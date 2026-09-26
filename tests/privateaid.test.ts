@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { Contract, ledger } from '../managed/contract/index.js';
+import { Contract, ledger } from '../blockchain/managed/contract/index.js';
 import * as compactRuntime from '@midnight-ntwrk/compact-runtime';
 
 describe('PrivateAid Compact Smart Contract Tests (Level 4)', () => {
@@ -137,7 +137,7 @@ describe('PrivateAid Compact Smart Contract Tests (Level 4)', () => {
   });
 
   it('4. Address & Network Validation: verifies 32-byte hex and network display names', async () => {
-    const { validateContractAddress, isValidBech32Address, getNetworkDisplayName } = await import('../src/utils/contract.js');
+    const { validateContractAddress, isValidBech32Address, getNetworkDisplayName } = await import('../frontend/utils/contract.js');
 
     const validHex = '02c01991a0f8bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e89a3f21';
     assert.strictEqual(validateContractAddress(validHex), true, 'Valid 32-byte hex address should pass validation');

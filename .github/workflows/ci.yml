@@ -27,16 +27,16 @@ jobs:
 
       - name: Verify contract sources
         run: |
-          test -f contracts/counter.compact
-          test -f contracts/privateaid.compact
+          test -f blockchain/contracts/counter.compact
+          test -f blockchain/contracts/privateaid.compact
 
       - name: compact compile check
         run: |
           if command -v compact &> /dev/null; then
             npm run compile
           else
-            echo "Using pre-compiled Compact contract artifacts in managed/"
-            test -f managed/contract/index.js
+            echo "Using pre-compiled Compact contract artifacts in blockchain/managed/"
+            test -f blockchain/managed/contract/index.js
           fi
 
       - name: Run test suite

@@ -1,6 +1,39 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ConnectedAPI, InitialAPI } from '@midnight-ntwrk/dapp-connector-api';
 import { setNetworkId as setSdkNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
+import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
+import { CompiledContract } from '@midnight-ntwrk/midnight-js-protocol/compact-js';
+import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
+import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
+import { ZKConfigProvider, type ZKIR, type ProverKey, type VerifierKey } from '@midnight-ntwrk/midnight-js-types';
+import * as CounterModule from '../../blockchain/managed/contract/index.js';
+
+export class BrowserZkConfigProvider extends ZKConfigProvider<string> {
+  async getZKIR(circuitId: string): Promise<ZKIR> {
+    const res = await fetch(`/managed/zkir/${circuitId}.zkir`);
+    if (!res.ok) throw new Error(`Failed to fetch ZKIR for ${circuitId}: ${res.statusText}`);
+    return await res.json();
+  }
+  async getProverKey(circuitId: string): Promise<ProverKey> {
+    const res = await fetch(`/managed/keys/${circuitId}.prover`);
+    if (!res.ok) throw new Error(`Failed to fetch prover key for ${circuitId}: ${res.statusText}`);
+    return new Uint8Array(await res.arrayBuffer()) as unknown as ProverKey;
+  }
+  async getVerifierKey(circuitId: string): Promise<VerifierKey> {
+    const res = await fetch(`/managed/keys/${circuitId}.verifier`);
+    if (!res.ok) throw new Error(`Failed to fetch verifier key for ${circuitId}: ${res.statusText}`);
+    return new Uint8Array(await res.arrayBuffer()) as unknown as VerifierKey;
+  }
+}
+
+export interface WalletServiceConfig {
+  indexerUri?: string;
+  indexerWsUri?: string;
+  nodeUri?: string;
+  substrateNodeUri?: string;
+  proofServerUri?: string;
+  proverServerUri?: string;
+}
 
 export type NetworkType = 'preprod' | 'preview';
 
@@ -118,6 +151,7 @@ export function useMidnight() {
 
   const [connectedApi, setConnectedApi] = useState<ConnectedAPI | null>(null);
   const connectedApiRef = useRef<ConnectedAPI | null>(null);
+  const serviceConfigRef = useRef<WalletServiceConfig | null>(null);
 
   const [contractState, setContractState] = useState<ContractLiveState>({
     round: 0,
@@ -272,6 +306,19 @@ export function useMidnight() {
 
       // 1. Establish genuine DApp connection with network id hint
       const api = await targetApi.connect(activeNetwork);
+
+      // 1b. Pull service URIs directly from connected wallet (serviceUriConfig / getConfiguration)
+      let serviceConfig: WalletServiceConfig | null = null;
+      try {
+        if (typeof (api as any).serviceUriConfig === 'function') {
+          serviceConfig = await (api as any).serviceUriConfig();
+        } else if (typeof (api as any).getConfiguration === 'function') {
+          serviceConfig = await (api as any).getConfiguration();
+        }
+      } catch (cfgErr) {
+        console.warn('Could not fetch wallet service config:', cfgErr);
+      }
+      serviceConfigRef.current = serviceConfig;
 
       // 2. Hint usage of necessary methods
       try {
@@ -448,32 +495,110 @@ export function useMidnight() {
           isSubmitting: true,
         }));
 
-        // Real transaction submission via DApp Connector
-        // The wallet signs, balances, and submits the transaction on-chain.
-        // balanceUnsealedTransaction + submitTransaction are the CAIP-372 calls.
-        let txId: string;
-        let confirmedRound: number;
-        let confirmedTotal: number;
+        // Real transaction submission via DApp Connector & Wallet-Derived Providers
+        const serviceConfig = serviceConfigRef.current;
+        const indexerUrl = serviceConfig?.indexerUri || NETWORK_DETAILS[activeNetwork].indexerUrl;
+        const indexerWsUrl = serviceConfig?.indexerWsUri || NETWORK_DETAILS[activeNetwork].indexerWsUrl;
+        const proofServerUrl = serviceConfig?.proofServerUri || serviceConfig?.proverServerUri;
 
-        if (typeof api.balanceUnsealedTransaction === 'function' && typeof api.submitTransaction === 'function') {
-          // Build a minimal unsealed transaction for the circuit call
-          // The actual circuit payload (secretIncrement witness) stays private in the wallet WASM.
-          const unsealedTx = await api.balanceUnsealedTransaction({
-            contractAddress: contractAddr,
-            circuit: 'increment',
-          } as any);
+        let txId: string = '';
+        let confirmedRound: number = contractState.round + 1;
+        let confirmedTotal: number = contractState.totalValue + 25000;
 
-          const submitResult = await api.submitTransaction(unsealedTx as any);
-          // submitTransaction returns the on-chain tx identifier
-          txId = (submitResult as any)?.txHash ?? (submitResult as any)?.hash ?? String(submitResult);
-          confirmedRound = contractState.round + 1;
-          confirmedTotal = contractState.totalValue + 25000;
-        } else {
-          // Wallet API does not expose balanceUnsealedTransaction — surface honest error
-          throw new Error(
-            'Connected wallet does not support balanceUnsealedTransaction / submitTransaction. ' +
-            'Please use 1AM Wallet v4+ or Midnight Lace with CAIP-372 support.'
-          );
+        let executedViaContract = false;
+        try {
+          const zkConfigProvider = new BrowserZkConfigProvider();
+          const wsImpl = typeof window !== 'undefined' ? (window.WebSocket as any) : undefined;
+          const publicDataProvider = indexerPublicDataProvider(indexerUrl, indexerWsUrl, wsImpl);
+
+          let proofProvider: any = null;
+          if (typeof (api as any).getProvingProvider === 'function') {
+            proofProvider = await (api as any).getProvingProvider(zkConfigProvider.asKeyMaterialProvider());
+          } else if (proofServerUrl) {
+            proofProvider = httpClientProofProvider(proofServerUrl, zkConfigProvider);
+          }
+
+          if (proofProvider) {
+            const privateStateStore = new Map<string, any>();
+            const privateStateProvider = {
+              setContractAddress: async () => {},
+              get: async (id: string) => privateStateStore.get(id) ?? null,
+              set: async (id: string, val: any) => { privateStateStore.set(id, val); },
+              remove: async (id: string) => { privateStateStore.delete(id); },
+              clear: async () => { privateStateStore.clear(); },
+              setSigningKey: async () => {},
+              getSigningKey: async () => null,
+              removeSigningKey: async () => {},
+              clearSigningKeys: async () => {},
+            };
+
+            const walletProvider = {
+              getCoinPublicKey: async () => {
+                const addrs = await api.getShieldedAddresses();
+                return addrs.shieldedCoinPublicKey;
+              },
+              getEncryptionPublicKey: async () => {
+                const addrs = await api.getShieldedAddresses();
+                return addrs.shieldedEncryptionPublicKey;
+              },
+              balanceTx: async (tx: any) => {
+                const res = await api.balanceUnsealedTransaction(tx);
+                return (res as any)?.tx ?? res;
+              },
+              submitTx: async (tx: any) => {
+                const res = await api.submitTransaction(tx);
+                return (res as any)?.txHash ?? (res as any)?.hash ?? (tx as any)?.id ?? String(res);
+              },
+            };
+
+            const defaultWitnesses = {
+              secretIncrement: (context: any) => [context.privateState, 1n],
+            };
+
+            const compiledContract = CompiledContract.make('counter', CounterModule.Contract).pipe(
+              CompiledContract.withWitnesses(defaultWitnesses),
+            );
+
+            const deployedContract: any = await findDeployedContract(
+              {
+                privateStateProvider: privateStateProvider as any,
+                publicDataProvider,
+                zkConfigProvider,
+                proofProvider,
+                walletProvider: walletProvider as any,
+                midnightProvider: walletProvider as any,
+              },
+              {
+                compiledContract: compiledContract as any,
+                contractAddress: contractAddr,
+                privateStateId: 'counterPrivateState',
+                initialPrivateState: {},
+              }
+            );
+
+            const callResult = await deployedContract.callTx.incrementWithSecret();
+            txId = callResult.public.txId;
+            executedViaContract = true;
+          }
+        } catch (contractErr) {
+          console.debug('findDeployedContract direct execution fell back to CAIP-372 API:', contractErr);
+        }
+
+        if (!executedViaContract) {
+          if (typeof api.balanceUnsealedTransaction === 'function' && typeof api.submitTransaction === 'function') {
+            const unsealedTx = await api.balanceUnsealedTransaction({
+              contractAddress: contractAddr,
+              circuit: 'incrementWithSecret',
+            } as any);
+
+            const submitResult = await api.submitTransaction(unsealedTx as any);
+            txId = (submitResult as any)?.txHash ?? (submitResult as any)?.hash ?? String(submitResult);
+          } else {
+            throw new Error(
+              'Connected wallet does not support balanceUnsealedTransaction / submitTransaction. ' +
+              'Please use 1AM Wallet or Midnight Lace with CAIP-372 support.'
+            );
+          }
         }
 
         setCircuitState({
