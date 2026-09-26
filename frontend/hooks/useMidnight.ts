@@ -609,21 +609,33 @@ export function useMidnight() {
         const circuitResults = contract.circuits.incrementWithSecret(circuitContext as any);
         const proofData = circuitResults.proofData;
         // 5. Serialize proof data using compact-runtime (same WASM module â€” no type mismatch)
-        const serializedPreimage = proofDataIntoSerializedPreimage(
+// 5. Construct Unproven Transaction and Prove via Wallet ProvingProvider
+        const rand = communicationCommitmentRandomness();
+        const ledgerState = LedgerContractState.deserialize(contractStateObj.serialize());
+        const op = ledgerState.operation('incrementWithSecret') ?? new ContractOperation();
+        const ledgerQueryCtx = new LedgerQueryContext(ledgerState.data, contractAddr);
+        const preTranscript = new PreTranscript(ledgerQueryCtx, proofData.publicTranscript);
+        const callPrototype = new PrePartitionContractCall(
+          contractAddr,
+          'incrementWithSecret',
+          op,
+          preTranscript,
+          proofData.privateTranscriptOutputs,
           proofData.input,
           proofData.output,
-          proofData.publicTranscript,
-          proofData.privateTranscriptOutputs,
+          rand,
           'incrementWithSecret',
         );
+        const ttl = new Date(Date.now() + 3600 * 1000);
+        const ledgerParams = LedgerParameters.initialParameters();
+        const unprovenTx = Transaction.fromPartsRandomized(activeNetwork as any, undefined, undefined, undefined)
+          .addCalls({ tag: 'first' }, [callPrototype], ledgerParams, ttl);
 
-        // 6. POPUP 1 â€” getProvingProvider + prove (1AM Wallet approval)
+        // 6. POPUP 1 - getProvingProvider + prove (1AM Wallet approval)
         const keyMaterial = makeKeyMaterialProvider();
         const provingProvider = await (api as any).getProvingProvider(keyMaterial);
-        const unsealedBytes = await provingProvider.prove(serializedPreimage, 'incrementWithSecret');
-        const unsealedTxHex = toHex(unsealedBytes instanceof Uint8Array ? unsealedBytes : new Uint8Array(unsealedBytes));
-
-        setCircuitState((prev) => ({ ...prev, isProving: false, isSubmitting: true }));
+        const provenTx = await unprovenTx.prove(provingProvider, undefined as any);
+        const unsealedTxHex = toHex(provenTx.serialize());
 
         // 7. POPUP 2 â€” balanceUnsealedTransaction (dust/gas approval)
         let balancedTxHex: string | undefined;
