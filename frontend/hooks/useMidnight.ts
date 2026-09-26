@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ConnectedAPI, InitialAPI } from '@midnight-ntwrk/dapp-connector-api';
 import { setNetworkId as setSdkNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 import {
@@ -634,7 +634,7 @@ export function useMidnight() {
         // 6. POPUP 1 - getProvingProvider + prove (1AM Wallet approval)
         const keyMaterial = makeKeyMaterialProvider();
         const provingProvider = await (api as any).getProvingProvider(keyMaterial);
-        const provenTx = await unprovenTx.prove(provingProvider, undefined as any);
+        const provenTx = await unprovenTx.prove(provingProvider, CostModel.initialCostModel());
         const unsealedTxHex = toHex(provenTx.serialize());
 
         // 7. POPUP 2 â€” balanceUnsealedTransaction (dust/gas approval)
