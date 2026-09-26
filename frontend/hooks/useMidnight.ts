@@ -577,6 +577,10 @@ export function useMidnight() {
           if (cfg?.indexerUri) indexerUrl = cfg.indexerUri;
         } catch {}
 
+        if (indexerUrl.includes('indexer.preprod.midnight.network') || indexerUrl.includes('indexer.preview.midnight.network')) {
+          indexerUrl = '/api/indexer';
+        }
+
         // 2. Fetch live on-chain contract state from Midnight GraphQL indexer
         const stateHex = await fetchContractStateHex(indexerUrl, contractAddr);
         if (!stateHex) throw new Error(
