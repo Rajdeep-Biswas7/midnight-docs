@@ -36,6 +36,7 @@ Thumbs.db
 # Logs
 logs/
 *.log
+deploy*.txt
 
 # Runtime data
 pids/

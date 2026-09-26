@@ -63,12 +63,14 @@ export interface CircuitCallState {
 
 // ── Verified Contract & Network Definitions ──────────────────────────
 export const DEFAULT_PREPROD_CONTRACT = '0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b';
+export const DEFAULT_PREPROD_DEPLOY_TX = 'bfd00a8ac48f72c3d16cc1cd0dbf509e1bec72c612dcbde9dccd608eeebbb859';
 export const DEFAULT_PREVIEW_CONTRACT = '';
 
 export const NETWORK_DETAILS: Record<NetworkType, {
   name: string;
   contractAddress: string;
   deployerWallet: string;
+  deployTxHash?: string;
   indexerUrl: string;
   indexerWsUrl: string;
   nodeUrl: string;
@@ -78,6 +80,7 @@ export const NETWORK_DETAILS: Record<NetworkType, {
     name: 'Midnight Preprod',
     contractAddress: '0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b',
     deployerWallet: 'mn_addr_preprod1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q7sx7ne',
+    deployTxHash: 'bfd00a8ac48f72c3d16cc1cd0dbf509e1bec72c612dcbde9dccd608eeebbb859',
     indexerUrl: 'https://indexer.preprod.midnight.network/api/v4/graphql',
     indexerWsUrl: 'wss://indexer.preprod.midnight.network/api/v4/graphql/ws',
     nodeUrl: 'https://rpc.preprod.midnight.network',
@@ -406,12 +409,12 @@ export function useMidnight() {
       const api = connectedApiRef.current;
 
       // Wallet must be connected — no silent fallback
-      if (!api) {
+      if (!api || !walletState.isConnected) {
         setCircuitState({
           isProving: false,
           isSubmitting: false,
           txHash: null,
-          error: 'No wallet connected. Please connect your 1AM Wallet before submitting a circuit call.',
+          error: 'Wallet not connected. Please connect your 1AM Wallet before submitting a circuit call.',
           success: false,
           disclosedRound: null,
           disclosedTotal: null,

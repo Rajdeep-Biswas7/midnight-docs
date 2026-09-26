@@ -1,31 +1,43 @@
-﻿import React, { useState } from 'react';
-import { QuantumLockIcon, CircuitCoreIcon, WitnessEyeIcon } from './CustomIcons';
-import { Cpu, Send, CheckCircle2, AlertCircle, Copy, Check, Sparkles, ArrowRight, Hash, ExternalLink, ShieldAlert, Layers, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
+import { QuantumLockIcon, WitnessEyeIcon } from './CustomIcons';
+import { Cpu, Send, AlertCircle, Copy, Check, Sparkles, ArrowRight, ShieldAlert, Layers, ShieldCheck, RefreshCw, Wallet } from 'lucide-react';
 import { type CircuitCallState, NETWORK_DETAILS, type NetworkType } from '../hooks/useMidnight';
+import { TransactionReceipt } from './TransactionReceipt';
 
 interface CircuitCallProps {
   isConnected: boolean;
   circuitState: CircuitCallState;
   activeNetwork: NetworkType;
+  blockHeight?: number | null;
   onCallCircuit: (contractAddress?: string) => void;
+  onConnectWallet?: () => void;
 }
 
 export const CircuitCall: React.FC<CircuitCallProps> = ({
   isConnected,
   circuitState,
   activeNetwork,
+  blockHeight,
   onCallCircuit,
+  onConnectWallet,
 }) => {
   const currentNetworkConfig = NETWORK_DETAILS[activeNetwork];
   const [contractAddress, setContractAddress] = useState(currentNetworkConfig.contractAddress);
   const [activeMode, setActiveMode] = useState<'beneficiary' | 'contribution'>('beneficiary');
   const [copiedContract, setCopiedContract] = useState(false);
-  const [copiedTx, setCopiedTx] = useState(false);
+  const [receiptDismissed, setReceiptDismissed] = useState(false);
 
   // Sync contractAddress if activeNetwork changes
   React.useEffect(() => {
     setContractAddress(NETWORK_DETAILS[activeNetwork].contractAddress);
   }, [activeNetwork]);
+
+  // Reset receipt dismiss state when a new transaction is made
+  React.useEffect(() => {
+    if (circuitState.txHash) {
+      setReceiptDismissed(false);
+    }
+  }, [circuitState.txHash]);
 
   const {
     isProving,
@@ -47,19 +59,13 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
     }
   };
 
-  const handleCopyTx = () => {
-    if (txHash) {
-      navigator.clipboard.writeText(txHash);
-      setCopiedTx(true);
-      setTimeout(() => setCopiedTx(false), 2000);
-    }
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoading && isConnected) {
-      onCallCircuit(contractAddress);
+    // Strict wallet-gating: never allow execution if disconnected or loading
+    if (!isConnected || isLoading) {
+      return;
     }
+    onCallCircuit(contractAddress);
   };
 
   return (
@@ -76,109 +82,36 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
                 Execute Compact ZK Circuit
               </h2>
               <p className="text-xs text-zinc-500 font-mono">
-                Circuit Target: <span className="font-bold text-black dark:text-[#FFD400]">incrementWithSecret()</span>
+                Target Circuit: <span className="font-bold text-black dark:text-[#FFD400]">incrementWithSecret()</span>
                 <span className="mx-1.5">•</span>
                 <span>Prover: BLS12-381 WASM</span>
               </p>
             </div>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-full">
-            <QuantumLockIcon className="w-3.5 h-3.5 text-emerald-600" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 rounded-full">
+            <QuantumLockIcon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             ZERO-KNOWLEDGE SOUNDNESS
           </span>
         </div>
 
-        {/* 3-Step Cryptographic Execution Pipeline Card (Cyphra Style) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 font-mono text-xs">
-          {/* Step 1: Private Witness */}
-          <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-950/70 border border-zinc-200 dark:border-zinc-800 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase">1. Private Witness</span>
-                <WitnessEyeIcon className="w-3.5 h-3.5 text-purple-600" />
-              </div>
-              <h4 className="font-bold text-black dark:text-white font-sans text-xs">Off-Chain Input</h4>
-              <div className="my-2.5 p-2 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] text-zinc-700 dark:text-zinc-300 space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">Witness:</span>
-                  <span className="font-bold text-purple-700 dark:text-purple-300">secretIncrement()</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">Constraint:</span>
-                  <span className="font-bold text-emerald-600">assert(secret &gt; 0)</span>
-                </div>
-              </div>
-            </div>
-            <div className="text-[10px] text-zinc-500 font-sans leading-tight">
-              *Kept strictly in browser local memory. Never sent to network.
-            </div>
-          </div>
-
-          {/* Step 2: Compact Prover */}
-          <div className="p-4 rounded-xl bg-[#FFD400]/10 dark:bg-[#FFD400]/5 border border-[#FFD400]/40 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold text-black dark:text-[#FFD400] uppercase">2. Compact Prover</span>
-                <span className="px-1.5 py-0.5 rounded bg-[#FFD400] text-black text-[9px] font-bold font-mono">
-                  BLS12-381
-                </span>
-              </div>
-              <h4 className="font-bold text-black dark:text-white font-sans text-xs">ZK Proof Synthesis</h4>
-              <div className="my-2.5 p-2 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] text-zinc-800 dark:text-zinc-200 space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">Engine:</span>
-                  <span className="font-bold">Groth16 SNARK</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">Proof Size:</span>
-                  <span className="font-bold text-emerald-600">~128 Bytes</span>
-                </div>
-              </div>
-            </div>
-            <div className="text-[10px] text-zinc-600 dark:text-zinc-400 font-sans leading-tight">
-              *Synthesizes mathematical proof of correctness client-side.
-            </div>
-          </div>
-
-          {/* Step 3: Public Settlement */}
-          <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-950/70 border border-zinc-200 dark:border-zinc-800 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase">3. On-Chain Ledger</span>
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              </div>
-              <h4 className="font-bold text-black dark:text-white font-sans text-xs">Public Settlement</h4>
-              <div className="my-2.5 p-2 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] text-zinc-800 dark:text-zinc-200 space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">Disclosure:</span>
-                  <span className="font-bold text-emerald-600">disclose(newTotal)</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">State:</span>
-                  <span className="font-bold">round += 1</span>
-                </div>
-              </div>
-            </div>
-            <div className="text-[10px] text-zinc-500 font-sans leading-tight">
-              *Only verified public state committed to Midnight consensus.
-            </div>
-          </div>
-        </div>
-
-        {/* Action Mode Toggle */}
+        {/* Step 1: Operation Intent */}
         <div className="space-y-2">
-          <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-bold block">
-            Operation Intent
-          </label>
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-bold block">
+              Step 1: Choose Action Intent
+            </label>
+            <span className="text-[11px] font-mono text-zinc-400">Select circuit payload type</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <button
               type="button"
               onClick={() => setActiveMode('beneficiary')}
               className={`p-3.5 rounded-xl border text-left transition-all ${
                 activeMode === 'beneficiary'
                   ? 'bg-black text-white dark:bg-white dark:text-black border-black dark:border-white shadow-xs'
-                  : 'bg-zinc-50 dark:bg-zinc-950/70 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-zinc-300'
+                  : 'bg-zinc-50 dark:bg-zinc-950/70 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-700'
               }`}
             >
               <div className="font-bold text-xs flex items-center gap-1.5 font-sans">
@@ -196,7 +129,7 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
               className={`p-3.5 rounded-xl border text-left transition-all ${
                 activeMode === 'contribution'
                   ? 'bg-black text-white dark:bg-white dark:text-black border-black dark:border-white shadow-xs'
-                  : 'bg-zinc-50 dark:bg-zinc-950/70 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-zinc-300'
+                  : 'bg-zinc-50 dark:bg-zinc-950/70 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-700'
               }`}
             >
               <div className="font-bold text-xs flex items-center gap-1.5 font-sans">
@@ -210,11 +143,11 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
           </div>
         </div>
 
-        {/* Contract Address Selector */}
+        {/* Step 2: Contract Address Selector */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-bold block">
-              Contract Address ({activeNetwork.toUpperCase()})
+              Step 2: Target Contract ({activeNetwork.toUpperCase()})
             </label>
             <span className="text-[11px] font-mono text-zinc-500">32-Byte Hex Identifier</span>
           </div>
@@ -226,7 +159,7 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
               onChange={(e) => setContractAddress(e.target.value)}
               disabled={isLoading}
               className="w-full bg-zinc-50 dark:bg-zinc-950/80 pl-3.5 pr-10 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 font-mono text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-black dark:focus:border-[#FFD400] transition-colors"
-              placeholder="02c01991a0..."
+              placeholder="0f63bb305f89..."
             />
             <button
               type="button"
@@ -239,38 +172,159 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
           </div>
         </div>
 
-        {/* Action Button */}
-        <form onSubmit={handleSubmit}>
-          <button
-            type="submit"
-            disabled={!isConnected || isLoading}
-            className="w-full py-4 px-6 rounded-xl font-bold text-sm text-black bg-[#FFD400] hover:bg-[#E5BE00] active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed transition-all border border-black/15 shadow-sm flex items-center justify-center gap-2.5 font-display"
-          >
-            {isProving ? (
-              <>
-                <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                <span>Synthesizing Client-Side ZK-SNARK Proof...</span>
-              </>
-            ) : isSubmitting ? (
-              <>
-                <Send className="w-4 h-4 animate-bounce" />
-                <span>Broadcasting Sealed State Transition via 1AM...</span>
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4 text-black" />
-                <span>
-                  {activeMode === 'beneficiary'
-                    ? 'Prove Eligibility & Execute Aid Claim'
-                    : 'Synthesize Proof & Commit Confidential Increment'}
-                </span>
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
-          </button>
-        </form>
+        {/* Step 3: Cryptographic Pipeline (Pedagogical Overview with Honest Illustrative Labels) */}
+        <div className="space-y-2">
+          <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-bold block">
+            Step 3: Review Cryptographic Pipeline
+          </label>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 font-mono text-xs">
+            {/* Step 3a: Private Witness */}
+            <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-950/70 border border-zinc-200 dark:border-zinc-800 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-bold text-zinc-500 uppercase">1. Private Witness</span>
+                  <WitnessEyeIcon className="w-3.5 h-3.5 text-purple-600" />
+                </div>
+                <h4 className="font-bold text-black dark:text-white font-sans text-xs">Off-Chain Input</h4>
+                <div className="my-2.5 p-2 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] text-zinc-700 dark:text-zinc-300 space-y-1">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Witness:</span>
+                    <span className="font-bold text-purple-700 dark:text-purple-300">secretIncrement()</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Constraint:</span>
+                    <span className="font-bold text-emerald-600">assert(secret &gt; 0)</span>
+                  </div>
+                </div>
+              </div>
+              <div className="text-[10px] text-zinc-500 font-sans leading-tight">
+                *Kept strictly in browser local memory. Never sent to network.
+              </div>
+            </div>
 
-        {/* Proving HUD */}
+            {/* Step 3b: Compact Prover */}
+            <div className="p-4 rounded-xl bg-[#FFD400]/10 dark:bg-[#FFD400]/5 border border-[#FFD400]/40 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-bold text-black dark:text-[#FFD400] uppercase">2. Compact Prover</span>
+                  <span className="px-1.5 py-0.5 rounded bg-[#FFD400] text-black text-[9px] font-bold font-mono">
+                    BLS12-381
+                  </span>
+                </div>
+                <h4 className="font-bold text-black dark:text-white font-sans text-xs">ZK Proof Synthesis</h4>
+                <div className="my-2.5 p-2 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] text-zinc-800 dark:text-zinc-200 space-y-1">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Engine:</span>
+                    <span className="font-bold">Groth16 SNARK (Compact standard)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Proof Size:</span>
+                    <span className="font-bold text-emerald-600">~128 Bytes (standard illustrative figure)</span>
+                  </div>
+                </div>
+              </div>
+              <div className="text-[10px] text-zinc-600 dark:text-zinc-400 font-sans leading-tight">
+                *Synthesizes mathematical proof client-side via WebAssembly prover.
+              </div>
+            </div>
+
+            {/* Step 3c: Public Settlement */}
+            <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-950/70 border border-zinc-200 dark:border-zinc-800 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-bold text-zinc-500 uppercase">3. On-Chain Ledger</span>
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                </div>
+                <h4 className="font-bold text-black dark:text-white font-sans text-xs">Public Settlement</h4>
+                <div className="my-2.5 p-2 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] text-zinc-800 dark:text-zinc-200 space-y-1">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Disclosure:</span>
+                    <span className="font-bold text-emerald-600">disclose(newTotal)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">State:</span>
+                    <span className="font-bold">round += 1</span>
+                  </div>
+                </div>
+              </div>
+              <div className="text-[10px] text-zinc-500 font-sans leading-tight">
+                *Only verified public state delta committed to Midnight consensus.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Step 4: Wallet Gating & Execution Trigger */}
+        <div className="space-y-3">
+          <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-bold block">
+            Step 4: Execute On-Chain State Transition
+          </label>
+
+          {/* Wallet Disconnected Warning */}
+          {!isConnected && (
+            <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2.5 text-amber-900 dark:text-amber-200">
+                <Wallet className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                <span className="font-medium">
+                  <strong>Wallet Required:</strong> You must connect your 1AM Wallet before executing ZK transactions.
+                </span>
+              </div>
+              {onConnectWallet && (
+                <button
+                  type="button"
+                  onClick={onConnectWallet}
+                  className="px-3.5 py-1.5 rounded-lg bg-black text-[#FFD400] dark:bg-[#FFD400] dark:text-black font-mono font-bold text-xs hover:opacity-90 active:scale-95 transition-all self-start sm:self-auto"
+                >
+                  Connect 1AM Now
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Action Button */}
+          <form onSubmit={handleSubmit}>
+            <button
+              type="submit"
+              disabled={!isConnected || isLoading}
+              className={`w-full py-4 px-6 rounded-xl font-bold text-sm text-black transition-all border shadow-sm flex items-center justify-center gap-2.5 font-display ${
+                !isConnected
+                  ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-300 dark:border-zinc-700 cursor-not-allowed opacity-60'
+                  : isLoading
+                  ? 'bg-[#FFD400] opacity-80 cursor-wait border-black/15'
+                  : 'bg-[#FFD400] hover:bg-[#E5BE00] active:scale-[0.99] border-black/15'
+              }`}
+            >
+              {isProving ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                  <span>Synthesizing Client-Side ZK-SNARK Proof (WASM)...</span>
+                </>
+              ) : isSubmitting ? (
+                <>
+                  <Send className="w-4 h-4 animate-bounce" />
+                  <span>Broadcasting Sealed State Transition via 1AM...</span>
+                </>
+              ) : !isConnected ? (
+                <>
+                  <Wallet className="w-4 h-4" />
+                  <span>Connect Wallet to Execute Circuit</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 text-black" />
+                  <span>
+                    {activeMode === 'beneficiary'
+                      ? 'Prove Eligibility & Execute Aid Claim'
+                      : 'Synthesize Proof & Commit Confidential Increment'}
+                  </span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+
+        {/* Loading / Proving Progress HUD */}
         {isLoading && (
           <div className="p-4 bg-zinc-50 dark:bg-zinc-950/80 rounded-xl border border-zinc-200 dark:border-zinc-800 space-y-3">
             <div className="flex items-center justify-between text-xs font-mono font-bold">
@@ -292,80 +346,43 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
           </div>
         )}
 
-        {/* Error Alert */}
+        {/* Error State Alert with Retry Affordance */}
         {error && (
-          <div className="p-4 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 rounded-xl flex items-start gap-3 text-rose-800 dark:text-rose-200 text-sm">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-600 mt-0.5" />
-            <div className="space-y-1">
-              <p className="font-bold text-rose-900 dark:text-rose-100">Execution Notice</p>
-              <p className="text-xs font-mono leading-relaxed">{error}</p>
+          <div className="p-4 bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-900 rounded-xl flex items-start justify-between gap-3 text-rose-800 dark:text-rose-200 text-sm">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-600 mt-0.5" />
+              <div className="space-y-1">
+                <p className="font-bold text-rose-900 dark:text-rose-100">Execution Error</p>
+                <p className="text-xs font-mono leading-relaxed">{error}</p>
+              </div>
             </div>
+            {isConnected && !isLoading && (
+              <button
+                type="button"
+                onClick={() => onCallCircuit(contractAddress)}
+                className="px-3 py-1 bg-rose-100 dark:bg-rose-900/60 hover:bg-rose-200 text-rose-900 dark:text-rose-100 text-xs font-mono font-bold rounded-lg transition-colors flex items-center gap-1"
+              >
+                <RefreshCw className="w-3 h-3" />
+                <span>Retry</span>
+              </button>
+            )}
           </div>
         )}
 
-        {/* Success Confirmation HUD */}
-        {success && txHash && (
-          <div className="p-5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800 rounded-2xl space-y-4 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-bold text-sm">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                <span className="font-display">Zero-Knowledge Circuit Verified &amp; Sealed On-Chain!</span>
-              </div>
-              <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-full">
-                BLOCK CONFIRMED
-              </span>
-            </div>
-
-            {/* Transaction Hash Box with Direct 1AM Explorer Link */}
-            <div className="space-y-2 bg-white dark:bg-zinc-900 p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-900">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-bold flex items-center gap-1">
-                  <Hash className="w-3 h-3 text-emerald-600" />
-                  Midnight Transaction Hash
-                </span>
-                <div className="flex items-center gap-2">
-                  <a
-                    href={`https://explorer.1am.xyz/contract/${contractAddress}?network=${activeNetwork}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] text-black dark:text-[#FFD400] font-mono font-bold hover:underline"
-                  >
-                    <span>1AM Explorer</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                  <button
-                    type="button"
-                    onClick={handleCopyTx}
-                    className="inline-flex items-center gap-1 text-[11px] text-zinc-700 dark:text-zinc-300 font-mono bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-700"
-                  >
-                    {copiedTx ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                    <span>{copiedTx ? 'Copied' : 'Copy'}</span>
-                  </button>
-                </div>
-              </div>
-              <div className="font-mono text-xs text-emerald-800 dark:text-emerald-300 break-all select-all font-bold">
-                {txHash}
-              </div>
-            </div>
-
-            {/* State Transition Cards */}
-            <div className="grid grid-cols-2 gap-3 pt-1">
-              <div className="p-3.5 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center">
-                <span className="text-[10px] font-mono uppercase text-zinc-500 block mb-1">Disclosed Round</span>
-                <span className="text-lg font-bold text-black dark:text-white font-mono">#{disclosedRound}</span>
-              </div>
-              <div className="p-3.5 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center">
-                <span className="text-[10px] font-mono uppercase text-zinc-500 block mb-1">
-                  {activeMode === 'beneficiary' ? 'Total Claims Verified' : 'New Public Total'}
-                </span>
-                <span className="text-lg font-bold text-emerald-700 dark:text-emerald-400 font-mono">{disclosedTotal?.toLocaleString()}</span>
-              </div>
-            </div>
-
-            <div className="text-center pt-1 flex items-center justify-center gap-2 text-xs text-emerald-700 dark:text-emerald-400 font-bold font-mono">
-              <QuantumLockIcon className="w-4 h-4 text-emerald-600" />
-              <span>Zero knowledge was NOT leaked to the network or validators.</span>
-            </div>
+        {/* Step 5: Persistent Transaction Receipt Component (A1 Requirement) */}
+        {success && txHash && !receiptDismissed && (
+          <div className="space-y-2">
+            <label className="text-xs font-mono uppercase tracking-wider text-emerald-700 dark:text-emerald-400 font-bold block">
+              Step 5: Verified Transaction Receipt
+            </label>
+            <TransactionReceipt
+              txHash={txHash}
+              network={activeNetwork}
+              blockHeight={blockHeight}
+              round={disclosedRound}
+              totalValue={disclosedTotal}
+              onDismiss={() => setReceiptDismissed(true)}
+            />
           </div>
         )}
       </div>

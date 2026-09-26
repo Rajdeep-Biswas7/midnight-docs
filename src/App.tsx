@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useMidnight } from './hooks/useMidnight';
+import { useMidnight, DEFAULT_PREPROD_DEPLOY_TX } from './hooks/useMidnight';
 import { WalletConnect } from './components/WalletConnect';
 import { CircuitCall } from './components/CircuitCall';
 import { ProofVisualizer } from './components/ProofVisualizer';
@@ -320,15 +320,29 @@ export const App: React.FC = () => {
                   {copiedContract ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
                   <span>{copiedContract ? 'Copied' : 'Copy Hex'}</span>
                 </button>
-                <a
-                  href={`https://explorer.1am.xyz/contract/${contractState.contractAddress}?network=${activeNetwork}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-black dark:text-[#FFD400] hover:underline font-bold flex items-center gap-0.5"
-                >
-                  <span>1AM</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                <div className="flex items-center gap-2">
+                  {activeNetwork === 'preprod' && (
+                    <a
+                      href={`https://explorer.1am.xyz/tx/${DEFAULT_PREPROD_DEPLOY_TX}?network=preprod`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-emerald-700 dark:text-emerald-400 hover:underline font-bold flex items-center gap-0.5 text-[10px]"
+                      title="View Verified Contract Deployment Transaction"
+                    >
+                      <span>Deploy Tx</span>
+                      <ExternalLink className="w-2.5 h-2.5" />
+                    </a>
+                  )}
+                  <a
+                    href={`https://explorer.1am.xyz/contract/${contractState.contractAddress}?network=${activeNetwork}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-black dark:text-[#FFD400] hover:underline font-bold flex items-center gap-0.5"
+                  >
+                    <span>1AM</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
               </div>
             </div>
 
@@ -414,7 +428,9 @@ export const App: React.FC = () => {
                 isConnected={isConnected}
                 circuitState={circuitState}
                 activeNetwork={activeNetwork}
+                blockHeight={contractState.blockHeight}
                 onCallCircuit={callCircuit}
+                onConnectWallet={() => connectWallet('1am')}
               />
 
               {/* Step-by-Step ZK Execution Visualizer */}

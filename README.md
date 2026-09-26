@@ -31,17 +31,23 @@
 
 ## Contract Address
 
-| Network | Address |
-|:---|:---|
-| **Preprod** | `0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b` |
-| **Preview** | `e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e` |
+| Network | Address | Status |
+|:---|:---|:---:|
+| **Preprod** | `0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b` | 🟢 Verified Live |
+| **Preview** | *(pending — redeploy in progress)* | 🟡 Redeploying |
+
+### 🔗 Verifiable On-Chain Evidence
+- **Preprod Contract on 1AM Explorer:** [`0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b`](https://explorer.1am.xyz/contract/0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b?network=preprod)
+- **Deployment Transaction Hash:** [`bfd00a8ac48f72c3d16cc1cd0dbf509e1bec72c612dcbde9dccd608eeebbb859`](https://explorer.1am.xyz/tx/bfd00a8ac48f72c3d16cc1cd0dbf509e1bec72c612dcbde9dccd608eeebbb859?network=preprod)
+
+---
 
 ## Level 5 — User Validation
 
 - **Target:** 50 Preprod users
-- **Current:** 50 / 50 verified
-- **See `USERS.md`** for wallet addresses and on-chain explorer evidence
-- **See `docs/FEEDBACK.md`** for feedback log and changes
+- **Current Status:** **1 / 50 on-chain transacted** (49 invited/queued)
+- **See `USERS.md`** for wallet addresses, transaction evidence, and active onboarding logs
+- **See `docs/FEEDBACK.md`** for user feedback log, theme analysis, and resulting product iterations
 
 ---
 
@@ -145,6 +151,34 @@ PrivateAid addresses this by combining **Midnight's dual-state architecture** wi
 - **Valid Input Constraint:** The private input is proven to be strictly positive (`assert(secret > 0)`) or below a threshold.
 - **Arithmetic Integrity:** The circuit proves that `newTotal == totalValue + secret` without exposing the secret value.
 - **Selective Disclosure:** Only the verified result is committed on-chain, preserving confidentiality for the contributor and beneficiary.
+
+---
+
+## Technical Architecture & Data Flow
+
+```mermaid
+flowchart TD
+    U[User in Browser] -->|1. Connect| WC[DApp Connector API<br/>Lace / 1am.xyz wallet]
+    WC -->|2. Approve connection| U
+    U -->|3. Choose action + private input| FE[PrivateAid Frontend<br/>React + Vite]
+    FE -->|4. Build unproven tx| WP[Wallet Provider<br/>balanceTx / submitTx]
+    FE -->|5. Request proof| PS[Local Proof Server<br/>Docker :6300]
+    PS -->|6. Groth16 proof| FE
+    FE -->|7. Submit signed tx| NODE[Midnight Node RPC<br/>rpc.preprod.midnight.network]
+    NODE -->|8. Included in block| IDX[Indexer<br/>indexer.preprod.midnight.network]
+    IDX -->|9. Public ledger state + tx data| FE
+    FE -->|10. Render receipt| U
+
+    subgraph Private ["Stays local — never leaves the browser"]
+        WITNESS[Private Witness<br/>secretIncrement, income, etc.]
+    end
+    WITNESS -.->|used only inside proof generation| PS
+```
+
+### Architecture Narrative
+1. **Wallet Authentication:** The 1AM Wallet connector authenticates the user and exposes real addresses and balances (`api.getUnshieldedAddress`, `api.getDustBalance`) via official CAIP-372 methods — zero mocks or synthetic fallbacks.
+2. **Local Witness & Proving:** Private inputs (the witness `secretIncrement` or income data) stay strictly inside local memory and are proven via client-side WebAssembly / local proof server — never transmitted to the public indexer or node.
+3. **Selective Disclosure & Consensus:** Only the resulting cryptographic zero-knowledge proof and the public ledger delta (`disclose(newTotal)`, `round += 1`) are committed on-chain. What is provable-but-hidden vs. what is public maps directly to the Compact smart contract's public state vs. private witnesses.
 
 ---
 
@@ -269,7 +303,7 @@ See [docs/USAGE.md](docs/USAGE.md) for a comprehensive walkthrough covering prer
 ## Submission Checklist
 
 - [✓] **Public GitHub Repository:** Open-source repository with documentation, architecture notes, and setup instructions ([https://github.com/Rajdeep-Biswas7/midnight-docs](https://github.com/Rajdeep-Biswas7/midnight-docs)).
-- [✓] **Verified Contract Hex Addresses:** Deployed and verified contracts on Midnight Preprod (`0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b`) and Preview (`e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e`).
+- [✓] **Verified Contract Hex Addresses:** Deployed and verified contract on Midnight Preprod (`0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b`) with verifiable on-chain deployment transaction [`bfd00a8a...`](https://explorer.1am.xyz/tx/bfd00a8ac48f72c3d16cc1cd0dbf509e1bec72c612dcbde9dccd608eeebbb859?network=preprod); Preview redeployment in progress.
 - [✓] **Genuine DApp Connector API:** Official CAIP-372 integration with 1AM Wallet, `setNetworkId('preprod')`, and live GraphQL indexer polling.
 - [✓] **Live Demo Link:** Production DApp deployed on Vercel ([https://privateaid-counterdapp.vercel.app/](https://privateaid-counterdapp.vercel.app/)).
 - [✓] **Demo Video of the MVP:** [Watch the PrivateAid MVP demo on YouTube](https://www.youtube.com/watch?v=lAUVTL0EaUM).
