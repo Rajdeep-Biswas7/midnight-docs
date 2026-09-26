@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+﻿import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ConnectedAPI, InitialAPI } from '@midnight-ntwrk/dapp-connector-api';
 import { setNetworkId as setSdkNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 import {
@@ -20,9 +20,9 @@ import {
 } from '@midnight-ntwrk/ledger-v8';
 import { Contract } from '../../blockchain/managed/contract/index.js';
 
-// â”€â”€ KeyMaterialProvider â€” serves ZK keys from /managed/ static files â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ KeyMaterialProvider Ã¢â‚¬â€ serves ZK keys from /managed/ static files Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 // This is what wallet.getProvingProvider(keyMaterialProvider) expects.
-// The wallet's proof server needs binary ZKIR (.bzkir) â€” NOT JSON (.zkir).
+// The wallet's proof server needs binary ZKIR (.bzkir) Ã¢â‚¬â€ NOT JSON (.zkir).
 function makeKeyMaterialProvider() {
   const base = '/managed';
   function circuitName(loc: string): string {
@@ -183,7 +183,7 @@ export interface CircuitCallState {
   disclosedTotal: number | null;
 }
 
-// â”€â”€ Verified Contract & Network Definitions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬ Verified Contract & Network Definitions Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export const DEFAULT_PREPROD_CONTRACT = '0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b';
 export const DEFAULT_PREPROD_DEPLOY_TX = 'bfd00a8ac48f72c3d16cc1cd0dbf509e1bec72c612dcbde9dccd608eeebbb859';
 export const DEFAULT_PREVIEW_CONTRACT = '';
@@ -538,14 +538,12 @@ export function useMidnight() {
     });
   }, []);
 
-  // Execute ZK Circuit through 1AM Wallet DApp Connector
-  // Real flow (zkDraw-proven pattern that shows wallet popups):
-  //   1. Fetch live on-chain state from Midnight indexer
-  //   2. Build CircuitContext (compact-runtime)
-  //   3. Run contract.circuits.incrementWithSecret() -> proofData (local, no popup)
-  //   4. getProvingProvider(keyMaterial) + Transaction.prove() -> POPUP 1 (ZK proof approval)
-  //   5. balanceUnsealedTransaction()                          -> POPUP 2 (gas/dust approval)
-  //   6. submitTransaction()                                  -> POPUP 3 (broadcast)
+  // Execute ZK Circuit â€” real 1AM wallet popup flow
+  // Uses compact-runtime's proofDataIntoSerializedPreimage + provingProvider.prove
+  // to avoid WASM type mismatch between compact-runtime and ledger-v8 objects.
+  //   POPUP 1: getProvingProvider + provingProvider.prove  (ZK proof approval)
+  //   POPUP 2: balanceUnsealedTransaction                  (gas/dust approval)
+  //   POPUP 3: submitTransaction                           (broadcast)
   const callCircuit = useCallback(
     async (targetContractAddress?: string) => {
       const contractAddr = targetContractAddress || NETWORK_DETAILS[activeNetwork].contractAddress;
@@ -566,14 +564,13 @@ export function useMidnight() {
       });
 
       try {
-        // 0. Non-fatal hintUsage
+        // hint (non-fatal)
         try {
-          if (typeof api.hintUsage === 'function') {
-            await api.hintUsage(['getProvingProvider', 'balanceUnsealedTransaction', 'submitTransaction', 'getShieldedAddresses']);
-          }
+          if (typeof api.hintUsage === 'function')
+            await api.hintUsage(['getProvingProvider', 'balanceUnsealedTransaction', 'submitTransaction']);
         } catch {}
 
-        // 1. Resolve indexer URL from connected wallet config (wallet knows its own network)
+        // 1. Resolve indexer URL from wallet config
         let indexerUrl = NETWORK_DETAILS[activeNetwork].indexerUrl;
         try {
           const cfg = await (api as any).getConfiguration?.() ?? await (api as any).serviceUriConfig?.() ?? null;
@@ -583,12 +580,11 @@ export function useMidnight() {
         // 2. Fetch live on-chain contract state from Midnight GraphQL indexer
         const stateHex = await fetchContractStateHex(indexerUrl, contractAddr);
         if (!stateHex) throw new Error(
-          `Contract ${contractAddr.slice(0, 10)}... not found on ${activeNetwork}. ` +
-          `Ensure the contract is deployed and the network is correct.`
+          `Contract ${contractAddr.slice(0, 10)}... not found on ${activeNetwork}.`
         );
         const contractStateObj = ContractState.deserialize(fromHex(stateHex));
 
-        // 3. Derive coinPublicKey for zswap local state (must be pure hex, not bech32)
+        // 3. Coin public key (must be pure hex, not bech32)
         let coinPublicKey = '00'.repeat(32);
         try {
           const shielded = await api.getShieldedAddresses();
@@ -596,12 +592,12 @@ export function useMidnight() {
           if (/^[0-9a-fA-F]+$/.test(rawKey)) {
             coinPublicKey = rawKey;
           } else if (rawKey) {
-            const hashBuf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(rawKey));
-            coinPublicKey = toHex(new Uint8Array(hashBuf));
+            const hb = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(rawKey));
+            coinPublicKey = toHex(new Uint8Array(hb));
           }
         } catch {}
 
-        // 4. Build Contract + CircuitContext
+        // 4. Build circuit context and run circuit locally (no popup)
         const witnesses = { secretIncrement: (ctx: any): [any, bigint] => [ctx.privateState, 1n] };
         const contract = new Contract(witnesses as any);
         const circuitContext = createCircuitContext(
@@ -610,103 +606,68 @@ export function useMidnight() {
           contractStateObj,
           {},
         );
+        const proofData = contract.circuits.incrementWithSecret(circuitContext as any);
 
-        // 5. Execute circuit locally to get proofData (no network, no popup yet)
-        const circuitResults = contract.circuits.incrementWithSecret(circuitContext as any);
-        const proofData = (circuitResults as any)?.result ?? circuitResults;
-
-        // 6. Build ledger-v8 PrePartitionContractCall
-        const ledgerState = LedgerContractState.deserialize(contractStateObj.serialize());
-        const op = ledgerState.operation('incrementWithSecret') ?? new ContractOperation();
-        const rand = communicationCommitmentRandomness();
-        const ledgerQueryCtx = new LedgerQueryContext(ledgerState.data, contractAddr);
-        const preTranscript = new PreTranscript(ledgerQueryCtx, proofData.publicTranscript);
-        const callPrototype = new PrePartitionContractCall(
-          contractAddr, 'incrementWithSecret', op, preTranscript,
-          proofData.privateTranscriptOutputs, proofData.input, proofData.output,
-          rand, 'incrementWithSecret',
+        // 5. Serialize proof data using compact-runtime (same WASM module â€” no type mismatch)
+        const serializedPreimage = proofDataIntoSerializedPreimage(
+          (proofData as any).input,
+          (proofData as any).output,
+          (proofData as any).publicTranscript,
+          (proofData as any).privateTranscriptOutputs,
+          'incrementWithSecret',
         );
 
-        // 7. Build unproven transaction
-        const ledgerParams = LedgerParameters.initialParameters();
-        const ttl = new Date(Date.now() + 3600 * 1000);
-        const unprovenTx = (Transaction as any)
-          .fromPartsRandomized(activeNetwork, undefined, undefined, undefined)
-          .addCalls({ tag: 'first' }, [callPrototype], ledgerParams, ttl);
-
-        // 8. -- POPUP 1 -- getProvingProvider + Transaction.prove
-        // The 1AM wallet extension opens a popup here for the user to approve the ZK proof
-        const keyMaterialProvider = makeKeyMaterialProvider();
-        const provingProvider = await (api as any).getProvingProvider(keyMaterialProvider);
-
-        let unsealedTxHex: string;
-        try {
-          const costModel = CostModel.initialCostModel();
-          const provenTx = await unprovenTx.prove(provingProvider, costModel);
-          unsealedTxHex = toHex(provenTx.serialize());
-        } catch (proveErr) {
-          console.warn('Transaction.prove fallback:', proveErr);
-          const preimage = proofDataIntoSerializedPreimage(
-            proofData.input, proofData.output,
-            proofData.publicTranscript, proofData.privateTranscriptOutputs,
-            'incrementWithSecret',
-          );
-          unsealedTxHex = toHex(await provingProvider.prove(preimage, 'incrementWithSecret') as Uint8Array);
-        }
+        // 6. POPUP 1 â€” getProvingProvider + prove (1AM Wallet approval)
+        const keyMaterial = makeKeyMaterialProvider();
+        const provingProvider = await (api as any).getProvingProvider(keyMaterial);
+        const unsealedBytes = await provingProvider.prove(serializedPreimage, 'incrementWithSecret');
+        const unsealedTxHex = toHex(unsealedBytes instanceof Uint8Array ? unsealedBytes : new Uint8Array(unsealedBytes));
 
         setCircuitState((prev) => ({ ...prev, isProving: false, isSubmitting: true }));
 
-        // 9. -- POPUP 2 -- balanceUnsealedTransaction (dust/gas approval)
+        // 7. POPUP 2 â€” balanceUnsealedTransaction (dust/gas approval)
         let balancedTxHex: string | undefined;
         for (let attempt = 1; attempt <= 3; attempt++) {
           try {
             const bal = await api.balanceUnsealedTransaction(unsealedTxHex as any);
-            balancedTxHex = (bal as any)?.tx ?? bal;
-            if (typeof balancedTxHex !== 'string') balancedTxHex = toHex(balancedTxHex as unknown as Uint8Array);
+            balancedTxHex = typeof bal === 'string' ? bal : (bal as any)?.tx;
+            if (balancedTxHex && typeof balancedTxHex !== 'string')
+              balancedTxHex = toHex(balancedTxHex as unknown as Uint8Array);
             break;
-          } catch (balErr: any) {
-            const msg = (balErr?.message ?? '').toLowerCase();
-            const isRetryable = !msg.includes('duplicate') && (msg.includes('pending') || msg.includes('wait'));
-            if (isRetryable && attempt < 3) { await new Promise((r) => setTimeout(r, 8000)); }
-            else throw balErr;
+          } catch (e: any) {
+            const m = (e?.message ?? '').toLowerCase();
+            if (!m.includes('duplicate') && (m.includes('pending') || m.includes('wait')) && attempt < 3)
+              await new Promise((r) => setTimeout(r, 8000));
+            else throw e;
           }
         }
-        if (!balancedTxHex) throw new Error('Transaction balancing failed: no response from wallet.');
+        if (!balancedTxHex) throw new Error('balanceUnsealedTransaction returned no result.');
 
-        // 10. -- POPUP 3 -- submitTransaction (broadcast to Midnight network)
+        // 8. POPUP 3 â€” submitTransaction (broadcast)
         const submitResult = await api.submitTransaction(balancedTxHex as any);
         const txId = await extractTxHash(balancedTxHex, submitResult);
 
-        // 11. Update UI with confirmed state
-        let confirmedRound = contractState.round + 1;
-        let confirmedTotal = contractState.totalValue + 1;
-        try {
-          if ((proofData as any)?.output?.round !== undefined) confirmedRound = Number((proofData as any).output.round);
-          if ((proofData as any)?.output?.totalValue !== undefined) confirmedTotal = Number((proofData as any).output.totalValue);
-        } catch {}
+        const confirmedRound = contractState.round + 1;
+        const confirmedTotal = contractState.totalValue + 1;
 
         setCircuitState({
           isProving: false, isSubmitting: false,
           txHash: txId, error: null, success: true,
           disclosedRound: confirmedRound, disclosedTotal: confirmedTotal,
         });
-
         setContractState((prev) => ({
           ...prev, round: confirmedRound, totalValue: confirmedTotal,
           isLoading: false, lastUpdated: new Date().toLocaleTimeString(), contractAddress: contractAddr,
         }));
-
         setContributionHistory((prev) => [{
-          id: `tx-${txId.slice(0, 8)}`,
-          round: confirmedRound, totalValue: confirmedTotal,
-          txHash: txId, time: 'Just now',
-          type: 'Relief Aid Claim', status: 'Confirmed on-chain',
+          id: `tx-${txId.slice(0, 8)}`, round: confirmedRound, totalValue: confirmedTotal,
+          txHash: txId, time: 'Just now', type: 'Relief Aid Claim', status: 'Confirmed on-chain',
         }, ...prev]);
       } catch (err: any) {
         console.error('Circuit execution error:', err);
         setCircuitState({
           isProving: false, isSubmitting: false, txHash: null,
-          error: err?.message || 'Transaction failed during zero-knowledge proof verification.',
+          error: err?.message || 'Transaction failed.',
           success: false, disclosedRound: null, disclosedTotal: null,
         });
       }
