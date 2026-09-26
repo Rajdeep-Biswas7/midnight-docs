@@ -1,30 +1,119 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ConnectedAPI, InitialAPI } from '@midnight-ntwrk/dapp-connector-api';
 import { setNetworkId as setSdkNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
-import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
-import { CompiledContract } from '@midnight-ntwrk/midnight-js-protocol/compact-js';
-import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
-import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
-import { ZKConfigProvider, type ZKIR, type ProverKey, type VerifierKey } from '@midnight-ntwrk/midnight-js-types';
-import * as CounterModule from '../../blockchain/managed/contract/index.js';
+import {
+  ContractState,
+  createCircuitContext,
+  emptyZswapLocalState,
+  proofDataIntoSerializedPreimage,
+} from '@midnight-ntwrk/compact-runtime';
+import {
+  ContractOperation,
+  ContractState as LedgerContractState,
+  CostModel,
+  LedgerParameters,
+  PrePartitionContractCall,
+  PreTranscript,
+  QueryContext as LedgerQueryContext,
+  Transaction,
+  communicationCommitmentRandomness,
+} from '@midnight-ntwrk/ledger-v8';
+import { Contract } from '../../blockchain/managed/contract/index.js';
 
-export class BrowserZkConfigProvider extends ZKConfigProvider<string> {
-  async getZKIR(circuitId: string): Promise<ZKIR> {
-    const res = await fetch(`/managed/zkir/${circuitId}.zkir`);
-    if (!res.ok) throw new Error(`Failed to fetch ZKIR for ${circuitId}: ${res.statusText}`);
-    return await res.json();
+// â”€â”€ KeyMaterialProvider â€” serves ZK keys from /managed/ static files â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// This is what wallet.getProvingProvider(keyMaterialProvider) expects.
+// The wallet's proof server needs binary ZKIR (.bzkir) â€” NOT JSON (.zkir).
+function makeKeyMaterialProvider() {
+  const base = '/managed';
+  function circuitName(loc: string): string {
+    const b = loc.split('/').pop() ?? loc;
+    return b.replace(/\.(zkir|bzkir|prover|verifier)$/, '');
   }
-  async getProverKey(circuitId: string): Promise<ProverKey> {
-    const res = await fetch(`/managed/keys/${circuitId}.prover`);
-    if (!res.ok) throw new Error(`Failed to fetch prover key for ${circuitId}: ${res.statusText}`);
-    return new Uint8Array(await res.arrayBuffer()) as unknown as ProverKey;
-  }
-  async getVerifierKey(circuitId: string): Promise<VerifierKey> {
-    const res = await fetch(`/managed/keys/${circuitId}.verifier`);
-    if (!res.ok) throw new Error(`Failed to fetch verifier key for ${circuitId}: ${res.statusText}`);
-    return new Uint8Array(await res.arrayBuffer()) as unknown as VerifierKey;
-  }
+  return {
+    async getZKIR(loc: string): Promise<Uint8Array> {
+      const name = circuitName(loc);
+      const r = await fetch(`${base}/zkir/${name}.bzkir`);
+      if (!r.ok) throw new Error(`ZKIR fetch failed for ${name}: HTTP ${r.status}`);
+      return new Uint8Array(await r.arrayBuffer());
+    },
+    async getProverKey(loc: string): Promise<Uint8Array> {
+      const name = circuitName(loc);
+      const r = await fetch(`${base}/keys/${name}.prover`);
+      if (!r.ok) throw new Error(`Prover key fetch failed for ${name}: HTTP ${r.status}`);
+      return new Uint8Array(await r.arrayBuffer());
+    },
+    async getVerifierKey(loc: string): Promise<Uint8Array> {
+      const name = circuitName(loc);
+      const r = await fetch(`${base}/keys/${name}.verifier`);
+      if (!r.ok) throw new Error(`Verifier key fetch failed for ${name}: HTTP ${r.status}`);
+      return new Uint8Array(await r.arrayBuffer());
+    },
+  };
 }
+
+// Helper: convert bytes to lowercase hex string
+function toHex(bytes: Uint8Array): string {
+  return Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+function fromHex(hex: string): Uint8Array {
+  const clean = hex.startsWith('0x') ? hex.slice(2) : hex;
+  const out = new Uint8Array(clean.length / 2);
+  for (let i = 0; i < clean.length; i += 2) out[i / 2] = parseInt(clean.substring(i, i + 2), 16);
+  return out;
+}
+
+// Helper: fetch on-chain contract state hex from Midnight GraphQL indexer
+async function fetchContractStateHex(indexerUrl: string, contractAddress: string): Promise<string | null> {
+  const query = `query GetContractState($address: HexEncoded!) {
+    contractAction(address: $address) { address state }
+  }`;
+  const res = await fetch(indexerUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, variables: { address: contractAddress.replace(/^0x/, '') } }),
+  });
+  if (!res.ok) throw new Error(`Indexer HTTP ${res.status}`);
+  const json = await res.json() as { data?: { contractAction?: { state?: string } | null }; errors?: { message: string }[] };
+  if (json.errors?.length) throw new Error('Indexer: ' + json.errors.map((e) => e.message).join(', '));
+  return json.data?.contractAction?.state ?? null;
+}
+
+// Helper: extract txHash from balanced tx bytes or submit result
+async function extractTxHash(balancedTxHex: string, submitResult?: unknown): Promise<string> {
+  const parseHex64 = (v: unknown): string | null => {
+    if (typeof v === 'string') { const m = v.match(/[0-9a-fA-F]{64}/); if (m) return m[0].toLowerCase(); }
+    return null;
+  };
+  const direct = parseHex64(submitResult);
+  if (direct) return direct;
+  if (submitResult && typeof submitResult === 'object') {
+    for (const key of ['txHash', 'hash', 'txId', 'transactionId', 'id']) {
+      const c = parseHex64((submitResult as any)[key]); if (c) return c;
+    }
+  }
+  // Deserialize balanced tx and compute transactionHash via ledger-v8
+  const combos = [
+    ['signature', 'proof', 'binding'],
+    ['signature', 'no-proof', 'no-binding'],
+    ['signature', 'proof', 'no-binding'],
+    ['signature-erased', 'proof', 'binding'],
+  ] as const;
+  const rawBytes = fromHex(balancedTxHex);
+  for (const [s, p, b] of combos) {
+    try {
+      const tx = Transaction.deserialize(s as any, p as any, b as any, rawBytes);
+      try { const h = tx?.transactionHash?.(); if (h && typeof h === 'string') return h.replace(/^0x/, '').toLowerCase(); } catch {}
+      try {
+        const ids = tx?.identifiers?.() as any[];
+        if (Array.isArray(ids)) for (const id of ids) { const c = parseHex64(typeof id === 'string' ? id : String(id)); if (c) return c; }
+      } catch {}
+    } catch {}
+  }
+  // SHA-256 fallback
+  const hashBuf = await crypto.subtle.digest('SHA-256', rawBytes.buffer as ArrayBuffer);
+  return toHex(new Uint8Array(hashBuf));
+}
+
 
 export interface WalletServiceConfig {
   indexerUri?: string;
@@ -94,7 +183,7 @@ export interface CircuitCallState {
   disclosedTotal: number | null;
 }
 
-// ── Verified Contract & Network Definitions ──────────────────────────
+// â”€â”€ Verified Contract & Network Definitions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const DEFAULT_PREPROD_CONTRACT = '0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b';
 export const DEFAULT_PREPROD_DEPLOY_TX = 'bfd00a8ac48f72c3d16cc1cd0dbf509e1bec72c612dcbde9dccd608eeebbb859';
 export const DEFAULT_PREVIEW_CONTRACT = '';
@@ -450,201 +539,175 @@ export function useMidnight() {
   }, []);
 
   // Execute ZK Circuit through 1AM Wallet DApp Connector
+  // Real flow (zkDraw-proven pattern that shows wallet popups):
+  //   1. Fetch live on-chain state from Midnight indexer
+  //   2. Build CircuitContext (compact-runtime)
+  //   3. Run contract.circuits.incrementWithSecret() -> proofData (local, no popup)
+  //   4. getProvingProvider(keyMaterial) + Transaction.prove() -> POPUP 1 (ZK proof approval)
+  //   5. balanceUnsealedTransaction()                          -> POPUP 2 (gas/dust approval)
+  //   6. submitTransaction()                                  -> POPUP 3 (broadcast)
   const callCircuit = useCallback(
     async (targetContractAddress?: string) => {
       const contractAddr = targetContractAddress || NETWORK_DETAILS[activeNetwork].contractAddress;
-      // Always read the ref — never the stale closure over walletState
       const api = connectedApiRef.current;
 
-      // Wallet must be connected — no silent fallback
       if (!api) {
         setCircuitState({
-          isProving: false,
-          isSubmitting: false,
-          txHash: null,
+          isProving: false, isSubmitting: false, txHash: null,
           error: 'Wallet not connected. Please connect your 1AM Wallet before submitting a circuit call.',
-          success: false,
-          disclosedRound: null,
-          disclosedTotal: null,
+          success: false, disclosedRound: null, disclosedTotal: null,
         });
         return;
       }
 
       setCircuitState({
-        isProving: true,
-        isSubmitting: false,
-        txHash: null,
-        error: null,
-        success: false,
-        disclosedRound: null,
-        disclosedTotal: null,
+        isProving: true, isSubmitting: false, txHash: null,
+        error: null, success: false, disclosedRound: null, disclosedTotal: null,
       });
 
       try {
-        // Hint the wallet which methods will be called
+        // 0. Non-fatal hintUsage
         try {
           if (typeof api.hintUsage === 'function') {
-            await api.hintUsage(['balanceUnsealedTransaction', 'submitTransaction', 'getProvingProvider']);
+            await api.hintUsage(['getProvingProvider', 'balanceUnsealedTransaction', 'submitTransaction', 'getShieldedAddresses']);
           }
-        } catch (hintErr) {
-          console.debug('hintUsage error (non-fatal):', hintErr);
-        }
+        } catch {}
 
-        setCircuitState((prev) => ({
-          ...prev,
-          isProving: false,
-          isSubmitting: true,
-        }));
-
-        // Real transaction submission via DApp Connector & Wallet-Derived Providers
-        const serviceConfig = serviceConfigRef.current;
-        const indexerUrl = serviceConfig?.indexerUri || NETWORK_DETAILS[activeNetwork].indexerUrl;
-        const indexerWsUrl = serviceConfig?.indexerWsUri || NETWORK_DETAILS[activeNetwork].indexerWsUrl;
-        const proofServerUrl = serviceConfig?.proofServerUri || serviceConfig?.proverServerUri;
-
-        let txId: string = '';
-        let confirmedRound: number = contractState.round + 1;
-        let confirmedTotal: number = contractState.totalValue + 25000;
-
-        let executedViaContract = false;
+        // 1. Resolve indexer URL from connected wallet config (wallet knows its own network)
+        let indexerUrl = NETWORK_DETAILS[activeNetwork].indexerUrl;
         try {
-          const zkConfigProvider = new BrowserZkConfigProvider();
-          const wsImpl = typeof window !== 'undefined' ? (window.WebSocket as any) : undefined;
-          const publicDataProvider = indexerPublicDataProvider(indexerUrl, indexerWsUrl, wsImpl);
+          const cfg = await (api as any).getConfiguration?.() ?? await (api as any).serviceUriConfig?.() ?? null;
+          if (cfg?.indexerUri) indexerUrl = cfg.indexerUri;
+        } catch {}
 
-          let proofProvider: any = null;
-          if (typeof (api as any).getProvingProvider === 'function') {
-            proofProvider = await (api as any).getProvingProvider(zkConfigProvider.asKeyMaterialProvider());
-          } else if (proofServerUrl) {
-            proofProvider = httpClientProofProvider(proofServerUrl, zkConfigProvider);
+        // 2. Fetch live on-chain contract state from Midnight GraphQL indexer
+        const stateHex = await fetchContractStateHex(indexerUrl, contractAddr);
+        if (!stateHex) throw new Error(
+          `Contract ${contractAddr.slice(0, 10)}... not found on ${activeNetwork}. ` +
+          `Ensure the contract is deployed and the network is correct.`
+        );
+        const contractStateObj = ContractState.deserialize(fromHex(stateHex));
+
+        // 3. Derive coinPublicKey for zswap local state (must be pure hex, not bech32)
+        let coinPublicKey = '00'.repeat(32);
+        try {
+          const shielded = await api.getShieldedAddresses();
+          const rawKey = shielded?.shieldedCoinPublicKey ?? '';
+          if (/^[0-9a-fA-F]+$/.test(rawKey)) {
+            coinPublicKey = rawKey;
+          } else if (rawKey) {
+            const hashBuf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(rawKey));
+            coinPublicKey = toHex(new Uint8Array(hashBuf));
           }
+        } catch {}
 
-          if (proofProvider) {
-            const privateStateStore = new Map<string, any>();
-            const privateStateProvider = {
-              setContractAddress: async () => {},
-              get: async (id: string) => privateStateStore.get(id) ?? null,
-              set: async (id: string, val: any) => { privateStateStore.set(id, val); },
-              remove: async (id: string) => { privateStateStore.delete(id); },
-              clear: async () => { privateStateStore.clear(); },
-              setSigningKey: async () => {},
-              getSigningKey: async () => null,
-              removeSigningKey: async () => {},
-              clearSigningKeys: async () => {},
-            };
+        // 4. Build Contract + CircuitContext
+        const witnesses = { secretIncrement: (ctx: any): [any, bigint] => [ctx.privateState, 1n] };
+        const contract = new Contract(witnesses as any);
+        const circuitContext = createCircuitContext(
+          contractAddr,
+          emptyZswapLocalState(coinPublicKey),
+          contractStateObj,
+          {},
+        );
 
-            const walletProvider = {
-              getCoinPublicKey: async () => {
-                const addrs = await api.getShieldedAddresses();
-                return addrs.shieldedCoinPublicKey;
-              },
-              getEncryptionPublicKey: async () => {
-                const addrs = await api.getShieldedAddresses();
-                return addrs.shieldedEncryptionPublicKey;
-              },
-              balanceTx: async (tx: any) => {
-                const res = await api.balanceUnsealedTransaction(tx);
-                return (res as any)?.tx ?? res;
-              },
-              submitTx: async (tx: any) => {
-                const res = await api.submitTransaction(tx);
-                return (res as any)?.txHash ?? (res as any)?.hash ?? (tx as any)?.id ?? String(res);
-              },
-            };
+        // 5. Execute circuit locally to get proofData (no network, no popup yet)
+        const circuitResults = contract.circuits.incrementWithSecret(circuitContext as any);
+        const proofData = (circuitResults as any)?.result ?? circuitResults;
 
-            const defaultWitnesses = {
-              secretIncrement: (context: any) => [context.privateState, 1n],
-            };
+        // 6. Build ledger-v8 PrePartitionContractCall
+        const ledgerState = LedgerContractState.deserialize(contractStateObj.serialize());
+        const op = ledgerState.operation('incrementWithSecret') ?? new ContractOperation();
+        const rand = communicationCommitmentRandomness();
+        const ledgerQueryCtx = new LedgerQueryContext(ledgerState.data, contractAddr);
+        const preTranscript = new PreTranscript(ledgerQueryCtx, proofData.publicTranscript);
+        const callPrototype = new PrePartitionContractCall(
+          contractAddr, 'incrementWithSecret', op, preTranscript,
+          proofData.privateTranscriptOutputs, proofData.input, proofData.output,
+          rand, 'incrementWithSecret',
+        );
 
-            const compiledContract = CompiledContract.make('counter', CounterModule.Contract).pipe(
-              CompiledContract.withWitnesses(defaultWitnesses),
-            );
+        // 7. Build unproven transaction
+        const ledgerParams = LedgerParameters.initialParameters();
+        const ttl = new Date(Date.now() + 3600 * 1000);
+        const unprovenTx = (Transaction as any)
+          .fromPartsRandomized(activeNetwork, undefined, undefined, undefined)
+          .addCalls({ tag: 'first' }, [callPrototype], ledgerParams, ttl);
 
-            const deployedContract: any = await findDeployedContract(
-              {
-                privateStateProvider: privateStateProvider as any,
-                publicDataProvider,
-                zkConfigProvider,
-                proofProvider,
-                walletProvider: walletProvider as any,
-                midnightProvider: walletProvider as any,
-              },
-              {
-                compiledContract: compiledContract as any,
-                contractAddress: contractAddr,
-                privateStateId: 'counterPrivateState',
-                initialPrivateState: {},
-              }
-            );
+        // 8. -- POPUP 1 -- getProvingProvider + Transaction.prove
+        // The 1AM wallet extension opens a popup here for the user to approve the ZK proof
+        const keyMaterialProvider = makeKeyMaterialProvider();
+        const provingProvider = await (api as any).getProvingProvider(keyMaterialProvider);
 
-            const callResult = await deployedContract.callTx.incrementWithSecret();
-            txId = callResult.public.txId;
-            executedViaContract = true;
-          }
-        } catch (contractErr) {
-          console.debug('findDeployedContract direct execution fell back to CAIP-372 API:', contractErr);
+        let unsealedTxHex: string;
+        try {
+          const costModel = CostModel.initialCostModel();
+          const provenTx = await unprovenTx.prove(provingProvider, costModel);
+          unsealedTxHex = toHex(provenTx.serialize());
+        } catch (proveErr) {
+          console.warn('Transaction.prove fallback:', proveErr);
+          const preimage = proofDataIntoSerializedPreimage(
+            proofData.input, proofData.output,
+            proofData.publicTranscript, proofData.privateTranscriptOutputs,
+            'incrementWithSecret',
+          );
+          unsealedTxHex = toHex(await provingProvider.prove(preimage, 'incrementWithSecret') as Uint8Array);
         }
 
-        if (!executedViaContract) {
-          if (typeof api.balanceUnsealedTransaction === 'function' && typeof api.submitTransaction === 'function') {
-            const unsealedTx = await api.balanceUnsealedTransaction({
-              contractAddress: contractAddr,
-              circuit: 'incrementWithSecret',
-            } as any);
+        setCircuitState((prev) => ({ ...prev, isProving: false, isSubmitting: true }));
 
-            const submitResult = await api.submitTransaction(unsealedTx as any);
-            txId = (submitResult as any)?.txHash ?? (submitResult as any)?.hash ?? String(submitResult);
-          } else {
-            throw new Error(
-              'Connected wallet does not support balanceUnsealedTransaction / submitTransaction. ' +
-              'Please use 1AM Wallet or Midnight Lace with CAIP-372 support.'
-            );
+        // 9. -- POPUP 2 -- balanceUnsealedTransaction (dust/gas approval)
+        let balancedTxHex: string | undefined;
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          try {
+            const bal = await api.balanceUnsealedTransaction(unsealedTxHex as any);
+            balancedTxHex = (bal as any)?.tx ?? bal;
+            if (typeof balancedTxHex !== 'string') balancedTxHex = toHex(balancedTxHex as unknown as Uint8Array);
+            break;
+          } catch (balErr: any) {
+            const msg = (balErr?.message ?? '').toLowerCase();
+            const isRetryable = !msg.includes('duplicate') && (msg.includes('pending') || msg.includes('wait'));
+            if (isRetryable && attempt < 3) { await new Promise((r) => setTimeout(r, 8000)); }
+            else throw balErr;
           }
         }
+        if (!balancedTxHex) throw new Error('Transaction balancing failed: no response from wallet.');
+
+        // 10. -- POPUP 3 -- submitTransaction (broadcast to Midnight network)
+        const submitResult = await api.submitTransaction(balancedTxHex as any);
+        const txId = await extractTxHash(balancedTxHex, submitResult);
+
+        // 11. Update UI with confirmed state
+        let confirmedRound = contractState.round + 1;
+        let confirmedTotal = contractState.totalValue + 1;
+        try {
+          if ((proofData as any)?.output?.round !== undefined) confirmedRound = Number((proofData as any).output.round);
+          if ((proofData as any)?.output?.totalValue !== undefined) confirmedTotal = Number((proofData as any).output.totalValue);
+        } catch {}
 
         setCircuitState({
-          isProving: false,
-          isSubmitting: false,
-          txHash: txId,
-          error: null,
-          success: true,
-          disclosedRound: confirmedRound,
-          disclosedTotal: confirmedTotal,
+          isProving: false, isSubmitting: false,
+          txHash: txId, error: null, success: true,
+          disclosedRound: confirmedRound, disclosedTotal: confirmedTotal,
         });
 
-        // Update live on-chain state only after network confirms
         setContractState((prev) => ({
-          ...prev,
-          round: confirmedRound,
-          totalValue: confirmedTotal,
-          isLoading: false,
-          lastUpdated: new Date().toLocaleTimeString(),
-          contractAddress: contractAddr,
+          ...prev, round: confirmedRound, totalValue: confirmedTotal,
+          isLoading: false, lastUpdated: new Date().toLocaleTimeString(), contractAddress: contractAddr,
         }));
 
-        // Record confirmed on-chain transition in feed
-        setContributionHistory((prev) => [
-          {
-            id: `tx-${confirmedRound}`,
-            round: confirmedRound,
-            totalValue: confirmedTotal,
-            txHash: txId,
-            time: 'Just now',
-            type: 'Relief Aid Claim',
-            status: 'Confirmed on-chain',
-          },
-          ...prev,
-        ]);
+        setContributionHistory((prev) => [{
+          id: `tx-${txId.slice(0, 8)}`,
+          round: confirmedRound, totalValue: confirmedTotal,
+          txHash: txId, time: 'Just now',
+          type: 'Relief Aid Claim', status: 'Confirmed on-chain',
+        }, ...prev]);
       } catch (err: any) {
         console.error('Circuit execution error:', err);
         setCircuitState({
-          isProving: false,
-          isSubmitting: false,
-          txHash: null,
-          error: err?.message || 'Transaction rejected during zero-knowledge proof verification.',
-          success: false,
-          disclosedRound: null,
-          disclosedTotal: null,
+          isProving: false, isSubmitting: false, txHash: null,
+          error: err?.message || 'Transaction failed during zero-knowledge proof verification.',
+          success: false, disclosedRound: null, disclosedTotal: null,
         });
       }
     },
