@@ -17,6 +17,8 @@
   "dependencies": {
     "@midnight-ntwrk/compact-runtime": "0.16.0",
     "@midnight-ntwrk/dapp-connector-api": "^4.0.1",
+    "@midnight-ntwrk/ledger-v8": "^8.1.0",
+    "@midnight-ntwrk/midnight-js-network-id": "^4.1.1",
     "@scure/bip39": "2.2.0",
     "lucide-react": "^1.46.0",
     "react": "^19.3.0",
