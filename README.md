@@ -88,7 +88,7 @@ A sleek, cyber-inspired interface with dark and light themes, animated backgroun
 
 | Dark Cyber Theme (Default) | High-Contrast Light Theme |
 |:---:|:---:|
-| <img src="docs/images/hero-dark.png" alt="Dark Cyber Theme" width="100%" /> | <img src="docs/images/hero-light.jpg" alt="Light Aurora Theme" width="100%" /> |
+| <img src="docs/images/hero-dark.png" alt="Dark Cyber Theme" width="100%" /> |
 
 ---
 
