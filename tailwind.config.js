@@ -8,16 +8,17 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Syne', 'sans-serif'],
-        sans: ['Space Grotesk', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        mono: ['var(--font-mono)', 'JetBrains Mono', 'Fira Code', 'monospace'],
+        sans: ['var(--font-sans)', 'system-ui', '-apple-system', 'sans-serif'],
       },
       colors: {
-        midnight: {
-          950: '#030712',
-          900: '#070d1e',
-          800: '#0c142b',
-          700: '#142145',
+        terminal: {
+          base: 'var(--bg-base)',
+          elevated: 'var(--bg-elevated)',
+          border: 'var(--border-subtle)',
+          primary: 'var(--text-primary)',
+          muted: 'var(--text-muted)',
+          accent: 'var(--accent)',
         },
       },
     },
