@@ -29,9 +29,12 @@ import {
   Layers,
   Sparkles,
   RefreshCw,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 export const App: React.FC = () => {
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<'all' | 'circuits' | 'aid' | 'ledger'>('all');
   const [copiedContract, setCopiedContract] = useState(false);
 
@@ -48,14 +51,20 @@ export const App: React.FC = () => {
       } else {
         clearInterval(interval);
       }
-    }, 42); // 42ms * 26 chars = ~1.1s total duration
+    }, 40); // 40ms * 26 chars = ~1.04s total duration
     return () => clearInterval(interval);
   }, []);
 
   // Synchronize documentElement dark mode class
   useEffect(() => {
-    document.documentElement.classList.add('dark');
-  }, []);
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  }, [isDarkMode]);
 
   const {
     isConnected,
@@ -92,46 +101,46 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen text-[#f5f5f5] bg-[#0a0a0a] flex flex-col justify-between overflow-x-hidden selection:bg-[#22c55e] selection:text-black font-sans">
-      {/* Subtle Terminal Background Grid & Minimal Particles */}
-      <AnimatedBackground />
+    <div className="relative min-h-screen text-foreground bg-background flex flex-col justify-between overflow-x-hidden selection:bg-accent selection:text-accent-foreground font-sans transition-colors duration-200">
+      {/* Subtle Anchor Grid & Keppel Particle Engine */}
+      <AnimatedBackground isDarkMode={isDarkMode} />
 
       {/* Foreground Main Container */}
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* ============================================================
-            Top Developer Terminal HUD Navigation (Full Laptop Width)
+            Top Developer Terminal HUD Navigation (Spanning Full Laptop Width)
             ============================================================ */}
-        <header className="border-b border-[#1f1f1f] bg-[#0a0a0a]/90 backdrop-blur-xl sticky top-0 z-50">
+        <header className="border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-50 transition-colors">
           <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-3.5 flex items-center justify-between gap-4">
             {/* Left: Brand Identity */}
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-[#111111] border border-[#1f1f1f] flex items-center justify-center text-[#22c55e] shadow-xs">
+              <div className="w-9 h-9 rounded-xl bg-card border border-border flex items-center justify-center text-accent shadow-bento">
                 <ZkShieldBrandIcon className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-base font-bold tracking-tight text-[#f5f5f5]">
+                  <span className="font-mono text-base font-bold tracking-tight text-foreground">
                     PrivateAid
                   </span>
-                  <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-[#22c55e]/10 text-[#22c55e] border border-[#22c55e]/30 font-bold">
+                  <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-accent/15 text-accent border border-accent/30 font-bold">
                     MIDNIGHT
                   </span>
                 </div>
-                <p className="text-[11px] text-[#8a8a8a] font-mono hidden sm:block">
+                <p className="text-[11px] text-muted-foreground font-mono hidden sm:block">
                   Confidential Humanitarian State Machine
                 </p>
               </div>
             </div>
 
-            {/* Center Navigation Links (Terminal Filter Pills) */}
-            <div className="hidden md:flex items-center gap-1.5 p-1 bg-[#111111] border border-[#1f1f1f] rounded-lg text-xs font-mono">
+            {/* Center Navigation Links (Anchor Filter Pills) */}
+            <div className="hidden md:flex items-center gap-1.5 p-1 bg-card border border-border rounded-xl text-xs font-mono shadow-bento">
               <button
                 type="button"
                 onClick={() => setActiveTab('all')}
-                className={`px-3.5 py-1.5 rounded transition-all font-bold ${
+                className={`px-3.5 py-1.5 rounded-lg transition-all font-bold ${
                   activeTab === 'all'
-                    ? 'bg-[#1f1f1f] text-[#22c55e] border border-[#22c55e]/30 shadow-xs'
-                    : 'text-[#8a8a8a] hover:text-[#f5f5f5]'
+                    ? 'bg-secondary text-accent border border-accent/40 shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Dashboard
@@ -139,10 +148,10 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab('circuits')}
-                className={`px-3.5 py-1.5 rounded transition-all font-bold ${
+                className={`px-3.5 py-1.5 rounded-lg transition-all font-bold ${
                   activeTab === 'circuits'
-                    ? 'bg-[#1f1f1f] text-[#22c55e] border border-[#22c55e]/30 shadow-xs'
-                    : 'text-[#8a8a8a] hover:text-[#f5f5f5]'
+                    ? 'bg-secondary text-accent border border-accent/40 shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 ZK Circuits
@@ -150,10 +159,10 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab('aid')}
-                className={`px-3.5 py-1.5 rounded transition-all font-bold ${
+                className={`px-3.5 py-1.5 rounded-lg transition-all font-bold ${
                   activeTab === 'aid'
-                    ? 'bg-[#1f1f1f] text-[#22c55e] border border-[#22c55e]/30 shadow-xs'
-                    : 'text-[#8a8a8a] hover:text-[#f5f5f5]'
+                    ? 'bg-secondary text-accent border border-accent/40 shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Aid Engine
@@ -161,27 +170,27 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab('ledger')}
-                className={`px-3.5 py-1.5 rounded transition-all font-bold ${
+                className={`px-3.5 py-1.5 rounded-lg transition-all font-bold ${
                   activeTab === 'ledger'
-                    ? 'bg-[#1f1f1f] text-[#22c55e] border border-[#22c55e]/30 shadow-xs'
-                    : 'text-[#8a8a8a] hover:text-[#f5f5f5]'
+                    ? 'bg-secondary text-accent border border-accent/40 shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Audit Feed
               </button>
             </div>
 
-            {/* Right: Network Toggle, Live Block, Theme & Wallet */}
+            {/* Right: Network Toggle, Live Block, Theme Toggle & Wallet */}
             <div className="flex items-center gap-2.5 text-xs font-mono">
               {/* Network Toggle (Preprod / Preview) */}
-              <div className="flex items-center p-0.5 bg-[#111111] border border-[#1f1f1f] rounded-lg">
+              <div className="flex items-center p-0.5 bg-card border border-border rounded-lg">
                 <button
                   type="button"
                   onClick={() => switchNetwork('preprod')}
-                  className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all ${
+                  className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
                     activeNetwork === 'preprod'
-                      ? 'bg-[#22c55e] text-black'
-                      : 'text-[#8a8a8a] hover:text-[#f5f5f5]'
+                      ? 'bg-accent text-accent-foreground font-bold shadow-xs'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   Preprod
@@ -189,10 +198,10 @@ export const App: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => switchNetwork('preview')}
-                  className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all ${
+                  className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
                     activeNetwork === 'preview'
-                      ? 'bg-[#22c55e] text-black'
-                      : 'text-[#8a8a8a] hover:text-[#f5f5f5]'
+                      ? 'bg-accent text-accent-foreground font-bold shadow-xs'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   Preview
@@ -202,16 +211,27 @@ export const App: React.FC = () => {
               {/* Live Indexer Block Height */}
               <div
                 title="Midnight Consensus Block Height"
-                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#111111] border border-[#1f1f1f] text-[11px] font-mono text-[#8a8a8a]"
+                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border border-border text-[11px] font-mono text-muted-foreground"
               >
-                <span className="w-2 h-2 rounded-full bg-[#22c55e] animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                 <span>{contractState.blockHeight ? `#${contractState.blockHeight.toLocaleString()}` : '#2,735,000'}</span>
               </div>
 
+              {/* Theme Toggle (Dark / Light) */}
+              <button
+                type="button"
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className="p-2 rounded-lg bg-card hover:bg-secondary text-foreground border border-border transition-colors shadow-xs"
+                title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                aria-label="Toggle Theme"
+              >
+                {isDarkMode ? <Sun className="w-4 h-4 text-accent" /> : <Moon className="w-4 h-4 text-foreground" />}
+              </button>
+
               {/* Quick 1AM Wallet Trigger Button */}
               {isConnected ? (
-                <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#22c55e]/10 border border-[#22c55e]/30 text-[#22c55e] font-bold text-xs">
-                  <span className="w-2 h-2 rounded-full bg-[#22c55e] animate-pulse" />
+                <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-accent/15 border border-accent/30 text-accent font-bold text-xs">
+                  <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                   <span>{truncateAddress(unshieldedAddress)}</span>
                 </div>
               ) : (
@@ -219,9 +239,9 @@ export const App: React.FC = () => {
                   type="button"
                   onClick={() => connectWallet('1am')}
                   disabled={isConnecting}
-                  className="px-4 py-2 rounded-lg bg-[#22c55e] hover:bg-[#16a34a] active:scale-95 text-black font-bold text-xs transition-all shadow-xs border border-[#22c55e]/50 flex items-center gap-2"
+                  className="px-4 py-2 rounded-lg bg-accent hover:opacity-90 active:scale-95 text-accent-foreground font-bold text-xs transition-all shadow-xs border border-accent/40 flex items-center gap-2"
                 >
-                  <Wallet className="w-3.5 h-3.5 text-black" />
+                  <Wallet className="w-3.5 h-3.5" />
                   <span>{isConnecting ? 'Connecting...' : 'Connect 1AM'}</span>
                 </button>
               )}
@@ -231,7 +251,7 @@ export const App: React.FC = () => {
                 href="https://github.com/Rajdeep-Biswas7/midnight-docs"
                 target="_blank"
                 rel="noreferrer"
-                className="p-2 rounded-lg bg-[#111111] hover:bg-[#1f1f1f] text-[#8a8a8a] hover:text-[#f5f5f5] border border-[#1f1f1f] transition-colors"
+                className="p-2 rounded-lg bg-card hover:bg-secondary text-muted-foreground hover:text-foreground border border-border transition-colors"
                 title="GitHub Repository"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -243,27 +263,27 @@ export const App: React.FC = () => {
         </header>
 
         {/* Live Midnight Consensus Telemetry Ribbon (Full Laptop Width) */}
-        <div className="border-b border-[#1f1f1f] bg-[#0a0a0a]/90 backdrop-blur-md overflow-x-auto py-2.5 text-[#8a8a8a]">
+        <div className="border-b border-border bg-background/80 backdrop-blur-md overflow-x-auto py-2.5 text-muted-foreground transition-colors">
           <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 flex items-center justify-between gap-6 text-[11px] font-mono whitespace-nowrap">
             <div className="flex items-center gap-2">
-              <Activity className="w-3.5 h-3.5 text-[#22c55e] animate-pulse" />
+              <Activity className="w-3.5 h-3.5 text-accent animate-pulse" />
               <span>CONSENSUS:</span>
-              <span className="text-[#22c55e] font-bold uppercase">{activeNetwork} ACTIVE</span>
+              <span className="text-accent font-bold uppercase">{activeNetwork} ACTIVE</span>
             </div>
             <div className="flex items-center gap-2">
-              <Lock className="w-3.5 h-3.5 text-[#22c55e]" />
+              <Lock className="w-3.5 h-3.5 text-accent" />
               <span>OFF-CHAIN WITNESS:</span>
-              <span className="text-[#f5f5f5] font-bold">STRICTLY LOCAL MEMORY</span>
+              <span className="text-foreground font-bold">STRICTLY LOCAL MEMORY</span>
             </div>
             <div className="flex items-center gap-2">
-              <Terminal className="w-3.5 h-3.5 text-[#22c55e]" />
+              <Terminal className="w-3.5 h-3.5 text-accent" />
               <span>PROVER:</span>
-              <span className="text-[#f5f5f5] font-bold">CLIENT WASM (BLS12-381)</span>
+              <span className="text-foreground font-bold">CLIENT WASM (BLS12-381)</span>
             </div>
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#22c55e]" />
+              <ShieldCheck className="w-3.5 h-3.5 text-accent" />
               <span>DAPP CONNECTOR:</span>
-              <span className="text-[#f5f5f5] font-bold">CAIP-372 / API v4.0.1</span>
+              <span className="text-foreground font-bold">CAIP-372 / API v4.0.1</span>
             </div>
           </div>
         </div>
@@ -272,17 +292,17 @@ export const App: React.FC = () => {
         <main className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-8 sm:py-12 space-y-8 flex-1">
           {/* Hero Banner with Complete, Unclipped Headline & Anchor Aesthetic */}
           <div className="text-center space-y-4 max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#111111] border border-[#1f1f1f] text-[#8a8a8a] text-xs font-mono font-bold shadow-xs">
-              <Sparkles className="w-3.5 h-3.5 text-[#22c55e]" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-card border border-border text-muted-foreground text-xs font-mono font-bold shadow-bento">
+              <Sparkles className="w-3.5 h-3.5 text-accent" />
               <span>Midnight Network • CAIP-372 Verified ZK DApp</span>
             </div>
 
-            <h1 className="font-mono text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#f5f5f5] leading-tight flex items-center justify-center flex-wrap">
+            <h1 className="font-mono text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight flex items-center justify-center flex-wrap">
               <span>{displayedHeadline}</span>
-              <span className="inline-block w-2 sm:w-3.5 h-7 sm:h-11 bg-[#22c55e] ml-1.5 align-middle animate-pulse" />
+              <span className="inline-block w-2 sm:w-3.5 h-7 sm:h-11 bg-accent ml-1.5 align-middle animate-pulse" />
             </h1>
 
-            <p className="text-sm sm:text-base text-[#8a8a8a] leading-relaxed font-sans max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-sans max-w-2xl mx-auto">
               Synthesize zero-knowledge proofs directly in browser memory. Increment community aid tallies and verify relief claims on Midnight without disclosing beneficiary identities.
             </p>
           </div>
@@ -290,21 +310,21 @@ export const App: React.FC = () => {
           {/* 4-Column Live Telemetry Cards across full laptop width */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-mono w-full">
             {/* Card 1: Verified Contract Hex */}
-            <div className="p-4 rounded-xl border border-[#1f1f1f] bg-[#111111] shadow-xs space-y-2">
-              <div className="flex items-center justify-between text-[#8a8a8a]">
+            <div className="p-4 rounded-xl border border-border bg-card shadow-bento space-y-2">
+              <div className="flex items-center justify-between text-muted-foreground">
                 <span className="font-bold">VERIFIED CONTRACT</span>
-                <Database className="w-3.5 h-3.5 text-[#22c55e]" />
+                <Database className="w-3.5 h-3.5 text-accent" />
               </div>
-              <div className="font-mono text-sm font-bold text-[#f5f5f5] truncate">
+              <div className="font-mono text-sm font-bold text-foreground truncate">
                 {truncateAddress(contractState.contractAddress)}
               </div>
-              <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-[#1f1f1f]">
+              <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-border">
                 <button
                   type="button"
                   onClick={handleCopyContract}
-                  className="text-[#8a8a8a] hover:text-[#f5f5f5] transition-colors flex items-center gap-1 font-bold"
+                  className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 font-bold"
                 >
-                  {copiedContract ? <Check className="w-3 h-3 text-[#22c55e]" /> : <Copy className="w-3 h-3" />}
+                  {copiedContract ? <Check className="w-3 h-3 text-accent" /> : <Copy className="w-3 h-3" />}
                   <span>{copiedContract ? 'Copied' : 'Copy Hex'}</span>
                 </button>
                 <div className="flex items-center gap-2">
@@ -313,7 +333,7 @@ export const App: React.FC = () => {
                       href={`https://explorer.1am.xyz/tx/${DEFAULT_PREPROD_DEPLOY_TX}?network=preprod`}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[#22c55e] hover:underline font-bold flex items-center gap-0.5 text-[10px]"
+                      className="text-accent hover:underline font-bold flex items-center gap-0.5 text-[10px]"
                       title="View Verified Contract Deployment Transaction"
                     >
                       <span>Deploy Tx</span>
@@ -324,7 +344,7 @@ export const App: React.FC = () => {
                     href={`https://explorer.1am.xyz/contract/${contractState.contractAddress}?network=${activeNetwork}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-[#f5f5f5] hover:text-[#22c55e] font-bold flex items-center gap-0.5 transition-colors"
+                    className="text-foreground hover:text-accent font-bold flex items-center gap-0.5 transition-colors"
                   >
                     <span>1AM</span>
                     <ExternalLink className="w-3 h-3" />
@@ -334,49 +354,49 @@ export const App: React.FC = () => {
             </div>
 
             {/* Card 2: Current Ledger Round */}
-            <div className="p-4 rounded-xl border border-[#1f1f1f] bg-[#111111] shadow-xs space-y-2">
-              <div className="flex items-center justify-between text-[#8a8a8a]">
+            <div className="p-4 rounded-xl border border-border bg-card shadow-bento space-y-2">
+              <div className="flex items-center justify-between text-muted-foreground">
                 <span className="font-bold">LEDGER ROUND</span>
-                <Cpu className="w-3.5 h-3.5 text-[#22c55e]" />
+                <Cpu className="w-3.5 h-3.5 text-accent" />
               </div>
-              <div className="font-mono text-2xl font-bold text-[#f5f5f5] tabular-nums">
+              <div className="font-mono text-2xl font-bold text-foreground tabular-nums">
                 #{contractState.round}
               </div>
-              <div className="text-[11px] text-[#22c55e] font-bold pt-1.5 border-t border-[#1f1f1f] flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3 text-[#22c55e]" />
+              <div className="text-[11px] text-accent font-bold pt-1.5 border-t border-border flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 text-accent" />
                 <span>Sequence Verified</span>
               </div>
             </div>
 
             {/* Card 3: Disclosed Total */}
-            <div className="p-4 rounded-xl border border-[#1f1f1f] bg-[#111111] shadow-xs space-y-2">
-              <div className="flex items-center justify-between text-[#8a8a8a]">
+            <div className="p-4 rounded-xl border border-border bg-card shadow-bento space-y-2">
+              <div className="flex items-center justify-between text-muted-foreground">
                 <span className="font-bold">DISCLOSED TOTAL</span>
-                <HeartHandshake className="w-3.5 h-3.5 text-[#22c55e]" />
+                <HeartHandshake className="w-3.5 h-3.5 text-accent" />
               </div>
-              <div className="font-mono text-2xl font-bold text-[#22c55e] tabular-nums">
+              <div className="font-mono text-2xl font-bold text-accent tabular-nums">
                 {contractState.totalValue.toLocaleString()}
               </div>
-              <div className="text-[11px] text-[#8a8a8a] pt-1.5 border-t border-[#1f1f1f]">
+              <div className="text-[11px] text-muted-foreground pt-1.5 border-t border-border">
                 tDUST Disclosed Pool
               </div>
             </div>
 
             {/* Card 4: Midnight Consensus Block */}
-            <div className="p-4 rounded-xl border border-[#1f1f1f] bg-[#111111] shadow-xs space-y-2">
-              <div className="flex items-center justify-between text-[#8a8a8a]">
+            <div className="p-4 rounded-xl border border-border bg-card shadow-bento space-y-2">
+              <div className="flex items-center justify-between text-muted-foreground">
                 <span className="font-bold">BLOCK HEIGHT</span>
-                <Layers className="w-3.5 h-3.5 text-[#22c55e]" />
+                <Layers className="w-3.5 h-3.5 text-accent" />
               </div>
-              <div className="font-mono text-2xl font-bold text-[#f5f5f5] tabular-nums">
+              <div className="font-mono text-2xl font-bold text-foreground tabular-nums">
                 {contractState.blockHeight ? `#${contractState.blockHeight.toLocaleString()}` : '#2,735,000'}
               </div>
-              <div className="text-[11px] text-[#8a8a8a] pt-1.5 border-t border-[#1f1f1f] flex items-center justify-between">
+              <div className="text-[11px] text-muted-foreground pt-1.5 border-t border-border flex items-center justify-between">
                 <span className="uppercase">{activeNetwork}</span>
                 <button
                   type="button"
                   onClick={refreshContractState}
-                  className="hover:text-[#22c55e] transition-colors"
+                  className="hover:text-accent transition-colors"
                   title="Sync Indexer"
                 >
                   <RefreshCw className="w-3 h-3" />
@@ -447,41 +467,41 @@ export const App: React.FC = () => {
           )}
 
           {/* Privacy Architecture Explainer Card (Full Laptop Coverage) */}
-          <div className="rounded-xl border border-[#1f1f1f] bg-[#111111] overflow-hidden w-full">
+          <div className="rounded-xl border border-border bg-card shadow-bento overflow-hidden w-full">
             <div className="p-6 sm:p-7 space-y-4">
-              <h3 className="font-mono text-base font-bold text-[#f5f5f5] flex items-center gap-2">
-                <ZkShieldBrandIcon className="w-5 h-5 text-[#22c55e]" />
+              <h3 className="font-mono text-base font-bold text-foreground flex items-center gap-2">
+                <ZkShieldBrandIcon className="w-5 h-5 text-accent" />
                 <span>Zero-Knowledge Soundness &amp; Security Architecture</span>
               </h3>
 
               <div className="grid sm:grid-cols-3 gap-4 text-xs font-mono">
-                <div className="p-4 bg-[#0a0a0a] rounded-lg border border-[#1f1f1f] space-y-2">
-                  <div className="flex items-center gap-2 text-[#f5f5f5] font-bold">
-                    <WitnessEyeIcon className="w-4 h-4 text-[#22c55e]" />
+                <div className="p-4 bg-background rounded-lg border border-border space-y-2">
+                  <div className="flex items-center gap-2 text-foreground font-bold">
+                    <WitnessEyeIcon className="w-4 h-4 text-accent" />
                     <span>1. Off-Chain Witness</span>
                   </div>
-                  <p className="text-[#8a8a8a] leading-relaxed font-sans">
-                    The caller passes <code className="text-[#22c55e] font-mono">secretIncrement()</code> in browser RAM. Zero bytes are transmitted across networks or leaked in transactions.
+                  <p className="text-muted-foreground leading-relaxed font-sans">
+                    The caller passes <code className="text-accent font-mono">secretIncrement()</code> in browser RAM. Zero bytes are transmitted across networks or leaked in transactions.
                   </p>
                 </div>
 
-                <div className="p-4 bg-[#0a0a0a] rounded-lg border border-[#1f1f1f] space-y-2">
-                  <div className="flex items-center gap-2 text-[#f5f5f5] font-bold">
-                    <CircuitCoreIcon className="w-4 h-4 text-[#22c55e]" />
+                <div className="p-4 bg-background rounded-lg border border-border space-y-2">
+                  <div className="flex items-center gap-2 text-foreground font-bold">
+                    <CircuitCoreIcon className="w-4 h-4 text-accent" />
                     <span>2. Client Prover</span>
                   </div>
-                  <p className="text-[#8a8a8a] leading-relaxed font-sans">
+                  <p className="text-muted-foreground leading-relaxed font-sans">
                     Compact ZK circuit verifies that the secret is positive and computes the tally mathematically without disclosing the secret input.
                   </p>
                 </div>
 
-                <div className="p-4 bg-[#0a0a0a] rounded-lg border border-[#1f1f1f] space-y-2">
-                  <div className="flex items-center gap-2 text-[#f5f5f5] font-bold">
-                    <LedgerBlockIcon className="w-4 h-4 text-[#22c55e]" />
+                <div className="p-4 bg-background rounded-lg border border-border space-y-2">
+                  <div className="flex items-center gap-2 text-foreground font-bold">
+                    <LedgerBlockIcon className="w-4 h-4 text-accent" />
                     <span>3. Ledger Seal</span>
                   </div>
-                  <p className="text-[#8a8a8a] leading-relaxed font-sans">
-                    Only the updated round sequence and cumulative relief total are published on Midnight via <code className="text-[#22c55e] font-mono">disclose()</code>.
+                  <p className="text-muted-foreground leading-relaxed font-sans">
+                    Only the updated round sequence and cumulative relief total are published on Midnight via <code className="text-accent font-mono">disclose()</code>.
                   </p>
                 </div>
               </div>
@@ -490,7 +510,7 @@ export const App: React.FC = () => {
         </main>
 
         {/* Footer (Full Laptop Width) */}
-        <footer className="border-t border-[#1f1f1f] bg-[#0a0a0a] py-6 text-xs text-[#8a8a8a] backdrop-blur-md">
+        <footer className="border-t border-border bg-background py-6 text-xs text-muted-foreground backdrop-blur-md transition-colors">
           <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="font-mono">
               © 2026 PrivateAid • Powered by Midnight Network &amp; Compact Smart Contracts
@@ -500,7 +520,7 @@ export const App: React.FC = () => {
                 href="https://docs.midnight.network"
                 target="_blank"
                 rel="noreferrer"
-                className="hover:text-[#22c55e] transition-colors flex items-center gap-1 font-bold"
+                className="hover:text-accent transition-colors flex items-center gap-1 font-bold"
               >
                 Docs <ExternalLink className="w-3 h-3" />
               </a>
@@ -508,7 +528,7 @@ export const App: React.FC = () => {
                 href="https://1am.xyz"
                 target="_blank"
                 rel="noreferrer"
-                className="hover:text-[#22c55e] transition-colors flex items-center gap-1 font-bold"
+                className="hover:text-accent transition-colors flex items-center gap-1 font-bold"
               >
                 1AM Wallet <ExternalLink className="w-3 h-3" />
               </a>
@@ -516,7 +536,7 @@ export const App: React.FC = () => {
                 href="https://midnight-tmnight-preprod.nethermind.dev"
                 target="_blank"
                 rel="noreferrer"
-                className="hover:text-[#22c55e] transition-colors flex items-center gap-1 font-bold"
+                className="hover:text-accent transition-colors flex items-center gap-1 font-bold"
               >
                 Preprod Faucet <ExternalLink className="w-3 h-3" />
               </a>

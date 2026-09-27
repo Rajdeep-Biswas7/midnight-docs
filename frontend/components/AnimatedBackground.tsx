@@ -4,7 +4,7 @@ interface AnimatedBackgroundProps {
   isDarkMode?: boolean;
 }
 
-export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = () => {
+export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({ isDarkMode = true }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = () => {
 
     window.addEventListener('resize', handleResize);
 
-    // Minimal developer terminal nodes
+    // Anchor floating particle nodes
     interface Node {
       x: number;
       y: number;
@@ -36,24 +36,26 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = () => {
       alpha: number;
     }
 
-    // Terminal colors: subtle greens and neutral grays
-    const terminalColors = ['#22c55e', '#8a8a8a', '#3f3f46', '#27272a'];
-    const nodeCount = Math.min(Math.floor((width * height) / 22000), 45);
+    // Keppel teal accent & neutral particles matching Anchor template
+    const darkColors = ['#38b2ac', '#4ecdc4', '#2ca58d', '#4a5568'];
+    const lightColors = ['#2c7a7b', '#319795', '#38b2ac', '#a0aec0'];
+    const colors = isDarkMode ? darkColors : lightColors;
+
+    const nodeCount = Math.min(Math.floor((width * height) / 24000), 45);
     const nodes: Node[] = [];
 
     for (let i = 0; i < nodeCount; i++) {
       nodes.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.35,
-        vy: (Math.random() - 0.5) * 0.35,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
         radius: Math.random() * 1.5 + 0.8,
-        color: terminalColors[Math.floor(Math.random() * terminalColors.length)],
+        color: colors[Math.floor(Math.random() * colors.length)],
         alpha: Math.random() * 0.35 + 0.15,
       });
     }
 
-    // Mouse coordinates
     let mouseX = -1000;
     let mouseY = -1000;
 
@@ -67,19 +69,19 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = () => {
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Draw subtle terminal connections between nodes
+      // Subtle connection lines between nearby particles
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
           const dx = nodes[i].x - nodes[j].x;
           const dy = nodes[i].y - nodes[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 120) {
-            const alpha = (1 - dist / 120) * 0.12;
+          if (dist < 110) {
+            const alpha = (1 - dist / 110) * (isDarkMode ? 0.12 : 0.08);
             ctx.beginPath();
             ctx.moveTo(nodes[i].x, nodes[i].y);
             ctx.lineTo(nodes[j].x, nodes[j].y);
-            ctx.strokeStyle = `rgba(34, 197, 94, ${alpha})`;
+            ctx.strokeStyle = isDarkMode ? `rgba(78, 205, 196, ${alpha})` : `rgba(49, 151, 149, ${alpha})`;
             ctx.lineWidth = 0.6;
             ctx.stroke();
           }
@@ -89,14 +91,12 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = () => {
       // Draw and update nodes
       for (let i = 0; i < nodes.length; i++) {
         const node = nodes[i];
-
         node.x += node.vx;
         node.y += node.vy;
 
         if (node.x < 0 || node.x > width) node.vx *= -1;
         if (node.y < 0 || node.y > height) node.vy *= -1;
 
-        // Mouse gentle interaction
         const mdx = mouseX - node.x;
         const mdy = mouseY - node.y;
         const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
@@ -124,26 +124,26 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, []);
+  }, [isDarkMode]);
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 select-none">
-      {/* Dark Base */}
-      <div className="absolute inset-0 bg-[#0a0a0a]" />
+      {/* Background layer */}
+      <div className="absolute inset-0 bg-background transition-colors duration-200" />
 
-      {/* Subtle Terminal Glow at Top */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80vw] h-[300px] bg-gradient-to-b from-[#22c55e]/5 to-transparent blur-[120px] pointer-events-none" />
+      {/* Subtle Anchor Teal Glow at Top */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[85vw] h-[320px] bg-gradient-to-b from-accent/10 to-transparent blur-[140px] pointer-events-none" />
 
-      {/* Interactive Terminal Nodes Canvas */}
+      {/* Interactive Canvas */}
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
 
-      {/* Subtle Grid Pattern Overlay */}
+      {/* Subtle Grid Overlay */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          opacity: 0.04,
-          backgroundImage: `linear-gradient(to right, #f5f5f5 1px, transparent 1px), linear-gradient(to bottom, #f5f5f5 1px, transparent 1px)`,
-          backgroundSize: '36px 36px',
+          opacity: isDarkMode ? 0.035 : 0.025,
+          backgroundImage: `linear-gradient(to right, var(--foreground) 1px, transparent 1px), linear-gradient(to bottom, var(--foreground) 1px, transparent 1px)`,
+          backgroundSize: '40px 40px',
           maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 85%)',
           WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 85%)',
         }}
@@ -151,3 +151,4 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = () => {
     </div>
   );
 };
+export default AnimatedBackground;
