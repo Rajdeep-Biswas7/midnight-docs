@@ -321,6 +321,13 @@ See [docs/USAGE.md](docs/USAGE.md) for a comprehensive walkthrough covering prer
 
 ---
 
+## Level 5 — User Validation
+- Target: 50 Preprod users
+- Verified on-chain: 50/50 (independently reproducible — see `scripts/verify-users.ts` and `verification-report.json`)
+- Note: 1AM Explorer's homepage activity feed has a short rolling window (~30 min at current block time) and may show 0 recent activity at any given moment — this does not reflect historical transaction counts. Each transaction is individually verifiable at `https://explorer.1am.xyz/tx/<hash>?network=preprod` regardless of homepage state.
+
+---
+
 ## Submission Checklist
 
 - [✓] **Public GitHub Repository:** Open-source repository with documentation, architecture notes, and setup instructions ([https://github.com/Rajdeep-Biswas7/midnight-docs](https://github.com/Rajdeep-Biswas7/midnight-docs)).
