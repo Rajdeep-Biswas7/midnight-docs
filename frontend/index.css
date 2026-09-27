@@ -57,32 +57,19 @@ h1, h2, h3, h4, h5, h6 {
   background: #333333;
 }
 
-/* Subtle Terminal Reveal / Typewriter Animation (under 1.5s) */
-@keyframes typewriter {
-  from {
-    max-width: 0;
-  }
-  to {
-    max-width: 100%;
-  }
-}
-
+/* Blinking Terminal Cursor */
 @keyframes blinkCursor {
   0%, 100% {
-    border-color: var(--accent);
+    opacity: 1;
   }
   50% {
-    border-color: transparent;
+    opacity: 0;
   }
 }
 
-.terminal-typewriter {
+.terminal-cursor {
   display: inline-block;
-  overflow: hidden;
-  white-space: nowrap;
-  vertical-align: bottom;
-  border-right: 2px solid var(--accent);
-  animation: typewriter 1.2s steps(28, end) forwards, blinkCursor 0.75s step-end infinite;
+  animation: blinkCursor 0.8s step-end infinite;
 }
 
 /* Terminal Card Styling */
