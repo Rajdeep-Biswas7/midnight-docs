@@ -1,21 +1,41 @@
-﻿export default async function handler(req, res) {
+// api/indexer.ts — Vercel serverless proxy for Midnight Indexer GraphQL
+// Proxies browser requests server-side to avoid CORS preflight rejections.
+
+export const config = {
+  api: {
+    bodyParser: true,
+  },
+};
+
+export default async function handler(req: any, res: any) {
+  // Allow CORS from any origin (this is our own proxy, safe to do)
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
+
   try {
     const upstream = await fetch('https://indexer.preprod.midnight.network/api/v4/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // Optional: impersonate a standard browser fetch if WAF blocks standard Node/Vercel fetch
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
       },
-      body: JSON.stringify(req.body),
+      body: typeof req.body === 'string' ? req.body : JSON.stringify(req.body),
     });
     const data = await upstream.text();
-    res.status(upstream.status).setHeader('Content-Type', 'application/json').send(data);
-  } catch (err) {
+    res.status(upstream.status)
+      .setHeader('Content-Type', 'application/json')
+      .send(data);
+  } catch (err: any) {
     res.status(502).json({ error: 'Upstream indexer request failed', detail: String(err) });
   }
 }
