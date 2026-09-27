@@ -203,7 +203,7 @@ export const NETWORK_DETAILS: Record<NetworkType, {
     contractAddress: '0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b',
     deployerWallet: 'mn_addr_preprod1w7hatkynrx7yzleqse06cvz4dcctsw66xm3387h4vsxkqz5dmq2q7sx7ne',
     deployTxHash: 'bfd00a8ac48f72c3d16cc1cd0dbf509e1bec72c612dcbde9dccd608eeebbb859',
-    indexerUrl: 'https://indexer.preprod.midnight.network/api/v4/graphql',
+    indexerUrl: '/api/indexer',
     indexerWsUrl: 'wss://indexer.preprod.midnight.network/api/v4/graphql/ws',
     nodeUrl: 'https://rpc.preprod.midnight.network',
     explorerUrl: 'https://explorer.1am.xyz',
@@ -212,7 +212,7 @@ export const NETWORK_DETAILS: Record<NetworkType, {
     name: 'Midnight Preview',
     contractAddress: '',
     deployerWallet: '',
-    indexerUrl: 'https://indexer.preview.midnight.network/api/v4/graphql',
+    indexerUrl: '/api/indexer',
     indexerWsUrl: 'wss://indexer.preview.midnight.network/api/v4/graphql/ws',
     nodeUrl: 'https://rpc.preview.midnight.network',
     explorerUrl: 'https://explorer.1am.xyz',
@@ -570,16 +570,13 @@ export function useMidnight() {
             await api.hintUsage(['getProvingProvider', 'balanceUnsealedTransaction', 'submitTransaction']);
         } catch {}
 
-        // 1. Resolve indexer URL from wallet config
+        // 1. Resolve indexer URL from wallet config (always /api/indexer — see NETWORK_DETAILS)
         let indexerUrl = NETWORK_DETAILS[activeNetwork].indexerUrl;
         try {
           const cfg = await (api as any).getConfiguration?.() ?? await (api as any).serviceUriConfig?.() ?? null;
-          if (cfg?.indexerUri) indexerUrl = cfg.indexerUri;
+          // If wallet provides an indexerUri, proxy it too — keep all indexer traffic server-side
+          if (cfg?.indexerUri && !cfg.indexerUri.includes('indexer.')) indexerUrl = cfg.indexerUri;
         } catch {}
-
-        if (indexerUrl.includes('indexer.preprod.midnight.network') || indexerUrl.includes('indexer.preview.midnight.network')) {
-          indexerUrl = '/api/indexer';
-        }
 
         // 2. Fetch live on-chain contract state from Midnight GraphQL indexer
         const stateHex = await fetchContractStateHex(indexerUrl, contractAddr);
