@@ -4,10 +4,11 @@
 ![Midnight](https://img.shields.io/badge/Midnight-Preprod-06b6d4?style=flat&logo=blockchain&logoColor=white)
 ![Tests](https://img.shields.io/badge/Tests-8%2F8%20Passing-10b981?style=flat)
 ![Zero Knowledge](https://img.shields.io/badge/ZK--SNARKs-Groth16%20%7C%20BLS12--381-8b5cf6?style=flat)
+[![X Profile](https://img.shields.io/badge/X-@PrivateAid0-000000?style=flat&logo=x&logoColor=white)](https://x.com/PrivateAid0)
 
 **A privacy-preserving humanitarian aid dApp on the Midnight blockchain — beneficiaries prove eligibility and donors contribute confidentially, using Compact smart contracts and zero-knowledge proofs.**
 
-[**Live Demo**](#live-demo) • [**Demo Video**](#demo-video) • [**Interface & Proof Architecture**](#interface--live-on-chain-verification) • [**Contract Address**](#contract-address) • [**Overview**](#what-this-product-does) • [**Privacy Model**](#privacy-model) • [**Tech Stack**](#tech-stack) • [**Local Setup**](#setup--run-locally) • [**Testing (`npm run test`)**](#run-tests) • [**CI/CD**](#cicd) • [**Usage Guide**](#usage-guide) • [**Level 5 — User Validation**](#level-5--user-validation) • [**Submission Checklist**](#submission-checklist)
+[**Live Demo**](#live-demo) • [**Demo Video**](#demo-video) • [**Interface & Proof Architecture**](#interface--live-on-chain-verification) • [**Contract Address**](#contract-address) • [**Overview**](#what-this-product-does) • [**Privacy Model**](#privacy-model) • [**Tech Stack**](#tech-stack) • [**Local Setup**](#setup--run-locally) • [**Testing (`npm run test`)**](#run-tests) • [**CI/CD**](#cicd) • [**Usage Guide**](#usage-guide) • [**Level 5 — User Validation**](#level-5--user-validation) • [**X Profile**](#product-x-profile) • [**Submission Checklist**](#submission-checklist)
 
 ---
 
@@ -250,6 +251,14 @@ See [docs/USAGE.md](docs/USAGE.md) for a comprehensive, non-technical, step-by-s
 
 ---
 
+## Product X Profile
+
+Follow project updates, architectural breakdowns, and Midnight testnet announcements:  
+🐦 **Official Handle**: [@PrivateAid0](https://x.com/PrivateAid0)  
+🔗 **Direct Profile**: [https://x.com/PrivateAid0](https://x.com/PrivateAid0)
+
+---
+
 ## Submission Checklist
 
 - [x] Public GitHub repository with full documentation
@@ -259,4 +268,5 @@ See [docs/USAGE.md](docs/USAGE.md) for a comprehensive, non-technical, step-by-s
 - [x] Real, screen-recorded demo video showing live on-chain transaction ([YouTube Demo](https://www.youtube.com/watch?v=y4dTkaZyvf4))
 - [x] 8/8 Automated Compact contract unit & circuit tests passing (`npm test` / `npm run test`)
 - [x] 50 users listed in [USERS.md](USERS.md) with real, independently verifiable transaction hashes
+- [x] Official X (Twitter) profile active ([@PrivateAid0](https://x.com/PrivateAid0))
 - [x] Clean browser console with zero runtime errors
