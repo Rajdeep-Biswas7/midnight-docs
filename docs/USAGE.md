@@ -53,7 +53,7 @@ Follow these simple steps to use PrivateAid:
 ### 4. Review On-Chain Activity & Verification Pipeline
 1. View the **Interactive ZK Circuit Execution Pipeline** to see how off-chain private witnesses, WebAssembly provers, and selective disclosures interact.
 2. View the **On-Chain Contribution & Transition Feed** to inspect verified on-chain extrinsics and block explorer links.
-3. You can verify the smart contract state directly on the [1AM Preprod Explorer](https://explorer.1am.xyz/contract/02c01991a0f8bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e89a3f21?network=preprod) to confirm cumulative pool updates without any private data exposure.
+3. You can verify the smart contract state directly on the [1AM Preprod Explorer](https://explorer.1am.xyz/contract/0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b?network=preprod) to confirm cumulative pool updates without any private data exposure.
 
 ---
 

@@ -4,8 +4,8 @@
  */
 
 export const CONTRACT_ADDRESSES = {
-  preprod: '02c01991a0f8bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e89a3f21',
-  preview: 'e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e',
+  preprod: '0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b',
+  preview: '0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b',
   undeployed: '',
 } as const;
 
