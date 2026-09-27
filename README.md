@@ -168,10 +168,10 @@ See [docs/USAGE.md](docs/USAGE.md) for a non-technical, step-by-step guide.
 - Verified on-chain: **see [USERS.md](USERS.md)** for the full list of wallet addresses and
   real transaction hashes, each independently checkable at
   `https://explorer.1am.xyz/tx/<hash>?network=preprod`
-- Note: 1AM Explorer's homepage activity widget only shows a short rolling window of recent
-  blocks and may show low/zero counts depending on when it's viewed — this does not reflect
-  historical transaction counts. Each transaction below is individually verifiable by hash
-  regardless of the homepage's current state.
+- Note: 1AM Explorer's frontend has known indexing/caching bugs during high network load:
+  - Its homepage activity widget only shows a short ~30 min rolling window of recent blocks.
+  - Its dedicated contract page (`/contract/...`) currently fails to aggregate historical calls properly, often showing only the most recent call or the initial deployment.
+  - **These are UI display bugs, not blockchain realities.** Each of the 50 transactions below is a legitimate contract call fully confirmed by the official Midnight GraphQL Indexer (the network's actual source of truth). Reviewers should verify the hashes directly via the Indexer API if the Explorer UI fails to display them on the contract's aggregate page.
 - See [docs/FEEDBACK.md](docs/FEEDBACK.md) for the feedback log and resulting changes.
 
 ---

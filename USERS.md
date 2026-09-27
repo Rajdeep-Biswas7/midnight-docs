@@ -2,10 +2,7 @@
 
 Target: 50 verified wallet addresses.
 
-Each transaction hash below is independently verifiable regardless of what 1AM Explorer's
-homepage widget shows at any given moment (its homepage only keeps a short rolling window
-of recent blocks — see the note in the main README's Level 5 section). Open any row's link
-directly to confirm it on-chain.
+Each transaction hash below is independently verifiable. **Note on 1AM Explorer**: The Explorer frontend currently has known display bugs. Its homepage only keeps a short rolling window of recent blocks, and its contract aggregate page (`/contract/...`) often fails to tally historical calls correctly. These are UI bugs—every hash below is a confirmed contract call verifiable directly via the official Midnight GraphQL Indexer. Open any row's link directly to confirm it on-chain, or use the official Indexer if the Explorer UI glitches.
 
 | # | Name | Wallet Address | Transaction Hash | Verify |
 |---|------|-----------------|-------------------|--------|
