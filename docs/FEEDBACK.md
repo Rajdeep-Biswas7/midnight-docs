@@ -1,7 +1,7 @@
 # User Feedback & Product Iteration — Level 5
 
 ## Feedback Collection Method
-Feedback was gathered directly from developers, testnet peers, and early contributors through direct messages (Telegram, Discord, and X) as well as live pairing sessions while interacting with the deployed Preprod contract (`0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b`).
+Feedback was gathered directly from developers, testnet peers, and early contributors through direct messages (Telegram, Discord, and X), live pairing sessions, and our dedicated [Google Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform) while interacting with the deployed Preprod contract (`0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b`).
 
 ---
 
