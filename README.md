@@ -4,18 +4,56 @@
 ![Midnight](https://img.shields.io/badge/Midnight-Preprod-06b6d4?style=flat&logo=blockchain&logoColor=white)
 ![Tests](https://img.shields.io/badge/Tests-8%2F8%20Passing-10b981?style=flat)
 ![Zero Knowledge](https://img.shields.io/badge/ZK--SNARKs-Groth16%20%7C%20BLS12--381-8b5cf6?style=flat)
-[![Feedback Form](https://img.shields.io/badge/Feedback-Google%20Form-4285F4?style=flat&logo=googleforms&logoColor=white)](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform)
+[![Submit Transaction](https://img.shields.io/badge/Preprod_Testing-Submit_Transaction-4285F4?style=flat&logo=googleforms&logoColor=white)](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform)
 [![X Profile](https://img.shields.io/badge/X-@PrivateAid0-000000?style=flat&logo=x&logoColor=white)](https://x.com/PrivateAid0)
 
 **A privacy-preserving humanitarian aid dApp on the Midnight blockchain — beneficiaries prove eligibility and donors contribute confidentially, using Compact smart contracts and zero-knowledge proofs.**
 
-[**Live Demo**](#live-demo) • [**Demo Video**](#demo-video) • [**Feedback Form**](#user-feedback-form) • [**New User Guide**](#new-user-guide--how-to-use-privateaid) • [**Interface & Proof Architecture**](#interface--live-on-chain-verification) • [**Contract Address**](#contract-address) • [**Overview**](#what-this-product-does) • [**Privacy Model**](#privacy-model) • [**Tech Stack**](#tech-stack) • [**Local Setup**](#setup--run-locally) • [**Testing (`npm run test`)**](#run-tests) • [**CI/CD**](#cicd) • [**Level 5 — User Validation**](#level-5--user-validation) • [**Submission Checklist**](#submission-checklist)
+[**Live Demo**](#live-demo) • [**⚡ Try DApp & Submit Tx**](#-try-the-dapp--submit-your-on-chain-transaction) • [**Demo Video**](#demo-video) • [**Interface & Proof Architecture**](#interface--live-on-chain-verification) • [**Contract Address**](#contract-address) • [**Overview**](#what-this-product-does) • [**Privacy Model**](#privacy-model) • [**Tech Stack**](#tech-stack) • [**Local Setup**](#setup--run-locally) • [**Testing (`npm run test`)**](#run-tests) • [**CI/CD**](#cicd) • [**Level 5 — User Validation**](#level-5--user-validation) • [**Submission Checklist**](#submission-checklist)
 
 ---
 
 ## Live Demo
 
 🚀 **Live Production DApp**: [https://privateaid-counterdapp.vercel.app/](https://privateaid-counterdapp.vercel.app/)
+
+---
+
+## ⚡ Try the DApp & Submit Your On-Chain Transaction
+
+> **New User Onboarding & On-Chain Verification Submission**:  
+> Are you testing PrivateAid on Midnight Preprod? Follow the 5-minute onboarding steps below to set up your 1AM wallet, execute a real zero-knowledge transaction, and submit your transaction ID and wallet address to our official registry:  
+> 
+> 📋 **Submit Your Wallet & Transaction Hash**: **[Google Form: PrivateAid On-Chain Transaction Submission ↗](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform)**
+
+### 🚀 How to Participate (Step-by-Step for New Users)
+
+1. **Install 1AM Wallet & Switch to Preprod**:
+   - Install the **[1AM Wallet](https://1am.xyz)** extension (for Google Chrome or Brave).
+   - Create a test wallet (*use only a test wallet, never one holding mainnet funds*).
+   - In wallet settings / network selector, switch the network to **PREPROD**.
+
+2. **Copy Address & Request Free Testnet Tokens**:
+   - Copy your unshielded Preprod address (`mn_addr_preprod1...`).
+   - Claim free test tokens from the faucet: [https://midnight-tmnight-preprod.nethermind.dev](https://midnight-tmnight-preprod.nethermind.dev) (or the official [Midnight Preprod Faucet](https://faucet.preprod.midnight.network/)).
+   - Wait 1–2 minutes. If your wallet shows no DUST, use the 1AM wallet's **generate-DUST** option and wait for it to balance.
+
+3. **Open the DApp & Connect**:
+   - Open **[https://privateaid-counterdapp.vercel.app/](https://privateaid-counterdapp.vercel.app/)**.
+   - Click **Connect Wallet** in the top navigation or in the 1AM card and approve the connection.
+
+4. **Execute an Action (Confidential Aid Claim or Donation)**:
+   - In the **Circuit Execution** panel, select a contribution increment value (e.g. `+10`), or simulate qualification in the **Humanitarian Verification Engine**.
+   - Click **Execute Confidential Increment (ZK Circuit)**.
+   - Approve the popup in your 1AM Wallet. The WebAssembly prover compiles a Groth16 zero-knowledge proof client-side without disclosing your secret witness values on-chain.
+
+5. **Copy Your Transaction Hash**:
+   - When the transaction confirms on-chain (~10–15 seconds), copy the **Transaction Hash** displayed directly in the persistent **Transaction Receipt** card (or from your 1AM wallet transaction history).
+
+6. **Submit Your Transaction in the Google Form**:
+   - Open the **[Google Form: PrivateAid On-Chain Transaction Submission ↗](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform)**.
+   - Enter your name, your unshielded Preprod wallet address (`mn_addr_preprod1...`), your transaction hash, and the action you executed.
+   - Your transaction will be verified on the Midnight Preprod blockchain and recorded in [USERS.md](USERS.md)!
 
 ---
 
@@ -236,64 +274,14 @@ Continuous Integration runs automatically via GitHub Actions ([`.github/workflow
 
 ---
 
-## User Feedback Form
+## Documentation & Advanced Guides
 
-We actively listen to early testers, developers, and community contributors to refine PrivateAid. Please share your experience, feature requests, or bug reports:
-
-📋 **Google Feedback Form**: [Submit Feedback on Google Forms ↗](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform)
-
----
-
-## New User Guide — How to Use PrivateAid
-
-Welcome! **PrivateAid** is a privacy-preserving humanitarian aid platform built on the Midnight blockchain. It allows beneficiaries to prove aid eligibility and donors to contribute funds without exposing personal financial details or identities to public ledgers.
-
-Here is a quick, step-by-step guide to get started in under 3 minutes:
-
-### 1. Prerequisites (Setup Your Wallet)
-Before interacting with the dApp on Midnight Preprod, ensure you have:
-1. **A Midnight-Compatible Web3 Wallet**:
-   - Install **[1AM Wallet](https://1am.xyz)** (recommended Chrome extension) or **Midnight Lace Wallet**.
-2. **Switch to Preprod Testnet**:
-   - Open your 1AM Wallet, go to Settings / Network selector, and select **Midnight Preprod** (Network ID: `preprod`).
-3. **Get Free Testnet Tokens (tNIGHT & DUST)**:
-   - Request testnet tokens from the official [Midnight Preprod Faucet](https://faucet.preprod.midnight.network/).
-   - Ensure your wallet has sufficient **tNIGHT** (gas) and **DUST** (zero-knowledge proof fee capacity).
-
-### 2. Connect Your Wallet
-1. Open the live dApp: [https://privateaid-counterdapp.vercel.app/](https://privateaid-counterdapp.vercel.app/)
-2. Click **Connect Wallet** in the top navigation bar or inside the 1AM Wallet HUD card.
-3. Select your installed wallet and approve the connection in the wallet popup.
-4. Your shielded address (`mn_addr_preprod1...`), DUST balance, and live block height will appear immediately.
-
-### 3. Verify Beneficiary Eligibility (ZK Simulator)
-*If you are an aid applicant testing qualification:*
-1. Scroll to the **Humanitarian Verification Engine & Eligibility Simulator**.
-2. Enter an illustrative annual household income (e.g., `$24,000`).
-3. Click **Simulate ZK Qualification**.
-4. The zero-knowledge circuit evaluates client-side whether your income meets the humanitarian threshold (`assert(income < $50,000)`).
-5. A green verification badge confirms qualification. **Notice:** Your exact income figure never leaves your browser and is never stored on the blockchain!
-
-### 4. Make a Confidential Aid Contribution (On-Chain ZK Circuit)
-*If you are a donor contributing relief funds to the pool:*
-1. In the **Circuit Execution** panel, select a contribution increment value (e.g., `+10`).
-2. Click **Execute Confidential Increment (ZK Circuit)**.
-3. Approve the transaction in your 1AM Wallet popup:
-   - The private witness synthesizes your confidential contribution amount in local browser memory.
-   - The WebAssembly prover compiles a Groth16 zero-knowledge proof.
-   - The transaction extrinsic is submitted to the Midnight Preprod blockchain.
-4. Once finalized by consensus (~10–15 seconds), the **Persistent Transaction Receipt** card displays:
-   - Your verified **Transaction Hash**
-   - The consensus **Block Height**
-   - The updated public aggregate relief pool total (`totalValue`) and `round`
-   - A direct link to inspect the transaction on the **1AM Preprod Explorer**.
-   - Your individual contribution amount remains 100% confidential.
-
-### 5. Submit Your Feedback
-After trying out the dApp, please help us improve by sharing your thoughts:
-👉 **[Fill out the 1-Minute Google Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform)**
-
-For advanced technical details, see the complete [docs/USAGE.md](docs/USAGE.md) and [docs/FEEDBACK.md](docs/FEEDBACK.md).
+For detailed architectural specifications, full non-technical walkthroughs, and testnet verification scripts:
+- 📖 **Usage Guide & FAQs**: [docs/USAGE.md](docs/USAGE.md) — Comprehensive user walkthrough, troubleshooting, and privacy breakdown.
+- 👥 **Preprod Users Directory**: [USERS.md](USERS.md) — Full ledger table of 50 verified on-chain transactions and block heights.
+- 📝 **Transaction Submission**: [Google Form ↗](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform) — Submit your wallet address and on-chain transaction hash.
+- 🛡️ **Product Iteration & Feedback**: [docs/FEEDBACK.md](docs/FEEDBACK.md) — Tester log, feedback themes, and UI improvements.
+- 🔍 **Independent Verification**: [docs/VERIFICATION.md](docs/VERIFICATION.md) — Guide to running `scripts/verify-users.ts` against the Midnight GraphQL Indexer.
 
 ---
 
@@ -325,5 +313,5 @@ Follow project updates, architectural breakdowns, and Midnight testnet announcem
 - [x] 8/8 Automated Compact contract unit & circuit tests passing (`npm test` / `npm run test`)
 - [x] 50 users listed in [USERS.md](USERS.md) with real, independently verifiable transaction hashes
 - [x] Official X (Twitter) profile active ([@PrivateAid0](https://x.com/PrivateAid0))
-- [x] Google Feedback Form live & linked ([Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform))
+- [x] Google Form for User Onboarding & On-Chain Tx Submission live ([Submit Transaction](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform))
 - [x] Clean browser console with zero runtime errors
