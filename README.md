@@ -63,7 +63,11 @@
 
 [![PrivateAid Live Demo Video](https://img.youtube.com/vi/y4dTkaZyvf4/maxresdefault.jpg)](https://www.youtube.com/watch?v=y4dTkaZyvf4)
 
-*Full demonstration covering 1AM Wallet connection on Preprod, client-side zero-knowledge proof synthesis via WebAssembly, state transition execution, and instant on-chain transaction receipt confirmation.*
+*Continuous screen recording demonstrating end-to-end functionality on Midnight Preprod:*
+- **Contract Address On-Screen**: Preprod contract `0f63bb30...` prominently displayed and polled in live telemetry.
+- **Full Transaction Lifecycle**: 1AM Wallet connection → action intent selection → WebAssembly ZK-SNARK circuit proving → 1AM wallet signature approval popup → confirmed on-chain transaction receipt.
+- **Block Explorer Verification**: Instant transition to the official 1AM Preprod Explorer showing the confirmed transaction settled in ledger consensus.
+- **Public vs. Private Architecture**: Step-by-step walkthrough explaining what is permanently shielded (witness eligibility & contribution amounts) vs. what is verifiable on the public ledger (state transition & round updates).
 
 ---
 
@@ -315,13 +319,24 @@ Follow project updates, architectural breakdowns, and Midnight testnet announcem
 
 ---
 
-## Brand Assets
+## Brand Brief & Visual Identity
 
-PrivateAid adopts the Anchor CLI-inspired minimalist palette:
-- **Primary Background**: Baltic Sea Dark (`#101314` / `#16191b`)
-- **Accent Theme**: Keppel / Mint Cyan (`#00cc99` / `#06b6d4`)
-- **Card Background**: Neutral Slate Dark (`#1a1d1f`)
-- **Typography**: Space Grotesk (Headlines) & JetBrains Mono (Telemetry/Code)
+PrivateAid adopts the Anchor CLI-inspired minimalist, high-contrast privacy palette:
+- **One-Line Tagline**: *Dignified relief, mathematically confidential.*
+- **3 Key Differentiators**:
+  1. **Zero-Knowledge Eligibility Verification**: Beneficiaries prove qualification criteria without revealing income, identity documents, or personal data.
+  2. **Confidential Pool Donations**: Donors contribute to aggregated disaster relief funds without broadcasting individual contribution amounts.
+  3. **100% Client-Side Proving**: Groth16 zero-knowledge proofs are synthesized directly inside browser memory via WebAssembly; private witness keys never touch a central server.
+- **Color Palette**:
+  - Primary Background: Baltic Sea Dark (`#101314` / `#16191b`)
+  - Accent Highlight: Keppel / Mint Cyan (`#00cc99` / `#06b6d4`)
+  - Surface Container: Neutral Slate Dark (`#1a1d1f`)
+  - Border Accents: Subdued Teal (`rgba(0, 204, 153, 0.15)`)
+- **Typography**: Space Grotesk (Display / Headlines) & JetBrains Mono (Telemetry / Cryptographic Hex)
+- **Official X (Twitter) Bio (<160 chars)**:  
+  `Confidential humanitarian aid on Midnight. Beneficiaries prove eligibility with ZK proofs; donors give privately. Built with Compact smart contracts. 🛡️` *(153 characters)*
+- **X Banner Concept**:  
+  Deep Baltic Sea charcoal canvas (`#101314`) featuring a glowing Keppel cyan (`#00cc99`) zero-knowledge circuit DAG transitioning into a smooth cryptographic heartbeat pulse on the right, anchored by the bold logotype: **PrivateAid — Confidential Relief, Cryptographically Proven.**
 - **Visuals & Diagrams**: Live application screenshots are hosted in `assets/privateaid-dashboard.png` and `assets/privateaid-receipt.png`.
 
 ---
