@@ -301,13 +301,13 @@ See [docs/FEEDBACK.md](docs/FEEDBACK.md) for the full user feedback log and arch
 
 ## Level 6 Users
 
-See [LAUNCH_USERS.md](LAUNCH_USERS.md) for the 20 verified Level 6 launch cohort users. Early testers onboard through the [Onboarding & Transaction Submission Form](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform).
+See [LAUNCH_USERS.md](LAUNCH_USERS.md)  Early testers onboard through the [Onboarding & Transaction Submission Form](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform).
 
 ---
 
 ## User Validation (70 Verified Preprod Users)
 
-See [USERS.md](USERS.md) for the full table of 70 verified on-chain Preprod transactions (50 from Level 5 and 20 from Level 6 in [LAUNCH_USERS.md](LAUNCH_USERS.md)). All 70 transactions are confirmed smart contract invocations committed to Midnight Preprod consensus and independently verifiable via GraphQL Indexer.
+See [USERS.md](USERS.md) for the full table of 70 verified on-chain Preprod transactions [LAUNCH_USERS.md](LAUNCH_USERS.md)). All 70 transactions are confirmed smart contract invocations committed to Midnight Preprod consensus and independently verifiable via GraphQL Indexer.
 
 ---
 
