@@ -186,7 +186,7 @@ export interface CircuitCallState {
 // Ã¢â€â‚¬Ã¢â€â‚¬ Verified Contract & Network Definitions Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export const DEFAULT_PREPROD_CONTRACT = '0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b';
 export const DEFAULT_PREPROD_DEPLOY_TX = 'bfd00a8ac48f72c3d16cc1cd0dbf509e1bec72c612dcbde9dccd608eeebbb859';
-export const DEFAULT_PREVIEW_CONTRACT = '';
+export const DEFAULT_PREVIEW_CONTRACT = 'e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e';
 
 export const NETWORK_DETAILS: Record<NetworkType, {
   name: string;
@@ -210,8 +210,9 @@ export const NETWORK_DETAILS: Record<NetworkType, {
   },
   preview: {
     name: 'Midnight Preview',
-    contractAddress: '',
+    contractAddress: 'e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e',
     deployerWallet: '',
+    deployTxHash: 'c5dfdf7312e6b41edc89f0f4d3dc3d7ee445670a71174a63fb6ac48acfa59b29',
     indexerUrl: '/api/indexer',
     indexerWsUrl: 'wss://indexer.preview.midnight.network/api/v4/graphql/ws',
     nodeUrl: 'https://rpc.preview.midnight.network',

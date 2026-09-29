@@ -86,17 +86,19 @@ Beneficiaries and donors synthesize Groth16 zero-knowledge proofs directly insid
 | Network | Address | Explorer | Status |
 |---------|---------|----------|--------|
 | **Preprod** | `0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b` | [View on 1AM Preprod Explorer ↗](https://explorer.1am.xyz/contract/0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b?network=preprod) | **Active & Deployed** |
+| **Preview** | `e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e` | [View on 1AM Preview Explorer ↗](https://explorer.1am.xyz/contract/e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e?network=preview) | **Active & Deployed** (Block #900,397) |
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- PrivateAid — Deployed Compact Contract on Midnight Testnet
+ PrivateAid — Deployed Compact Contracts on Midnight Testnets
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  Contract Source  : ./blockchain/contracts/privateaid.compact
  Managed Bindings : ./blockchain/managed/contract/index.js
  Preprod Contract : 0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b
- Target Network   : Midnight Preprod (CAIP-372 API v4.0.1)
+ Preview Contract : e648cb51d165b7050f6bfd2d4846ef0e520c0c15f0e50859230cb5c512f51f5e
  Active Circuit   : incrementWithSecret (Beneficiary Aid Claim / Confidential Donation)
- Verified Tx Hash : e2dcd29b2e1871f55ae98ded64c1f4f0c41655a23cdbe50437874c7aa56f166a
+ Preprod Tx Hash  : e2dcd29b2e1871f55ae98ded64c1f4f0c41655a23cdbe50437874c7aa56f166a
+ Preview Tx Hash  : c5dfdf7312e6b41edc89f0f4d3dc3d7ee445670a71174a63fb6ac48acfa59b29
  Status           : DEPLOYED & SETTLED — see Level 5 for 50 on-chain transaction proofs
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
