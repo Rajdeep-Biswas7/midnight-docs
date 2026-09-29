@@ -33,3 +33,14 @@ Feedback and on-chain testing submissions were gathered directly from developers
 | **Strict Wallet-Gating on Circuit Execution** | Addressed Feedback #1: Disabled the execution button when `!isConnected`, added warning banner, and enforced programmatic checks in `callCircuit()` to reject unauthorized attempts. | `47d6881` & current |
 | **Transparent Cryptographic Metric Labels** | Addressed Feedback #3: Relabeled pedagogical proof size to `~128 Bytes (standard illustrative figure)` to clarify it represents standard curve benchmarks rather than dynamic measurements. | current |
 | **Responsive Hash Truncation for Mobile Viewports** | Addressed Feedback #4: Added responsive CSS and compact hash truncation (`0xbfd0...bb859`) with a full-copy affordance for screens under 640px. | current |
+
+---
+
+## Level 6 Improvements
+
+| Change | User Feedback That Triggered It | Status | Commit |
+|--------|--------------------------------|--------|--------|
+| **1-Click Registry Submission Button on `TransactionReceipt`** | Users requested a direct button after transaction settlement to submit their wallet and tx hash to the on-chain registry without manual tab switching. | Completed | `5575be5` |
+| **DUST Gas & Proving Capacity Helper in `WalletConnect`** | Users with 0 DUST experienced silent proving failures or popup timeouts; added dynamic inline capacity indicator and instant faucet link. | Completed | `5575be5` |
+| **Step-by-Step Onboarding Architecture in Header** | Testers requested clear upfront instructions distinguishing public ledger settlement from private witness inputs before executing the circuit. | Completed | `570176d` |
+
