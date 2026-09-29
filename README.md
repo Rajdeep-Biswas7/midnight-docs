@@ -274,24 +274,34 @@ Continuous Integration runs automatically via GitHub Actions ([`.github/workflow
 
 ---
 
-## Documentation & Advanced Guides
+## Usage Guide
 
-For detailed architectural specifications, full non-technical walkthroughs, and testnet verification scripts:
-- 📖 **Usage Guide & FAQs**: [docs/USAGE.md](docs/USAGE.md) — Comprehensive user walkthrough, troubleshooting, and privacy breakdown.
-- 👥 **Preprod Users Directory**: [USERS.md](USERS.md) — Full ledger table of 50 verified on-chain transactions and block heights.
-- 📝 **Transaction Submission**: [Google Form ↗](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform) — Submit your wallet address and on-chain transaction hash.
-- 🛡️ **Product Iteration & Feedback**: [docs/FEEDBACK.md](docs/FEEDBACK.md) — Tester log, feedback themes, and UI improvements.
-- 🔍 **Independent Verification**: [docs/VERIFICATION.md](docs/VERIFICATION.md) — Guide to running `scripts/verify-users.ts` against the Midnight GraphQL Indexer.
+See [docs/USAGE.md](docs/USAGE.md) for a comprehensive, non-technical, step-by-step user guide covering Preprod onboarding and first transactions.
 
 ---
 
-## Level 5 — User Validation
+## Feedback & Iterations
 
-- **Target**: 50 Preprod users
-- **Verified on-chain**: **see [USERS.md](USERS.md)** for the full table of 50 distinct wallet addresses and real transaction hashes, each independently checkable at `https://explorer.1am.xyz/tx/<hash>?network=preprod`.
-- **Transaction Proofs**: Every single transaction is a confirmed smart contract invocation committed to Midnight Preprod consensus.
-- **Note on 1AM Explorer**: 1AM Explorer's frontend has known indexing/caching display limitations during high testnet throughput (short rolling block window on homepage, and aggregate contract page caching). Reviewers can verify every transaction directly by transaction hash on 1AM Explorer or query the official Midnight GraphQL Indexer API directly.
-- **Feedback & Iteration**: See [docs/FEEDBACK.md](docs/FEEDBACK.md) for tester feedback and corresponding UI improvements.
+See [docs/FEEDBACK.md](docs/FEEDBACK.md) for the full user feedback log and architectural iteration matrix.
+
+### Summary of Top Changes Made from User Feedback:
+- **1-Click Registry Submission from Receipt**: Built a direct submission button on the `TransactionReceipt` card that auto-copies the verified transaction hash and opens the on-chain registry form.
+- **DUST Gas & Proving Capacity Helper**: Added real-time gas capacity indicators and direct faucet links in `WalletConnect` to prevent silent transaction timeouts.
+- **Strict Wallet-Gating & Guidance**: Hardened circuit invocation against unauthorized state, disabling execution buttons when disconnected and presenting explicit onboarding cues.
+- **Pedagogical Metric Disclaimers**: Added standard BLS12-381 curve benchmark disclaimers (`~128 Bytes`) to clarify illustrative Groth16 sizes vs. dynamic metrics.
+- **Responsive Viewport Formatting**: Added responsive CSS with compact hash truncation and full-copy affordances for smaller screens.
+
+---
+
+## Level 6 Users
+
+See [LAUNCH_USERS.md](LAUNCH_USERS.md) for the Level 6 launch user registry. Early testers onboard through the [Onboarding & Transaction Submission Form](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform).
+
+---
+
+## Level 5 Users
+
+See [USERS.md](USERS.md) for the full table of 50 verified on-chain Preprod transactions. All 50 transactions are confirmed smart contract invocations committed to Midnight Preprod consensus and independently verifiable via GraphQL Indexer.
 
 ---
 
@@ -303,15 +313,30 @@ Follow project updates, architectural breakdowns, and Midnight testnet announcem
 
 ---
 
+## Brand Assets
+
+PrivateAid adopts the Anchor CLI-inspired minimalist palette:
+- **Primary Background**: Baltic Sea Dark (`#101314` / `#16191b`)
+- **Accent Theme**: Keppel / Mint Cyan (`#00cc99` / `#06b6d4`)
+- **Card Background**: Neutral Slate Dark (`#1a1d1f`)
+- **Typography**: Space Grotesk (Headlines) & JetBrains Mono (Telemetry/Code)
+- **Visuals & Diagrams**: Live application screenshots are hosted in `assets/privateaid-dashboard.png` and `assets/privateaid-receipt.png`.
+
+---
+
 ## Submission Checklist
 
-- [x] Public GitHub repository with full documentation
-- [x] Live demo deployed ([https://privateaid-counterdapp.vercel.app/](https://privateaid-counterdapp.vercel.app/))
+- [x] Public GitHub repository with complete documentation ([github.com/Rajdeep-Biswas7/midnight-docs](https://github.com/Rajdeep-Biswas7/midnight-docs))
+- [x] Live demo deployed and operational ([https://privateaid-counterdapp.vercel.app/](https://privateaid-counterdapp.vercel.app/))
 - [x] Contract address verified on-chain (Preprod `0f63bb305f8934af2710eba04baea56d44a29329d8e7333d007c0127657bdc4b`)
 - [x] CI/CD pipeline green on latest commit ([`.github/workflows/ci.yml`](.github/workflows/ci.yml))
 - [x] Real, screen-recorded demo video showing live on-chain transaction ([YouTube Demo](https://www.youtube.com/watch?v=y4dTkaZyvf4))
 - [x] 8/8 Automated Compact contract unit & circuit tests passing (`npm test` / `npm run test`)
 - [x] 50 users listed in [USERS.md](USERS.md) with real, independently verifiable transaction hashes
+- [x] Level 6 launch user registry created in [LAUNCH_USERS.md](LAUNCH_USERS.md)
+- [x] Feedback improvements implemented in code and documented in [docs/FEEDBACK.md](docs/FEEDBACK.md)
+- [x] Usage guide updated with Preprod onboarding and first transaction in [docs/USAGE.md](docs/USAGE.md)
 - [x] Official X (Twitter) profile active ([@PrivateAid0](https://x.com/PrivateAid0))
 - [x] Google Form for User Onboarding & On-Chain Tx Submission live ([Submit Transaction](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform))
+- [x] Over 30 meaningful, incremental commits on `main`
 - [x] Clean browser console with zero runtime errors
