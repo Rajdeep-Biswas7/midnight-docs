@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* ---- Neutral palette: baltic-sea ---- */
+  --color-baltic-sea-50:  oklch(97.48% 0.00 301.43);
+  --color-baltic-sea-100: oklch(94.80% 0.01 297.72);
+  --color-baltic-sea-200: oklch(88.34% 0.01 296.33);
+  --color-baltic-sea-300: oklch(47.69% 0.02 291.24);
+  --color-baltic-sea-400: oklch(44.91% 0.04 292.35);
+  --color-baltic-sea-500: oklch(40.99% 0.04 292.76);
+  --color-baltic-sea-600: oklch(34.20% 0.04 293.15);
+  --color-baltic-sea-700: oklch(30.16% 0.04 295.15);
+  --color-baltic-sea-800: oklch(26.32% 0.03 293.63);
+  --color-baltic-sea-900: oklch(17.16% 0.02 294.89);
+  --color-baltic-sea-950: oklch(16.00% 0.0152 296.75);
+
+  /* ---- Accent palette: keppel (teal) ---- */
+  --color-keppel-50:  oklch(98.08% 0.01 181.42);
+  --color-keppel-100: oklch(93.79% 0.03 177.17);
+  --color-keppel-200: oklch(87.75% 0.06 177.32);
+  --color-keppel-300: oklch(79.68% 0.09 178.36);
+  --color-keppel-400: oklch(70.64% 0.10 179.40);
+  --color-keppel-500: oklch(67.55% 0.11 179.75);
+  --color-keppel-600: oklch(52.92% 0.08 180.79);
+  --color-keppel-700: oklch(45.58% 0.07 182.55);
+  --color-keppel-800: oklch(39.55% 0.05 182.73);
+  --color-keppel-900: oklch(35.39% 0.04 183.99);
+  --color-keppel-950: oklch(25.12% 0.03 188.72);
+
+  /* ---- Fonts & Radius ---- */
+  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", monospace;
+  --radius: 0.75rem;
+
+  /* ---- Light-mode default variant ---- */
+  --background: var(--color-baltic-sea-50);
+  --foreground: var(--color-baltic-sea-900);
+  --card: oklch(100% 0 0);
+  --card-foreground: var(--color-baltic-sea-900);
+  --popover: oklch(100% 0 0);
+  --popover-foreground: var(--color-baltic-sea-900);
+  --primary: var(--color-baltic-sea-900);
+  --primary-foreground: var(--color-baltic-sea-50);
+  --secondary: var(--color-baltic-sea-100);
+  --secondary-foreground: var(--color-baltic-sea-800);
+  --muted: var(--color-baltic-sea-100);
+  --muted-foreground: var(--color-baltic-sea-500);
+  --accent: var(--color-keppel-600);
+  --accent-foreground: oklch(100% 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: var(--color-baltic-sea-200);
+  --input: var(--color-baltic-sea-200);
+  --ring: var(--color-keppel-600);
+  --bento-shadow: inset 0 -20px 80px -20px rgba(0, 0, 0, 0.04);
+
+  /* Compatibility aliases */
+  --bg-base: var(--background);
+  --bg-elevated: var(--card);
+  --border-subtle: var(--border);
+  --text-primary: var(--foreground);
+  --text-muted: var(--muted-foreground);
+}
+
+.dark, [data-theme="dark"] {
+  /* ---- Semantic tokens (dark mode / default) ---- */
+  --background: hsl(255, 11.11%, 7.06%);
+  --foreground: var(--color-baltic-sea-100);
+  --card: var(--color-baltic-sea-900);
+  --card-foreground: var(--color-baltic-sea-100);
+  --popover: var(--color-baltic-sea-900);
+  --popover-foreground: var(--color-baltic-sea-100);
+  --primary: var(--color-baltic-sea-100);
+  --primary-foreground: var(--color-baltic-sea-950);
+  --secondary: var(--color-baltic-sea-800);
+  --secondary-foreground: var(--color-baltic-sea-200);
+  --muted: var(--color-baltic-sea-800);
+  --muted-foreground: var(--color-baltic-sea-400);
+  --accent: var(--color-keppel-500);
+  --accent-foreground: var(--color-keppel-950);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: var(--color-baltic-sea-700);
+  --input: var(--color-baltic-sea-800);
+  --ring: var(--color-keppel-500);
+  --bento-shadow: inset 0 -20px 80px -20px #ffffff0f;
+
+  /* Compatibility aliases */
+  --bg-base: var(--background);
+  --bg-elevated: var(--card);
+  --border-subtle: var(--border);
+  --text-primary: var(--foreground);
+  --text-muted: var(--muted-foreground);
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--background);
+  color: var(--foreground);
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar (Anchor signature: 8px, baltic-sea-700 thumb) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-baltic-sea-700);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-baltic-sea-600);
+}
+
+/* Bento Card Style with inner glow */
+.bento-card {
+  background-color: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--bento-shadow);
+}
+
+/* Blinking Terminal Cursor */
+@keyframes blinkCursor {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.terminal-cursor {
+  display: inline-block;
+  animation: blinkCursor 0.8s step-end infinite;
+}
