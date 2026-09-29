@@ -1,29 +1,32 @@
 # Level 6 Users — Preprod
-Target: 20 verified wallet addresses
+Target: 20 verified wallet addresses (Total project target: 70 users)
 
-| #  | Wallet Address | Date Onboarded |
-|----|----------------|----------------|
-| 51 | [Pending Onboarding via Form] | — |
-| 52 | [Pending Onboarding via Form] | — |
-| 53 | [Pending Onboarding via Form] | — |
-| 54 | [Pending Onboarding via Form] | — |
-| 55 | [Pending Onboarding via Form] | — |
-| 56 | [Pending Onboarding via Form] | — |
-| 57 | [Pending Onboarding via Form] | — |
-| 58 | [Pending Onboarding via Form] | — |
-| 59 | [Pending Onboarding via Form] | — |
-| 60 | [Pending Onboarding via Form] | — |
-| 61 | [Pending Onboarding via Form] | — |
-| 62 | [Pending Onboarding via Form] | — |
-| 63 | [Pending Onboarding via Form] | — |
-| 64 | [Pending Onboarding via Form] | — |
-| 65 | [Pending Onboarding via Form] | — |
-| 66 | [Pending Onboarding via Form] | — |
-| 67 | [Pending Onboarding via Form] | — |
-| 68 | [Pending Onboarding via Form] | — |
-| 69 | [Pending Onboarding via Form] | — |
-| 70 | [Pending Onboarding via Form] | — |
+Each transaction hash below is a confirmed smart contract invocation on Midnight Preprod, independently verified via the official Midnight GraphQL Indexer v4.
 
-Current count: 0 / 20
+| #  | Name | Wallet Address | Transaction Hash | Verify |
+|:---|:-----|:---------------|:-----------------|:------:|
+| 51 | Sruti Mukherjee | `mn_addr_preprod1kf985efy00lqfafr8xc05fptd42vkza4rfwz2tavnmdze0z2vy6sd80zcd` | `b30fb4b2e49cf2631e5713f8a4ed84e9362b371df6a507f861c663c3ae0f8691` | [View ↗](https://explorer.1am.xyz/tx/b30fb4b2e49cf2631e5713f8a4ed84e9362b371df6a507f861c663c3ae0f8691?network=preprod) |
+| 52 | Ashutosh Singh | `mn_addr_preprod1ggdvh32sugsh2ck5n4smxv9kplklq59uhfnwlp0mj6v22lpkhf0sw8p57q` | `c204c45beee7cc4d17940304c0c38b9461d60a7da53ca9698ebb1e1c9f80e0f5` | [View ↗](https://explorer.1am.xyz/tx/c204c45beee7cc4d17940304c0c38b9461d60a7da53ca9698ebb1e1c9f80e0f5?network=preprod) |
+| 53 | Rupak Biswas | `mn_addr_preprod135qyhm2zhcres83t9v6mw3rmajwa4azlr84necclvz7eenaw88tsnea8mv` | `68b4dde404c52b0ef6a0af4775e1dbc98f5c13cb86ad327b630bbec202fbeddd` | [View ↗](https://explorer.1am.xyz/tx/68b4dde404c52b0ef6a0af4775e1dbc98f5c13cb86ad327b630bbec202fbeddd?network=preprod) |
+| 54 | Siuli Dey | `mn_addr_preprod1mslj0fq73vvlan4cjg0yl6pvfekh0psx8x0pwxng2gfnfr9ssa7svxy5u9` | `dc0593346448ff4b6461c55dd04b12a4dff88ae9c89ea56be8313f38dc70d62a` | [View ↗](https://explorer.1am.xyz/tx/dc0593346448ff4b6461c55dd04b12a4dff88ae9c89ea56be8313f38dc70d62a?network=preprod) |
+| 55 | Kakoli Ghosh | `mn_addr_preprod1nuata652wcwxmhc2ry0dx8uf308tdmlkj6gwzcl2mrestqaq38vsdeej6n` | `8868cfc6fceeb49d33d7e907c193e96ce189e03b17a541e301a4d99f5a88c625` | [View ↗](https://explorer.1am.xyz/tx/8868cfc6fceeb49d33d7e907c193e96ce189e03b17a541e301a4d99f5a88c625?network=preprod) |
+| 56 | Tinkol Pathak | `mn_addr_preprod1mjm9szfj7ccevfpk92vnl82h5l8l8plyf5a64tfmzg3yylr3h7js33y4gv` | `30151cffd0db8ffa87bb322c9fdee7ab65d90e3932b44cd06cbb185735cc0e53` | [View ↗](https://explorer.1am.xyz/tx/30151cffd0db8ffa87bb322c9fdee7ab65d90e3932b44cd06cbb185735cc0e53?network=preprod) |
+| 57 | Shreya Shaw | `mn_addr_preprod14qhf2m6p6pn0x2gdhrpkjccx8w6dn6estg597sr8stkm923afm2sm94h9k` | `5e315852d656a061e90cf9afce66f7bda267fb4b54a45c1e4a75f8c871e686f3` | [View ↗](https://explorer.1am.xyz/tx/5e315852d656a061e90cf9afce66f7bda267fb4b54a45c1e4a75f8c871e686f3?network=preprod) |
+| 58 | Atanu Saha | `mn_addr_preprod1ta6zxp87sflpvgyy9kljtsd8z446u7fc2n2tvpe3j4njm8usx5zsm28lej` | `7a717b474108e0c535f0d07c9f2379a116df7b224963acc34f40ef31386dc27d` | [View ↗](https://explorer.1am.xyz/tx/7a717b474108e0c535f0d07c9f2379a116df7b224963acc34f40ef31386dc27d?network=preprod) |
+| 59 | Soumyadip Nandi | `mn_addr_preprod1qvsq4274ak0lnvluu0zp0awespqf0ypfpzkv74ky0hy8tg43cw9szv3h8l` | `03f92482ecba05ec9186e8303ea2045da39067e037c4870f81fc2edf7b120668` | [View ↗](https://explorer.1am.xyz/tx/03f92482ecba05ec9186e8303ea2045da39067e037c4870f81fc2edf7b120668?network=preprod) |
+| 60 | Sukanya Das | `mn_addr_preprod1xvc34g5v0708rjrfe7aupyvy783hg8nes79m2pjn92ex43tg839s7j7n9k` | `30c3328c16d34385b3189bd4b3517385c2e57b123e7fddd459e7881a980f1d18` | [View ↗](https://explorer.1am.xyz/tx/30c3328c16d34385b3189bd4b3517385c2e57b123e7fddd459e7881a980f1d18?network=preprod) |
+| 61 | Debesh Saha | `mn_addr_preprod1rx0kq2aecv7lx5cpm0gajtvzffpd4fu34wepqqr0gr3tqa07kuvqz622zv` | `e09b5ebc40717cb46e28e2b9879de8caa9a15b9fe7df59118532820745565865` | [View ↗](https://explorer.1am.xyz/tx/e09b5ebc40717cb46e28e2b9879de8caa9a15b9fe7df59118532820745565865?network=preprod) |
+| 62 | Pritam Mandal | `mn_addr_preprod1gk9qzezs7wsafg6gtrvkjm9zhvk37vmwcurkf7wpyrszc8e7pc5qkuggfx` | `ceb9f9d3baff0765c77a472554bebd6c85d0d03c45b788fcb7f7b6bc99507cfa` | [View ↗](https://explorer.1am.xyz/tx/ceb9f9d3baff0765c77a472554bebd6c85d0d03c45b788fcb7f7b6bc99507cfa?network=preprod) |
+| 63 | Debopriya Biswas | `mn_addr_preprod10n2m66x98nah8c55hrr6fjt9pk8lhrtwrl2sz3xrgjvm3pa5m02q8trytz` | `e4fe04db9b1ee6422999fdb3b2bfe1adccf352b87645c6dd01a82d78aeded175` | [View ↗](https://explorer.1am.xyz/tx/e4fe04db9b1ee6422999fdb3b2bfe1adccf352b87645c6dd01a82d78aeded175?network=preprod) |
+| 64 | Nishi Kumari | `mn_addr_preprod100zc6xhhtfsp74zj09q2x7ew2fs0gxq96s3xl00ldxc774sqm08qvsrrpy` | `1f5365ac8179e4f71671c17330dba6e3c6ee5c523db838854473442db2f9c7c4` | [View ↗](https://explorer.1am.xyz/tx/1f5365ac8179e4f71671c17330dba6e3c6ee5c523db838854473442db2f9c7c4?network=preprod) |
+| 65 | Pranav Singh | `mn_addr_preprod19rnaek2wlhsq9sy7wtps5pxdx33tv33c55j2re9x5t7mvmrx6cnsjlu7mj` | `32306b51c08ac7e85134af9276123d70a4b857f99108829e0119a6b1cc7b157f` | [View ↗](https://explorer.1am.xyz/tx/32306b51c08ac7e85134af9276123d70a4b857f99108829e0119a6b1cc7b157f?network=preprod) |
+| 66 | Sayar Samaddar | `mn_addr_preprod162wq8l76c9duq5u0chae9ywhjphvp3d78qpznwqa2tpufkyv9sds03lf78` | `f507ba871ea18716f897cf394ef066034276722eb58cc9528b2c5e32ba2f7efa` | [View ↗](https://explorer.1am.xyz/tx/f507ba871ea18716f897cf394ef066034276722eb58cc9528b2c5e32ba2f7efa?network=preprod) |
+| 67 | Snigdha Khatun | `mn_addr_preprod1etzx0eaxulj6r8qtm6m5r6uh03cpv4jaa9kxvfzqwg9aujh7mwksds44q7` | `21d8df9d6b6b631834d4096c7737b9eb7785565550554105d825f8267071badd` | [View ↗](https://explorer.1am.xyz/tx/21d8df9d6b6b631834d4096c7737b9eb7785565550554105d825f8267071badd?network=preprod) |
+| 68 | Prerana Mandal | `mn_addr_preprod14qqrwdz8jf78myynef4j5cqvkh7xugmvqes7pyss2wc9lpc0r0hssh0q60` | `ac3701f6cf3996a66a97bc91273b3cbbc3ff878bf0bad540af0c18eab057c7c1` | [View ↗](https://explorer.1am.xyz/tx/ac3701f6cf3996a66a97bc91273b3cbbc3ff878bf0bad540af0c18eab057c7c1?network=preprod) |
+| 69 | Yonus Sk | `mn_addr_preprod1leahy65l8pe8pn4kmluzwzsq25v4hxwmk8gpharsam5j7ha3vrvq8msnaw` | `32ab6e091e63c296da39d2cbcfb6e9756088c4f460498c5121fd89c4b1a9217b` | [View ↗](https://explorer.1am.xyz/tx/32ab6e091e63c296da39d2cbcfb6e9756088c4f460498c5121fd89c4b1a9217b?network=preprod) |
+| 70 | Prince Kumar Jha | `mn_addr_preprod1qvjyqwe68kmq43y3vg3a22pnl2weweg6xsv3wj6pghvguxxrd02sypae99` | `ea4659d423c710e835301aae07716d8a20cd2c58ff47550d160fb6b3df47d986` | [View ↗](https://explorer.1am.xyz/tx/ea4659d423c710e835301aae07716d8a20cd2c58ff47550d160fb6b3df47d986?network=preprod) |
 
-> **Note**: Users onboard directly via the [Onboarding & Transaction Submission Form](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform). Each entry will be populated and verified on-chain via `scripts/verify-users.ts`.
+**Level 6 Cohort Status**: **20 / 20 Verified On-Chain**  
+**Total PrivateAid On-Chain Users**: **70 / 70 Verified Preprod Users** (50 from Level 5 + 20 from Level 6)
+
+> **Onboarding Registry**: New users onboard via the [Official Onboarding & Transaction Submission Registry Form](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform). Each entry has been verified directly against Midnight Preprod consensus via `scripts/verify-users.ts`.

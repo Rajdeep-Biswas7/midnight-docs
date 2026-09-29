@@ -9,7 +9,7 @@
 
 **A privacy-preserving humanitarian aid dApp on the Midnight blockchain — beneficiaries prove eligibility and donors contribute confidentially, using Compact smart contracts and zero-knowledge proofs.**
 
-[**Live Demo**](#live-demo) • [**⚡ Try DApp & Submit Tx**](#-try-the-dapp--submit-your-on-chain-transaction) • [**Demo Video**](#demo-video) • [**Interface & Proof Architecture**](#interface--live-on-chain-verification) • [**Contract Address**](#contract-address) • [**Overview**](#what-this-product-does) • [**Privacy Model**](#privacy-model) • [**Tech Stack**](#tech-stack) • [**Local Setup**](#setup--run-locally) • [**Testing (`npm run test`)**](#run-tests) • [**CI/CD**](#cicd) • [**Level 5 — User Validation**](#level-5--user-validation) • [**Submission Checklist**](#submission-checklist)
+[**Live Demo**](#live-demo) • [**⚡ Try DApp & Submit Tx**](#-try-the-dapp--submit-your-on-chain-transaction) • [**Demo Video**](#demo-video) • [**Interface & Proof Architecture**](#interface--live-on-chain-verification) • [**Contract Address**](#contract-address) • [**Overview**](#what-this-product-does) • [**Privacy Model**](#privacy-model) • [**Tech Stack**](#tech-stack) • [**Local Setup**](#setup--run-locally) • [**Testing (`npm run test`)**](#run-tests) • [**CI/CD**](#cicd) • [**User Validation (70 Users)**](#user-validation-70-verified-preprod-users) • [**Submission Checklist**](#submission-checklist)
 
 ---
 
@@ -53,7 +53,7 @@
 6. **Submit Your Transaction in the Google Form**:
    - Open the **[Google Form: PrivateAid On-Chain Transaction Submission ↗](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform)**.
    - Enter your name, your unshielded Preprod wallet address (`mn_addr_preprod1...`), your transaction hash, and the action you executed.
-   - Your transaction will be verified on the Midnight Preprod blockchain and recorded in [USERS.md](USERS.md)!
+   - Your transaction will be verified on the Midnight Preprod blockchain and recorded in [USERS.md](USERS.md) and [LAUNCH_USERS.md](LAUNCH_USERS.md)!
 
 ---
 
@@ -99,7 +99,7 @@ Beneficiaries and donors synthesize Groth16 zero-knowledge proofs directly insid
  Active Circuit   : incrementWithSecret (Beneficiary Aid Claim / Confidential Donation)
  Preprod Tx Hash  : e2dcd29b2e1871f55ae98ded64c1f4f0c41655a23cdbe50437874c7aa56f166a
  Preview Tx Hash  : c5dfdf7312e6b41edc89f0f4d3dc3d7ee445670a71174a63fb6ac48acfa59b29
- Status           : DEPLOYED & SETTLED — see Level 5 for 50 on-chain transaction proofs
+ Status           : DEPLOYED & SETTLED — see USERS.md for 70 on-chain transaction proofs
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -297,13 +297,13 @@ See [docs/FEEDBACK.md](docs/FEEDBACK.md) for the full user feedback log and arch
 
 ## Level 6 Users
 
-See [LAUNCH_USERS.md](LAUNCH_USERS.md) for the Level 6 launch user registry. Early testers onboard through the [Onboarding & Transaction Submission Form](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform).
+See [LAUNCH_USERS.md](LAUNCH_USERS.md) for the 20 verified Level 6 launch cohort users. Early testers onboard through the [Onboarding & Transaction Submission Form](https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform).
 
 ---
 
-## Level 5 Users
+## User Validation (70 Verified Preprod Users)
 
-See [USERS.md](USERS.md) for the full table of 50 verified on-chain Preprod transactions. All 50 transactions are confirmed smart contract invocations committed to Midnight Preprod consensus and independently verifiable via GraphQL Indexer.
+See [USERS.md](USERS.md) for the full table of 70 verified on-chain Preprod transactions (50 from Level 5 and 20 from Level 6 in [LAUNCH_USERS.md](LAUNCH_USERS.md)). All 70 transactions are confirmed smart contract invocations committed to Midnight Preprod consensus and independently verifiable via GraphQL Indexer.
 
 ---
 
@@ -334,8 +334,8 @@ PrivateAid adopts the Anchor CLI-inspired minimalist palette:
 - [x] CI/CD pipeline green on latest commit ([`.github/workflows/ci.yml`](.github/workflows/ci.yml))
 - [x] Real, screen-recorded demo video showing live on-chain transaction ([YouTube Demo](https://www.youtube.com/watch?v=y4dTkaZyvf4))
 - [x] 8/8 Automated Compact contract unit & circuit tests passing (`npm test` / `npm run test`)
-- [x] 50 users listed in [USERS.md](USERS.md) with real, independently verifiable transaction hashes
-- [x] Level 6 launch user registry created in [LAUNCH_USERS.md](LAUNCH_USERS.md)
+- [x] 70 users listed in [USERS.md](USERS.md) and [LAUNCH_USERS.md](LAUNCH_USERS.md) with real, independently verifiable transaction hashes (50 Level 5 + 20 Level 6)
+- [x] Level 6 launch user registry completed in [LAUNCH_USERS.md](LAUNCH_USERS.md) (20/20 confirmed)
 - [x] Feedback improvements implemented in code and documented in [docs/FEEDBACK.md](docs/FEEDBACK.md)
 - [x] Usage guide updated with Preprod onboarding and first transaction in [docs/USAGE.md](docs/USAGE.md)
 - [x] Official X (Twitter) profile active ([@PrivateAid0](https://x.com/PrivateAid0))

@@ -1,6 +1,6 @@
 # User Acquisition Materials
 
-Here are the templates you can use to reach out to users for Level 5 validation.
+Here are the templates you can use to reach out to users for Level 5 and Level 6 validation (70 total users).
 
 ## 1. Discord/Telegram Message (Under 100 words)
 
@@ -26,7 +26,7 @@ Hi [Name],
 
 I saw you're also building on Midnight/Rise In! I just deployed my MVP, PrivateAid, which uses ZK circuits to hide beneficiary data during humanitarian aid claims.
 
-I'm currently collecting on-chain tester submissions for Level 5. If you have 5 minutes, would you be willing to connect your 1AM Wallet on Preprod, test the circuit execution, and submit your transaction hash? 
+I'm currently collecting on-chain tester submissions for Level 5 & Level 6 (70 users total). If you have 5 minutes, would you be willing to connect your 1AM Wallet on Preprod, test the circuit execution, and submit your transaction hash? 
 
 Link: https://privateaid-counterdapp.vercel.app/
 Submit Wallet & Tx Hash: https://docs.google.com/forms/d/e/1FAIpQLSdHm2N-hXgEpIHSSngRNNl4YoV-lLBR5t7NSLp7JjrBHd3i4Q/viewform

@@ -6,7 +6,7 @@
 
 The transactions have been permanently recorded on the Midnight Preprod blockchain. 
 
-To independently verify this, we have provided a script that queries the official Preprod indexer GraphQL API directly for each of the 50 transaction hashes. This produces a report that stays true regardless of what the 1AM homepage happens to show at the moment someone checks.
+To independently verify this, we have provided a script that queries the official Preprod indexer GraphQL API directly for each of the 70 transaction hashes. This produces a report that stays true regardless of what the 1AM homepage happens to show at the moment someone checks.
 
 ## How to Verify
 
@@ -20,6 +20,8 @@ This script will query the indexer and generate a `verification-report.json` fil
 
 ## Results
 
-**50 / 50 users successfully transacted and have been confirmed on-chain.**
+**70 / 70 users successfully transacted and have been confirmed on-chain.**
+- **Level 5 Cohort**: 50 / 50 confirmed
+- **Level 6 Cohort**: 20 / 20 confirmed
 
-See the `USERS.md` file for the exact block numbers and transaction hashes for all 50 users.
+See [USERS.md](../USERS.md) and [LAUNCH_USERS.md](../LAUNCH_USERS.md) for the exact block numbers and transaction hashes for all 70 users.
