@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
 import { WitnessEyeIcon, QuantumLockIcon, CircuitCoreIcon, LedgerBlockIcon, EnergySparkIcon } from './CustomIcons';
 import { EyeOff, Eye, CheckCircle2 } from 'lucide-react';
-import { useMidnight } from '../hooks/useMidnight';
 
-export const ProofVisualizer: React.FC = () => {
-  const { contractState } = useMidnight();
+interface ProofVisualizerProps {
+  round?: number;
+  totalValue?: number;
+}
+
+export const ProofVisualizer: React.FC<ProofVisualizerProps> = ({
+  round = 12,
+  totalValue = 42,
+}) => {
   const [demoSecret, setDemoSecret] = useState<number>(5);
   const [showSecretInSimulator, setShowSecretInSimulator] = useState<boolean>(false);
   const [activeStep, setActiveStep] = useState<number>(2);
 
-  const initialTotal = contractState.totalValue || 42;
-  const initialRound = contractState.round || 12;
+  const initialTotal = totalValue || 42;
+  const initialRound = round || 12;
   const nextTotal = initialTotal + demoSecret;
   const nextRound = initialRound + 1;
 

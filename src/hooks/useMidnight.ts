@@ -63,13 +63,16 @@ function fromHex(hex: string): Uint8Array {
 }
 
 // Helper: fetch on-chain contract state hex from Midnight GraphQL indexer
-async function fetchContractStateHex(indexerUrl: string, contractAddress: string): Promise<string | null> {
+async function fetchContractStateHex(indexerUrl: string, contractAddress: string, networkId: string = 'preprod'): Promise<string | null> {
   const query = `query GetContractState($address: HexEncoded!) {
     contractAction(address: $address) { address state }
   }`;
   const res = await fetch(indexerUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-midnight-network': networkId,
+    },
     body: JSON.stringify({ query, variables: { address: contractAddress.replace(/^0x/, '') } }),
   });
   if (!res.ok) throw new Error(`Indexer HTTP ${res.status}`);
@@ -148,6 +151,7 @@ export interface ContractLiveState {
   deployerWallet: string;
   blockHeight: number | null;
   blockHash: string | null;
+  indexerUnavailable?: boolean;
 }
 
 export interface ContributionRecord {
@@ -241,6 +245,9 @@ export function useMidnight() {
   const [connectedApi, setConnectedApi] = useState<ConnectedAPI | null>(null);
   const connectedApiRef = useRef<ConnectedAPI | null>(null);
   const serviceConfigRef = useRef<WalletServiceConfig | null>(null);
+  const isExecutingRef = useRef<boolean>(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const backoffDelayRef = useRef<number>(15000);
 
   const [contractState, setContractState] = useState<ContractLiveState>({
     round: 0,
@@ -251,6 +258,7 @@ export function useMidnight() {
     deployerWallet: NETWORK_DETAILS.preprod.deployerWallet,
     blockHeight: null,
     blockHash: null,
+    indexerUnavailable: false,
   });
 
   const [contributionHistory, setContributionHistory] = useState<ContributionRecord[]>([]);
@@ -270,7 +278,7 @@ export function useMidnight() {
     try {
       setSdkNetworkId(activeNetwork);
     } catch (err) {
-      console.warn('setNetworkId error:', err);
+      console.debug('setNetworkId error:', err);
     }
     setWalletState((prev) => ({ ...prev, networkId: activeNetwork }));
     setContractState((prev) => ({
@@ -281,15 +289,19 @@ export function useMidnight() {
   }, [activeNetwork]);
 
   // Fetch real-time block telemetry from Midnight GraphQL Indexer
-  const fetchLiveTelemetry = useCallback(async (net: NetworkType) => {
+  const fetchLiveTelemetry = useCallback(async (net: NetworkType, signal?: AbortSignal) => {
     const netConfig = NETWORK_DETAILS[net];
     try {
       const response = await fetch(netConfig.indexerUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-midnight-network': net,
+        },
         body: JSON.stringify({
           query: '{ block { height hash timestamp } }',
         }),
+        signal,
       });
 
       if (response.ok) {
@@ -303,21 +315,72 @@ export function useMidnight() {
             blockHeight: height,
             blockHash: hash,
             lastUpdated: new Date().toLocaleTimeString(),
+            indexerUnavailable: false,
           }));
+          backoffDelayRef.current = 15000; // Reset to 15s on success
+          return true;
+        } else if (json?.errors?.length) {
+          setContractState((prev) => ({ ...prev, indexerUnavailable: true }));
+          backoffDelayRef.current = Math.min(backoffDelayRef.current * 2, 60000);
+          console.debug('Indexer telemetry returned error, skipping cycle:', json.errors[0]?.message);
+          return false;
         }
+      } else {
+        setContractState((prev) => ({ ...prev, indexerUnavailable: true }));
+        backoffDelayRef.current = Math.min(backoffDelayRef.current * 2, 60000);
+        console.debug('Indexer telemetry HTTP status:', response.status);
+        return false;
       }
-    } catch (err) {
-      console.debug('Failed to poll indexer telemetry:', err);
+    } catch (err: any) {
+      if (err?.name === 'AbortError') return false;
+      setContractState((prev) => ({ ...prev, indexerUnavailable: true }));
+      backoffDelayRef.current = Math.min(backoffDelayRef.current * 2, 60000);
+      console.debug('Failed to poll indexer telemetry:', err?.message || err);
+      return false;
     }
   }, []);
 
-  // Poll live telemetry periodically
+  // Poll live telemetry periodically with dynamic backoff (15s, 30s, 60s), visibility pause, and AbortController
   useEffect(() => {
-    fetchLiveTelemetry(activeNetwork);
-    const interval = setInterval(() => {
-      fetchLiveTelemetry(activeNetwork);
-    }, 12000);
-    return () => clearInterval(interval);
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let isCancelled = false;
+
+    const scheduleNextPoll = () => {
+      if (isCancelled) return;
+      timeoutId = setTimeout(async () => {
+        if (isCancelled) return;
+        if (!document.hidden) {
+          abortControllerRef.current?.abort();
+          const controller = new AbortController();
+          abortControllerRef.current = controller;
+          await fetchLiveTelemetry(activeNetwork, controller.signal);
+        }
+        scheduleNextPoll();
+      }, backoffDelayRef.current);
+    };
+
+    if (!document.hidden) {
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+      fetchLiveTelemetry(activeNetwork, controller.signal);
+    }
+    scheduleNextPoll();
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden && !isCancelled) {
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
+        fetchLiveTelemetry(activeNetwork, controller.signal);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      isCancelled = true;
+      if (timeoutId) clearTimeout(timeoutId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      abortControllerRef.current?.abort();
+    };
   }, [activeNetwork, fetchLiveTelemetry]);
 
   // Scan available wallets adhering to CAIP-372 / Midnight DApp Connector
@@ -405,7 +468,7 @@ export function useMidnight() {
           serviceConfig = await (api as any).getConfiguration();
         }
       } catch (cfgErr) {
-        console.warn('Could not fetch wallet service config:', cfgErr);
+        console.debug('Could not fetch wallet service config:', cfgErr);
       }
       serviceConfigRef.current = serviceConfig;
 
@@ -423,7 +486,7 @@ export function useMidnight() {
           ]);
         }
       } catch (err) {
-        console.warn('hintUsage failed (non-fatal):', err);
+        console.debug('hintUsage failed (non-fatal):', err);
       }
 
       // 3. Query unshielded address
@@ -432,7 +495,7 @@ export function useMidnight() {
         const resp = await api.getUnshieldedAddress();
         unshielded = resp.unshieldedAddress;
       } catch (addrErr) {
-        console.warn('getUnshieldedAddress failed:', addrErr);
+        console.debug('getUnshieldedAddress failed:', addrErr);
         unshielded = '';
       }
 
@@ -457,7 +520,7 @@ export function useMidnight() {
           dustCapStr = `${cap.toLocaleString()} DUST`;
         }
       } catch (dustErr) {
-        console.warn('getDustBalance failed:', dustErr);
+        console.debug('getDustBalance failed:', dustErr);
         dustBalStr = '0.00 DUST';
         dustCapStr = '0.00 DUST';
       }
@@ -472,7 +535,7 @@ export function useMidnight() {
           nightBalStr = `${num.toLocaleString()} NIGHT`;
         }
       } catch (nightErr) {
-        console.warn('getUnshieldedBalances failed:', nightErr);
+        console.debug('getUnshieldedBalances failed:', nightErr);
         nightBalStr = '0.00 NIGHT';
       }
 
@@ -494,9 +557,14 @@ export function useMidnight() {
         error: null,
       }));
     } catch (err: any) {
-      console.error('Wallet connection error:', err);
-      let errorMsg = err?.message || 'Failed to connect wallet.';
-      if (errorMsg.includes('User rejected') || errorMsg.includes('declined')) {
+      const message = err?.message || String(err);
+      const isCancelled =
+        message.includes('User rejected') || /rejected|cancelled|declined|denied/i.test(message);
+      if (!isCancelled) {
+        console.error('Unexpected wallet connection error:', err);
+      }
+      let errorMsg = message || 'Failed to connect wallet.';
+      if (isCancelled) {
         errorMsg = 'Connection request was cancelled by the user in 1AM Wallet.';
       } else if (errorMsg.includes('network')) {
         errorMsg = `Network mismatch. Please ensure 1AM Wallet is configured for ${NETWORK_DETAILS[activeNetwork].name}.`;
@@ -558,6 +626,12 @@ export function useMidnight() {
         return;
       }
 
+      if (isExecutingRef.current) {
+        console.debug('Circuit execution already in progress, ignoring duplicate call.');
+        return;
+      }
+      isExecutingRef.current = true;
+
       setCircuitState({
         isProving: true, isSubmitting: false, txHash: null,
         error: null, success: false, disclosedRound: null, disclosedTotal: null,
@@ -579,7 +653,7 @@ export function useMidnight() {
         } catch {}
 
         // 2. Fetch live on-chain contract state from Midnight GraphQL indexer
-        const stateHex = await fetchContractStateHex(indexerUrl, contractAddr);
+        const stateHex = await fetchContractStateHex(indexerUrl, contractAddr, activeNetwork);
         if (!stateHex) throw new Error(
           `Contract ${contractAddr.slice(0, 10)}... not found on ${activeNetwork}.`
         );
@@ -609,8 +683,7 @@ export function useMidnight() {
         );
         const circuitResults = contract.circuits.incrementWithSecret(circuitContext as any);
         const proofData = circuitResults.proofData;
-        // 5. Serialize proof data using compact-runtime (same WASM module â€” no type mismatch)
-// 5. Construct Unproven Transaction and Prove via Wallet ProvingProvider
+        // 5. Construct Unproven Transaction and Prove via Wallet ProvingProvider
         const rand = communicationCommitmentRandomness();
         const ledgerState = LedgerContractState.deserialize(contractStateObj.serialize());
         const op = ledgerState.operation('incrementWithSecret') ?? new ContractOperation();
@@ -638,9 +711,15 @@ export function useMidnight() {
         const provenTx = await unprovenTx.prove(provingProvider, CostModel.initialCostModel());
         const unsealedTxHex = toHex(provenTx.serialize());
 
-        // 7. POPUP 2 â€” balanceUnsealedTransaction (dust/gas approval)
+        // Stream multiplexer settle delay: allow 1AM Wallet injected script to finalize proving stream
+        await new Promise((r) => setTimeout(r, 800));
+
+        // Proving complete — entering wallet balance & submission phase
+        setCircuitState((prev) => ({ ...prev, isProving: false, isSubmitting: true }));
+
+        // 7. POPUP 2 — balanceUnsealedTransaction (dust/gas approval)
         let balancedTxHex: string | undefined;
-        for (let attempt = 1; attempt <= 3; attempt++) {
+        for (let attempt = 1; attempt <= 4; attempt++) {
           try {
             const bal = await api.balanceUnsealedTransaction(unsealedTxHex as any);
             balancedTxHex = typeof bal === 'string' ? bal : (bal as any)?.tx;
@@ -649,14 +728,22 @@ export function useMidnight() {
             break;
           } catch (e: any) {
             const m = (e?.message ?? '').toLowerCase();
-            if (!m.includes('duplicate') && (m.includes('pending') || m.includes('wait')) && attempt < 3)
-              await new Promise((r) => setTimeout(r, 8000));
-            else throw e;
+            const isPendingOrDuplicate =
+              m.includes('duplicate') || m.includes('pending') || m.includes('wait') || m.includes('busy');
+            if (isPendingOrDuplicate && attempt < 4) {
+              console.debug(`balanceUnsealedTransaction attempt ${attempt} delayed (${m}). Retrying in ${2 * attempt}s...`);
+              await new Promise((r) => setTimeout(r, 2000 * attempt));
+            } else {
+              throw e;
+            }
           }
         }
         if (!balancedTxHex) throw new Error('balanceUnsealedTransaction returned no result.');
 
-        // 8. POPUP 3 â€” submitTransaction (broadcast)
+        // Settle delay before transaction submission
+        await new Promise((r) => setTimeout(r, 500));
+
+        // 8. POPUP 3 — submitTransaction (broadcast)
         const submitResult = await api.submitTransaction(balancedTxHex as any);
         const txId = await extractTxHash(balancedTxHex, submitResult);
 
@@ -677,12 +764,37 @@ export function useMidnight() {
           txHash: txId, time: 'Just now', type: 'Relief Aid Claim', status: 'Confirmed on-chain',
         }, ...prev]);
       } catch (err: any) {
-        console.error('Circuit execution error:', err);
+        const message = err?.message ?? String(err);
+        const isUserRejected =
+          message.includes('User rejected') || /rejected by user|user denied|cancelled/i.test(message);
+        const isDuplicateRequest =
+          message.includes('Duplicate request') || /already pending/i.test(message);
+
+        if (!isUserRejected && !isDuplicateRequest) {
+          console.error('Unexpected circuit execution error:', err);
+        }
+
+        let friendlyError = message;
+        if (isUserRejected) {
+          friendlyError = 'You cancelled the wallet request. No changes were made.';
+        } else if (isDuplicateRequest) {
+          friendlyError =
+            'A request is already pending in your wallet — check for an open popup, or wait a moment and try again.';
+        } else {
+          friendlyError = `Transaction failed: ${message}`;
+        }
+
         setCircuitState({
-          isProving: false, isSubmitting: false, txHash: null,
-          error: err?.message || 'Transaction failed.',
-          success: false, disclosedRound: null, disclosedTotal: null,
+          isProving: false,
+          isSubmitting: false,
+          txHash: null,
+          error: friendlyError,
+          success: false,
+          disclosedRound: null,
+          disclosedTotal: null,
         });
+      } finally {
+        isExecutingRef.current = false;
       }
     },
     [activeNetwork, contractState]

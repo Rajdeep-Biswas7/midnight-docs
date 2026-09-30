@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { HeartHandshake, ShieldCheck, CheckCircle2, XCircle, Users, DollarSign, ExternalLink, Sparkles, Lock } from 'lucide-react';
-import { DEFAULT_PREPROD_CONTRACT, useMidnight } from '../hooks/useMidnight';
+import { DEFAULT_PREPROD_CONTRACT, type ContributionRecord } from '../hooks/useMidnight';
 
 interface AidVerificationFeedProps {
   contractAddress?: string;
   networkId?: string;
+  history?: ContributionRecord[];
 }
 
 export const AidVerificationFeed: React.FC<AidVerificationFeedProps> = ({
   contractAddress = DEFAULT_PREPROD_CONTRACT,
   networkId = 'preprod',
+  history = [],
 }) => {
-  const { contributionHistory } = useMidnight();
+  const contributionHistory = history;
   const [testIncome, setTestIncome] = useState<number>(32000);
   const threshold = 50000;
   const isEligible = testIncome < threshold && testIncome > 0;

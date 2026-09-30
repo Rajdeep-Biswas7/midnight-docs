@@ -404,12 +404,17 @@ export const App: React.FC = () => {
               <div className="font-mono text-2xl font-bold text-foreground tabular-nums">
                 {contractState.blockHeight ? `#${contractState.blockHeight.toLocaleString()}` : '#2,735,000'}
               </div>
-              <div className="text-[11px] text-muted-foreground pt-1.5 border-t border-border flex items-center justify-between">
+              <div className="text-[11px] text-muted-foreground pt-1.5 border-t border-border flex items-center justify-between gap-2">
                 <span className="uppercase">{activeNetwork}</span>
+                {contractState.indexerUnavailable && (
+                  <span className="text-[10px] text-amber-500 font-mono truncate" title="Telemetry retrying in background">
+                    Indexer temporarily unavailable, retrying
+                  </span>
+                )}
                 <button
                   type="button"
                   onClick={refreshContractState}
-                  className="hover:text-accent transition-colors"
+                  className="hover:text-accent transition-colors shrink-0"
                   title="Sync Indexer"
                 >
                   <RefreshCw className="w-3 h-3" />
@@ -454,7 +459,7 @@ export const App: React.FC = () => {
               />
 
               {/* Step-by-Step ZK Execution Visualizer */}
-              <ProofVisualizer />
+              <ProofVisualizer round={contractState.round} totalValue={contractState.totalValue} />
             </div>
           )}
 
@@ -464,6 +469,7 @@ export const App: React.FC = () => {
               <AidVerificationFeed
                 contractAddress={contractState.contractAddress}
                 networkId={networkId}
+                history={contributionHistory}
               />
             </div>
           )}
